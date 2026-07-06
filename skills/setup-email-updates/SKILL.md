@@ -79,3 +79,21 @@ git add .bridge/email-config.json
 git commit -m "chore: update bridge email config recipients"
 git push
 ```
+
+## Step 5 — Batch: Scan Parent Folder
+
+```bash
+for dir in */; do
+  dir="${dir%/}"
+  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
+    echo "$dir"
+  fi
+done
+```
+
+For each repo name printed, `cd` into it and run Steps 2-4 for that repo only, one repo at a time — ask the user about recipients for repo #1, finish it (including commit+push), then move to repo #2. Do not front-load every question before touching any repo.
+
+## Notes
+
+- This skill never sets `lastSentSha` to anything other than the current `HEAD` at creation time — it never touches `lastSentSha` on an edit.
+- This skill is interactive by design. Do not schedule it under `/loop`; that's `send-update-email`'s job.
