@@ -1,0 +1,16 @@
+{
+  "name": "bridge",
+  "version": "1.0.0",
+  "description": "Bridge gstack reviewed plans into Superpowers writing-plans format. Reads a gstack-approved plan, transforms it into a Superpowers-compatible implementation spec, then invokes superpowers:writing-plans.",
+  "author": {
+    "name": "ds-anxing"
+  },
+  "license": "MIT",
+  "keywords": [
+    "gstack",
+    "superpowers",
+    "planning",
+    "bridge",
+    "workflow"
+  ]
+}
