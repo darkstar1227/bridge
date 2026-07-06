@@ -55,7 +55,7 @@ This keeps one copy of the send/grouping/template logic — no risk of two skill
    - On failure: log the error, skip this repo (no email, no state change). In batch mode, continue to the next repo.
 2. Read `.bridge/email-config.json` for `recipients` and `lastSentSha`.
    - If missing, in single-repo mode: stop and tell the user to run `/bridge:setup-email-updates` first — `send-update-email` does not create config itself (that's the setup skill's job).
-   - If missing, in batch mode: skip this subdirectory silently (no prompt — batch mode is meant to run unattended).
+   - If missing, in batch mode: skip this subdirectory silently — no prompt, and `send-update-email` never invokes `/bridge:setup-email-updates` on the repo's behalf. Batch/`/loop` runs are unattended; a repo only starts receiving emails once someone has explicitly run the setup skill on it.
 3. Run `git log <lastSentSha>..HEAD` to get the accumulated commits.
    - If no new commits: skip — no email sent, `lastSentSha` unchanged.
 4. For each commit in range, read the commit message and diff, paying particular attention to `version` changes in `package.json`.
@@ -147,6 +147,8 @@ A separate skill (`skills/setup-email-updates/SKILL.md`) responsible only for cr
 
 **Mode detection** mirrors `send-update-email`: cwd is a git repo → single-repo mode; cwd is a parent folder → batch mode, scanning immediate subdirectories that are git repos.
 
+`setup-email-updates` is inherently interactive (it asks for recipients) and is meant to be run by a human on demand — unlike `send-update-email`, it is not designed to be scheduled under `/loop`.
+
 **Single-repo mode:**
 1. If `.bridge/email-config.json` already exists: show the current `recipients` list and ask whether to add/remove/replace any. `lastSentSha` is left untouched by any edit here — only `recipients` can change, so re-running setup can never cause a duplicate send or a gap.
 2. If it does not exist: ask the user for the recipient email list, then create the file with `lastSentSha` set to current HEAD (so tracking starts from "now" — this run does not retroactively email the full historical log).
@@ -160,7 +162,7 @@ For each immediate subdirectory that is a git repo: if it already has `.bridge/e
 | Situation | Handling |
 |---|---|
 | `git pull` fails (conflict/network) | Log error, skip repo — no email, no state change. Batch mode continues to next repo. |
-| `.bridge/email-config.json` missing | Single mode: stop, tell the user to run `/bridge:setup-email-updates` first. Batch mode: skip subdirectory silently. |
+| `.bridge/email-config.json` missing | Single mode: stop, tell the user to run `/bridge:setup-email-updates` first. Batch mode: skip subdirectory silently — never auto-invoke setup. |
 | No new commits since `lastSentSha` | Skip — no email, state unchanged. |
 | `RESEND_API_KEY` / `BRIDGE_EMAIL_FROM` unset | Single mode: stop, state exactly what's missing. Batch mode: log error, skip sending — never silent. |
 | Resend API returns an error (4xx/5xx) | Do not update state, do not commit. Report the error (with repo name) to the user / batch summary. |
