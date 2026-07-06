@@ -243,7 +243,7 @@ mkdir plain-folder
 echo "not a repo" > plain-folder/readme.txt
 ```
 
-Expected: `repo-a` and `repo-b` are git repos with one commit each; `plain-folder` is a plain directory (not a git repo); the `-remote.git` bare repos are not directly relevant to the scan (they end in `.git` as a directory name, not a normal repo name, but the scan command in Step 2 will still see them as subdirectories — verify below that the scan correctly identifies only the *non-bare* checkouts as work trees).
+Expected: `repo-a` and `repo-b` are git repos with one commit each; `plain-folder` is a plain directory (not a git repo); the `-remote.git` bare repos exist as subdirectories too and must be excluded by the scan (see Step 2 — a naive exit-code check is not enough, since a bare repo still exits `0`).
 
 - [ ] **Step 2: Validate the parent-folder scan command**
 
@@ -251,13 +251,22 @@ Expected: `repo-a` and `repo-b` are git repos with one commit each; `plain-folde
 cd /tmp/bridge-batch-test
 for dir in */; do
   dir="${dir%/}"
-  if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
     echo "$dir"
   fi
 done
 ```
 
-Expected output: exactly `repo-a` and `repo-b`, each on its own line — `plain-folder` and the two `*-remote.git` bare repos must NOT appear (a bare repo answers `rev-parse --is-inside-work-tree` with `false`, not `true`, so it's correctly excluded).
+Expected output: exactly `repo-a` and `repo-b`, each on its own line — `plain-folder` and the two `*-remote.git` bare repos must NOT appear.
+
+**Why not just check the exit code:** `git -C <bare-repo> rev-parse --is-inside-work-tree` prints `false` but still **exits `0`** — a bare repo is a valid git repository, just not a work tree. A check that only tests `$? -eq 0` (e.g. `if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then`) incorrectly treats bare repos as work trees. Verify this yourself before moving on:
+
+```bash
+cd /tmp/bridge-batch-test
+git -C repo-a-remote.git rev-parse --is-inside-work-tree; echo "exit:$?"
+```
+
+Expected: prints `false` then `exit:0` — confirming the exit code alone can't distinguish a bare repo from a work tree; the printed value must be checked.
 
 - [ ] **Step 3: Append batch mode and notes to `skills/setup-email-updates/SKILL.md`**
 
@@ -270,7 +279,7 @@ Append this after the existing "Step 4 — Single-repo: Edit Existing Config" se
 ```bash
 for dir in */; do
   dir="${dir%/}"
-  if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
     echo "$dir"
   fi
 done
@@ -934,7 +943,7 @@ Expected: three subdirectories — `repo-configured`, `repo-no-config`, `repo-up
 cd /tmp/bridge-batch-send-test
 for dir in */; do
   dir="${dir%/}"
-  if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
     if [ -f "$dir/.bridge/email-config.json" ]; then
       LAST_SHA=$(jq -r '.lastSentSha' "$dir/.bridge/email-config.json")
       COUNT=$(git -C "$dir" log "$LAST_SHA"..HEAD --oneline | wc -l | tr -d ' ')
@@ -968,7 +977,7 @@ Append this after the existing "Step 8 — Update State on Success" section:
 ```bash
 for dir in */; do
   dir="${dir%/}"
-  if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
     echo "$dir"
   fi
 done
