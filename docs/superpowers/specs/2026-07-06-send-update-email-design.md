@@ -88,12 +88,14 @@ Location: `.bridge/email-config.json` inside each target repo, committed to git.
 - `lastSentSha`: HEAD commit at the time of the last successful send; the anchor for the next `git log` range.
 - `lastSentAt`: informational only, for human debugging — not used in any logic branch.
 
-### Secrets (environment variables — never written to any config file)
+### Sending Mechanism and Secrets
 
-- `RESEND_API_KEY` — Resend API key.
-- `BRIDGE_EMAIL_FROM` — sender address, in `"Display Name <email@domain>"` format (domain must be verified in Resend). This is global (one value for all repos). The skill constructs the per-repo `From` header by inserting the repo name between the display name and the email — e.g. `BRIDGE_EMAIL_FROM="Bridge Bot <noreply@example.com>"` + repo `FlightPath` → `From: Bridge Bot (FlightPath) <noreply@example.com>`. No per-repo sender config needed.
+> **Revised post-implementation:** originally this section specified a `RESEND_API_KEY` environment variable + raw `curl` against `https://api.resend.com/emails`. That was built, tested, and shipped, then replaced with the mechanism below at the user's request. `skills/send-update-email/SKILL.md` is the source of truth; this section is updated to match it.
 
-If either is missing: single-repo mode stops and tells the user exactly what to set; batch mode logs the error for that run and skips sending (never silently drops it).
+- **Resend MCP connection** — the skill sends mail by calling the connected Resend MCP tool (located via `ToolSearch query: "resend send email"` at send-time), not by holding an API key itself. One-time setup per machine (including any machine running `/loop`): `claude mcp add --transport http resend https://mcp.resend.com`, then complete whatever authentication step that prompts for. The connection persists across sessions once established.
+- `BRIDGE_EMAIL_FROM` — still a plain environment variable (never written to any config file), sender address in `"Display Name <email@domain>"` format (domain must be verified in Resend). This is global (one value for all repos). The skill constructs the per-repo `From` value by inserting the repo name between the display name and the email — e.g. `BRIDGE_EMAIL_FROM="Bridge Bot <noreply@example.com>"` + repo `FlightPath` → `Bridge Bot (FlightPath) <noreply@example.com>`. No per-repo sender config needed.
+
+If the MCP tool isn't found, or `BRIDGE_EMAIL_FROM` is missing: single-repo mode stops and tells the user exactly what to set up; batch mode logs the error for that run and skips sending (never silently drops it).
 
 ## Commit / Version Grouping Logic
 
@@ -165,7 +167,7 @@ For each immediate subdirectory that is a git repo: if it already has `.bridge/e
 | `.bridge/email-config.json` missing | Single mode: stop, tell the user to run `/bridge:setup-email-updates` first. Batch mode: skip subdirectory silently — never auto-invoke setup. |
 | No new commits since `lastSentSha` | Skip — no email, state unchanged. |
 | `RESEND_API_KEY` / `BRIDGE_EMAIL_FROM` unset | Single mode: stop, state exactly what's missing. Batch mode: log error, skip sending — never silent. |
-| Resend API returns an error (4xx/5xx) | Do not update state, do not commit. Report the error (with repo name) to the user / batch summary. |
+| Resend MCP tool call returns an error | Do not update state, do not commit. Report the error (with repo name) to the user / batch summary. |
 | `package.json` absent (non-npm repo) | Fall back to commit-time-range block titles; keep root-cause bullet merging. |
 | State commit/push fails after a successful send | Explicitly warn the user: email sent, but state not persisted — next run may re-send this range. |
 
@@ -173,7 +175,7 @@ For each immediate subdirectory that is a git repo: if it already has `.bridge/e
 
 1. Create a throwaway test repo, add `.bridge/email-config.json` with your own email as the sole recipient, make a few commits (including a `package.json` version bump), run `/bridge:send-update-email`. Confirm: the email arrives with correctly grouped content, and `lastSentSha` is updated and committed+pushed.
 2. Create a parent folder with 2-3 test repos, one deliberately missing `.bridge/email-config.json`. Run the same command from the parent folder. Confirm the scan/skip logic and the end-of-run summary are correct.
-3. Deliberately misconfigure `RESEND_API_KEY` to exercise the failure path; confirm state is not falsely updated.
+3. Deliberately disconnect/misname the Resend MCP tool (or run before completing `claude mcp add`) to exercise the failure path; confirm state is not falsely updated.
 4. Run `/bridge:setup-email-updates` on a repo with no config (confirm it's created with `lastSentSha` at current HEAD) and again on the same repo (confirm it shows existing recipients and only changes `recipients`, never `lastSentSha`). Repeat in batch mode against a parent folder with a mix of already-configured and unconfigured repos.
 
 ## Open Questions / Explicit Assumptions
