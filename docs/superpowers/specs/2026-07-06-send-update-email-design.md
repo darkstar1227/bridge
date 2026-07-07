@@ -80,22 +80,29 @@ Location: `.bridge/email-config.json` inside each target repo, committed to git.
     "bob@example.com"
   ],
   "lastSentSha": "a1b2c3d4e5f6...",
-  "lastSentAt": "2026-07-01T09:00:00Z"
+  "lastSentAt": "2026-07-01T09:00:00Z",
+  "mcpServerName": "resend-flightpath"
 }
 ```
 
 - `recipients`: flat array of email addresses; all are `to` recipients of one shared email (no per-recipient personalization, no BCC split).
 - `lastSentSha`: HEAD commit at the time of the last successful send; the anchor for the next `git log` range.
 - `lastSentAt`: informational only, for human debugging — not used in any logic branch.
+- `mcpServerName`: the name of this repo's dedicated Resend MCP connection (see "Sending Mechanism and Secrets" below), set once at creation and never edited afterward — changing a repo's sender requires re-registering the connection, not editing this field directly.
 
 ### Sending Mechanism and Secrets
 
-> **Revised post-implementation:** originally this section specified a `RESEND_API_KEY` environment variable + raw `curl` against `https://api.resend.com/emails`. That was built, tested, and shipped, then replaced with the mechanism below at the user's request. `skills/send-update-email/SKILL.md` is the source of truth; this section is updated to match it.
+> **Revised post-implementation (twice):** originally this section specified a `RESEND_API_KEY` environment variable + raw `curl` against `https://api.resend.com/emails`. That was built, tested, and shipped, then replaced at the user's request — first with a single shared Resend MCP connection (`BRIDGE_EMAIL_FROM` + generic `ToolSearch`), then again after inspecting `resend-mcp`'s actual tool schema on GitHub revealed that a shared connection can't express a per-repo sender display name (the tool's `from` parameter, when present, is typed as a bare email and its description explicitly instructs any calling agent to always ask a human for it — incompatible with unattended batch/`/loop` sends). The mechanism below — one dedicated MCP connection per repo — is what's actually shipped in `skills/setup-email-updates/SKILL.md` and `skills/send-update-email/SKILL.md`; those files are the source of truth.
 
-- **Resend MCP connection** — the skill sends mail by calling the connected Resend MCP tool (located via `ToolSearch query: "resend send email"` at send-time), not by holding an API key itself. One-time setup per machine (including any machine running `/loop`): `claude mcp add --transport http resend https://mcp.resend.com`, then complete whatever authentication step that prompts for. The connection persists across sessions once established.
-- `BRIDGE_EMAIL_FROM` — still a plain environment variable (never written to any config file), sender address in `"Display Name <email@domain>"` format (domain must be verified in Resend). This is global (one value for all repos). The skill constructs the per-repo `From` value by inserting the repo name between the display name and the email — e.g. `BRIDGE_EMAIL_FROM="Bridge Bot <noreply@example.com>"` + repo `FlightPath` → `Bridge Bot (FlightPath) <noreply@example.com>`. No per-repo sender config needed.
+- **One Resend MCP connection per repo**, named `resend-<repo-slug>` (slug derived from the repo's directory name). `/bridge:setup-email-updates` registers it once per repo, at first setup, via:
+  ```bash
+  claude mcp add resend-<repo-slug> -e RESEND_API_KEY=$RESEND_API_KEY -e SENDER_EMAIL_ADDRESS="<per-repo sender string>" -- npx -y resend-mcp
+  ```
+  Because `SENDER_EMAIL_ADDRESS` is passed straight through to the real Resend SDK call unvalidated, it can be a full `"Display Name <email@domain>"` string (e.g. `Bridge Bot (FlightPath) <noreply@example.com>`) even though the tool's own live `from` argument (used only when no `SENDER_EMAIL_ADDRESS` is configured) is restricted to a bare email address. Configuring the sender this way also removes `from` from the tool's input schema entirely, avoiding the tool's built-in "must ask a human" requirement — necessary for unattended batch/`/loop` sends.
+- `.bridge/email-config.json` gains a `mcpServerName` field (e.g. `"resend-flightpath"`) recording which connection belongs to this repo. `send-update-email` reads it and locates that specific tool via `ToolSearch query: "<mcpServerName> send email"` — it never passes a `from` argument itself, and never holds `RESEND_API_KEY` (that only needs to exist in the environment at `setup-email-updates` time, to register the connection).
+- Trade-off accepted: the per-repo MCP connection registration lives in the local Claude Code config, not in git — unlike `.bridge/email-config.json`, it does not travel with `git clone` and must be re-established (by re-running `/bridge:setup-email-updates`) on every machine that will run `send-update-email` for that repo, including any machine running `/loop`.
 
-If the MCP tool isn't found, or `BRIDGE_EMAIL_FROM` is missing: single-repo mode stops and tells the user exactly what to set up; batch mode logs the error for that run and skips sending (never silently drops it).
+If this repo's `resend-<repo-slug>` connection isn't found: single-repo mode stops and tells the user to re-run `/bridge:setup-email-updates`; batch mode logs the error for that run and skips sending (never silently drops it).
 
 ## Commit / Version Grouping Logic
 
@@ -153,7 +160,7 @@ A separate skill (`skills/setup-email-updates/SKILL.md`) responsible only for cr
 
 **Single-repo mode:**
 1. If `.bridge/email-config.json` already exists: show the current `recipients` list and ask whether to add/remove/replace any. `lastSentSha` is left untouched by any edit here — only `recipients` can change, so re-running setup can never cause a duplicate send or a gap.
-2. If it does not exist: ask the user for the recipient email list, then create the file with `lastSentSha` set to current HEAD (so tracking starts from "now" — this run does not retroactively email the full historical log).
+2. If it does not exist: ask the user for the recipient email list and the sender string to use for this repo, register a dedicated `resend-<repo-slug>` MCP connection with that sender (skipped if one already exists for this slug), then create the file with `lastSentSha` set to current HEAD (so tracking starts from "now" — this run does not retroactively email the full historical log) and `mcpServerName` set to the connection just registered.
 3. `git add`, `commit` (e.g. `chore: init bridge email config`), and `push` the new/updated file.
 
 **Batch mode (parent folder):**
@@ -166,7 +173,7 @@ For each immediate subdirectory that is a git repo: if it already has `.bridge/e
 | `git pull` fails (conflict/network) | Log error, skip repo — no email, no state change. Batch mode continues to next repo. |
 | `.bridge/email-config.json` missing | Single mode: stop, tell the user to run `/bridge:setup-email-updates` first. Batch mode: skip subdirectory silently — never auto-invoke setup. |
 | No new commits since `lastSentSha` | Skip — no email, state unchanged. |
-| `RESEND_API_KEY` / `BRIDGE_EMAIL_FROM` unset | Single mode: stop, state exactly what's missing. Batch mode: log error, skip sending — never silent. |
+| This repo's `resend-<repo-slug>` MCP connection not found | Single mode: stop, tell the user to re-run `/bridge:setup-email-updates`. Batch mode: log error, skip sending — never silent. |
 | Resend MCP tool call returns an error | Do not update state, do not commit. Report the error (with repo name) to the user / batch summary. |
 | `package.json` absent (non-npm repo) | Fall back to commit-time-range block titles; keep root-cause bullet merging. |
 | State commit/push fails after a successful send | Explicitly warn the user: email sent, but state not persisted — next run may re-send this range. |
@@ -175,8 +182,9 @@ For each immediate subdirectory that is a git repo: if it already has `.bridge/e
 
 1. Create a throwaway test repo, add `.bridge/email-config.json` with your own email as the sole recipient, make a few commits (including a `package.json` version bump), run `/bridge:send-update-email`. Confirm: the email arrives with correctly grouped content, and `lastSentSha` is updated and committed+pushed.
 2. Create a parent folder with 2-3 test repos, one deliberately missing `.bridge/email-config.json`. Run the same command from the parent folder. Confirm the scan/skip logic and the end-of-run summary are correct.
-3. Deliberately disconnect/misname the Resend MCP tool (or run before completing `claude mcp add`) to exercise the failure path; confirm state is not falsely updated.
-4. Run `/bridge:setup-email-updates` on a repo with no config (confirm it's created with `lastSentSha` at current HEAD) and again on the same repo (confirm it shows existing recipients and only changes `recipients`, never `lastSentSha`). Repeat in batch mode against a parent folder with a mix of already-configured and unconfigured repos.
+3. Deliberately remove or rename a repo's `resend-<repo-slug>` MCP connection (or don't register it yet) to exercise the failure path; confirm state is not falsely updated.
+4. Run `/bridge:setup-email-updates` on a repo with no config (confirm it's created with `lastSentSha` at current HEAD, `mcpServerName` set, and the `resend-<repo-slug>` connection registered with the chosen sender) and again on the same repo (confirm it shows existing recipients and only changes `recipients`, never `lastSentSha` or `mcpServerName`). Repeat in batch mode against a parent folder with a mix of already-configured and unconfigured repos.
+5. Confirm two different repos' emails arrive with two different sender display names, proving the per-repo MCP connection actually isolates sender identity as designed.
 
 ## Open Questions / Explicit Assumptions
 
@@ -184,3 +192,4 @@ For each immediate subdirectory that is a git repo: if it already has `.bridge/e
 - [ASSUMPTION] All current recipients share the Asia/Taipei timezone, so it's hardcoded rather than made configurable.
 - [ASSUMPTION] "Batch mode" repo discovery is a plain directory scan (immediate children only, not recursive) — nested repos-of-repos are out of scope.
 - [OPEN] Exact wording/emoji set for section labels (新增/已修正/已優化) can be refined during implementation to match the reference example's tone as closely as possible.
+- [ASSUMPTION] `/loop` batch runs happen on a single, persistent machine where `/bridge:setup-email-updates` has already registered every repo's `resend-<repo-slug>` MCP connection — those registrations live in local Claude Code config, not git, and won't exist on a fresh/ephemeral machine without re-running setup there first.
