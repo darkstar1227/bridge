@@ -158,3 +158,20 @@ curl -s -w '\n%{http_code}' -X POST 'https://api.resend.com/emails' \
 ```
 
 Check the trailing HTTP status code that `-w '\n%{http_code}'` appends. `200` means success — go to Step 8. Anything else (4xx/5xx) means failure: do not update state, do not commit (Step 8). Report the error body and status code to the user (single-repo mode) or record it for the batch summary (Step 9), including the repo name.
+
+## Step 8 — Update State on Success
+
+```bash
+HEAD_SHA=$(git rev-parse HEAD)
+NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+jq --arg sha "$HEAD_SHA" --arg now "$NOW" \
+  '.lastSentSha = $sha | .lastSentAt = $now' \
+  .bridge/email-config.json > .bridge/email-config.json.tmp
+mv .bridge/email-config.json.tmp .bridge/email-config.json
+
+git add .bridge/email-config.json
+git commit -m "chore: update bridge email state"
+git push
+```
+
+If this `commit`/`push` fails after the email already sent successfully: explicitly warn the user that the email went out but the state file wasn't persisted, and that the next run may re-send this same commit range. Do not silently swallow this — it's the one case where the email and the repo's tracked state can disagree.
