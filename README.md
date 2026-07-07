@@ -40,10 +40,31 @@ Reads the latest gstack-approved plan from your project, extracts structured inf
 - "convert gstack plan"
 - "handoff to superpowers"
 
+### `/bridge:setup-email-updates`
+
+Creates or edits the `.bridge/email-config.json` a repo needs before `/bridge:send-update-email` will work — who gets notified. Works on a single repo, or in bulk when run from a parent folder containing multiple repos (asks one repo at a time). Interactive by design — not meant to run under `/loop`.
+
+**Triggers:**
+- `/bridge:setup-email-updates`
+- "setup email updates"
+- "configure update email recipients"
+- "init bridge email config"
+
+### `/bridge:send-update-email`
+
+Sends a readable, bullet-point update email via [Resend](https://resend.com) summarizing everything a repo shipped since the last send — grouped by version and by root cause, not listed commit-by-commit. Works on a single repo (run manually near the end of a session) or in batch across a parent folder of repos (run on a schedule via `/loop`). Requires `RESEND_API_KEY` and `BRIDGE_EMAIL_FROM` environment variables, and a `.bridge/email-config.json` created via `/bridge:setup-email-updates`.
+
+**Triggers:**
+- `/bridge:send-update-email`
+- "send update email"
+- "email changelog"
+- "notify team of updates"
+
 ## Requirements
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`
 - [superpowers](https://github.com/obra/superpowers) — for `writing-plans`
+- [Resend](https://resend.com) account — for `/bridge:send-update-email`
 
 ## License
 
