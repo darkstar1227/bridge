@@ -97,3 +97,64 @@ If there is no `package.json` (Step 5 fallback): use the commit date range as th
 - `新增` (Added / new feature)
 - `已修正` (Fixed)
 - `已優化` (Optimized)
+
+## Step 7 — Render Email and Send via Resend
+
+Build the subject and body in this structure (Traditional Chinese, matching the reference template):
+
+```
+主旨: <repo 名稱> 已更新到 <最新版本號>
+
+大家好,
+
+<repo 名稱> 發布了 <最新版本號>（本封合併 <N> 版更新，含 <最早版本號> ~ <最新版本號>）。
+
+發布時間: <HEAD commit 的 committer 時間，轉換為 Asia/Taipei UTC+8> (Asia/Taipei, UTC+8)
+
+<版本區塊 1 標題>
+新增
+• xxx
+已修正
+• xxx
+
+<版本區塊 2 標題>
+已修正
+• xxx
+已優化
+• xxx
+
+—
+查看完整 commit 記錄: <git remote get-url origin 的輸出，轉成瀏覽器可開啟的 URL>
+— Bridge 自動通知
+```
+
+Get the HEAD commit time and repo remote URL for the template:
+
+```bash
+git log -1 --format=%cI HEAD
+git remote get-url origin
+```
+
+Wrap that structure in a light HTML shell (bold, larger text for version block headings; bold small labels for 新增/已修正/已優化; standard `<ul><li>` bullet lists; generous `line-height`; `font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; `max-width: 600px; margin: 0 auto;` wrapper). Produce a plain-text version with the same structure (no HTML tags) for the `text` field. Do not use a colored card/box background — this is a plain, document-style layout.
+
+Build the `from` header by inserting the repo name between the display name and the email address of `BRIDGE_EMAIL_FROM`. For example, if `BRIDGE_EMAIL_FROM="Bridge Bot <noreply@example.com>"` and the repo is named `FlightPath`, the `from` value is `"Bridge Bot (FlightPath) <noreply@example.com>"`.
+
+Send it using `jq` to build the JSON payload safely (avoids shell-escaping bugs with HTML/Chinese content) and `curl` to POST it:
+
+```bash
+jq -n \
+  --arg from "$FROM_HEADER" \
+  --argjson to "$RECIPIENTS" \
+  --arg subject "$SUBJECT" \
+  --arg html "$HTML_BODY" \
+  --arg text "$TEXT_BODY" \
+  '{from: $from, to: $to, subject: $subject, html: $html, text: $text}' \
+  > /tmp/bridge-resend-payload.json
+
+curl -s -w '\n%{http_code}' -X POST 'https://api.resend.com/emails' \
+  -H "Authorization: Bearer $RESEND_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d @/tmp/bridge-resend-payload.json
+```
+
+Check the trailing HTTP status code that `-w '\n%{http_code}'` appends. `200` means success — go to Step 8. Anything else (4xx/5xx) means failure: do not update state, do not commit (Step 8). Report the error body and status code to the user (single-repo mode) or record it for the batch summary (Step 9), including the repo name.
