@@ -11,6 +11,7 @@ allowed-tools:
   - Write
   - Glob
   - Grep
+  - ToolSearch
 ---
 
 # Bridge: Send Update Email
@@ -19,14 +20,24 @@ allowed-tools:
 
 ## Purpose
 
-Sends colleagues a readable, bullet-point update email summarizing everything that changed in a repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via the Resend API.
+Sends colleagues a readable, bullet-point update email summarizing everything that changed in a repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via the Resend MCP server (not a raw API key + `curl`).
 
-## Required Environment Variables
+## Requirements
 
-- `RESEND_API_KEY` — Resend API key.
-- `BRIDGE_EMAIL_FROM` — sender address in `"Display Name <email@domain>"` format; the domain must be verified in Resend.
+- **Resend MCP connection.** This skill sends mail by calling the connected Resend MCP tool, not by holding an API key itself. One-time setup (per machine that will run this skill, including any machine running `/loop`):
+  ```bash
+  claude mcp add --transport http resend https://mcp.resend.com
+  ```
+  Then complete whatever authentication step that command prompts for. This only needs to be done once per machine — the connection persists across sessions.
+- `BRIDGE_EMAIL_FROM` environment variable — sender address in `"Display Name <email@domain>"` format; the domain must be verified in Resend. Still required even though the API key itself is gone, because this skill builds a repo-specific sender name from it (see Step 7).
 
-If either is unset: in single-repo mode, stop and tell the user exactly which variable is missing and that it must be exported before this skill can send mail. In batch mode, log the error and skip sending for the current run (see Step 9) — never send silently without checking these first.
+At the start of Step 7 (not before — no need to check this until you're actually about to send), locate the Resend MCP tool:
+
+```
+ToolSearch query: "resend send email"
+```
+
+If nothing matches: in single-repo mode, stop and tell the user to run `claude mcp add --transport http resend https://mcp.resend.com` (and complete authentication) before this skill can send mail. In batch mode, log the error and skip sending for the current run (see Step 9) — never send silently without this check. If `BRIDGE_EMAIL_FROM` is unset, apply the same handling.
 
 ## Step 1 — Detect Mode
 
@@ -149,25 +160,22 @@ Wrap that structure in a light HTML shell (bold, larger text for version block h
 
 Build the `from` header by inserting the repo name between the display name and the email address of `BRIDGE_EMAIL_FROM`. For example, if `BRIDGE_EMAIL_FROM="Bridge Bot <noreply@example.com>"` and the repo is named `FlightPath`, the `from` value is `"Bridge Bot (FlightPath) <noreply@example.com>"`.
 
-Send it using `jq` to build the JSON payload safely (avoids shell-escaping bugs with HTML/Chinese content) and `curl` to POST it:
+Locate the Resend MCP tool (see "Requirements" above):
 
-```bash
-jq -n \
-  --arg from "$FROM_HEADER" \
-  --argjson to "$RECIPIENTS" \
-  --arg subject "$SUBJECT" \
-  --arg html "$HTML_BODY" \
-  --arg text "$TEXT_BODY" \
-  '{from: $from, to: $to, subject: $subject, html: $html, text: $text}' \
-  > /tmp/bridge-resend-payload.json
-
-curl -s -w '\n%{http_code}' -X POST 'https://api.resend.com/emails' \
-  -H "Authorization: Bearer $RESEND_API_KEY" \
-  -H 'Content-Type: application/json' \
-  -d @/tmp/bridge-resend-payload.json
+```
+ToolSearch query: "resend send email"
 ```
 
-Check the trailing HTTP status code that `-w '\n%{http_code}'` appends. `200` means success — go to Step 8. Anything else (4xx/5xx) means failure: do not update state, do not commit (Step 8). Report the error body and status code to the user (single-repo mode) or record it for the batch summary (Step 9), including the repo name.
+If nothing matches: stop and report the missing MCP connection (single-repo mode) or log it and skip sending for this repo (batch mode) — see the "Requirements" section above and Step 9.
+
+Call the resolved tool directly with:
+- `from`: the value built above
+- `to`: the `recipients` array from Step 3
+- `subject`: the subject line built above
+- `html`: the rendered HTML body
+- `text`: the rendered plain-text body
+
+Do not build a raw HTTP payload or call `curl` — the MCP tool call *is* the send. Check its result: a successful send returns the sent email's id with no error. Anything else (an `error` field, a thrown tool error, etc.) means failure: do not update state, do not commit (Step 8). Report the error to the user (single-repo mode) or record it for the batch summary (Step 9), including the repo name.
 
 ## Step 8 — Update State on Success
 
@@ -215,7 +223,7 @@ Failed: <repo> — <reason>, ...
 | `git pull` fails | Skip repo — no email, no state change. Batch mode continues to next repo. |
 | `.bridge/email-config.json` missing | Single mode: stop, tell user to run `/bridge:setup-email-updates`. Batch mode: skip silently, never auto-invoke setup. |
 | No new commits since `lastSentSha` (including ranges that are bookkeeping-only, see Step 4) | Skip — no email, state unchanged. |
-| `RESEND_API_KEY` / `BRIDGE_EMAIL_FROM` unset | Single mode: stop, name the missing variable. Batch mode: log error, skip sending. |
-| Resend API returns non-`200` | Do not update state, do not commit. Report error (with repo name). |
+| Resend MCP tool not found, or `BRIDGE_EMAIL_FROM` unset | Single mode: stop, name what's missing (MCP connection or env var). Batch mode: log error, skip sending. |
+| Resend MCP tool call returns an error | Do not update state, do not commit. Report error (with repo name). |
 | `package.json` absent | Use commit-date-range block titles; keep root-cause bullet merging. |
 | State commit/push fails after a successful send | Warn user explicitly: email sent, state not persisted. |
