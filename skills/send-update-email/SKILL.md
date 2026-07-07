@@ -185,3 +185,37 @@ git push
 ```
 
 If this `commit`/`push` fails after the email already sent successfully: explicitly warn the user that the email went out but the state file wasn't persisted, and that the next run may re-send this same commit range. Do not silently swallow this — it's the one case where the email and the repo's tracked state can disagree.
+
+## Step 9 — Batch Mode
+
+```bash
+for dir in */; do
+  dir="${dir%/}"
+  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
+    echo "$dir"
+  fi
+done
+```
+
+For each repo name printed, `cd` into it and run Steps 2-8 for that repo. Never invoke `/bridge:setup-email-updates` on a repo's behalf — a repo with no config is simply skipped (recorded as "skipped: no config"). A single repo's pull failure, send failure, or state-persist failure must not stop processing of the remaining repos — record the outcome and move to the next directory.
+
+After every subdirectory has been processed, print a summary:
+
+```
+Sent: <repo>, <repo>, ...
+Skipped (no config): <repo>, ...
+Skipped (no new commits): <repo>, ...
+Failed: <repo> — <reason>, ...
+```
+
+## Error Handling Reference
+
+| Situation | Handling |
+|---|---|
+| `git pull` fails | Skip repo — no email, no state change. Batch mode continues to next repo. |
+| `.bridge/email-config.json` missing | Single mode: stop, tell user to run `/bridge:setup-email-updates`. Batch mode: skip silently, never auto-invoke setup. |
+| No new commits since `lastSentSha` (including ranges that are bookkeeping-only, see Step 4) | Skip — no email, state unchanged. |
+| `RESEND_API_KEY` / `BRIDGE_EMAIL_FROM` unset | Single mode: stop, name the missing variable. Batch mode: log error, skip sending. |
+| Resend API returns non-`200` | Do not update state, do not commit. Report error (with repo name). |
+| `package.json` absent | Use commit-date-range block titles; keep root-cause bullet merging. |
+| State commit/push fails after a successful send | Warn user explicitly: email sent, state not persisted. |
