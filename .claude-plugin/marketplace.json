@@ -1,0 +1,13 @@
+{
+  "name": "bridge",
+  "owner": {
+    "name": "ds-anxing"
+  },
+  "plugins": [
+    {
+      "name": "bridge",
+      "source": "./",
+      "description": "Bridge gstack reviewed plans into Superpowers writing-plans format. Reads a gstack-approved plan, transforms it into a Superpowers-compatible implementation spec, then invokes superpowers:writing-plans."
+    }
+  ]
+}
