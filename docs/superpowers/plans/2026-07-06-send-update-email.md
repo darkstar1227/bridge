@@ -1,5 +1,7 @@
 # Send Update Email Implementation Plan
 
+> **⚠️ Superseded mechanism notice:** Tasks 1-8 below were executed as written and both skills shipped exactly as described here, using `RESEND_API_KEY` + raw `curl` against `https://api.resend.com/emails`. After implementation, the send mechanism in `skills/send-update-email/SKILL.md` was changed to call the Resend MCP server (`claude mcp add --transport http resend https://mcp.resend.com`) instead — no more API key, no more `curl`. That later change is **not** reflected in Task 5's or Task 9's text below (curl invocation, `RESEND_API_KEY` exports, etc.) — those sections are kept as an accurate historical record of how the feature was originally built and verified. **`skills/send-update-email/SKILL.md` is the current source of truth**; if you're resuming or re-planning this work, read that file, not the curl-based steps here.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add two skills to the `bridge` plugin — `/bridge:setup-email-updates` (configure recipients per repo) and `/bridge:send-update-email` (send a version-grouped, bullet-point changelog email via Resend for everything committed since the last send) — usable on a single repo or in batch across a parent folder of repos.
