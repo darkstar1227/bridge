@@ -68,13 +68,23 @@ git log "$LAST_SHA"..HEAD --oneline
 
 If this prints nothing: no new commits since the last send. Skip this repo — no email, `lastSentSha` unchanged. In batch mode, record this as a "skipped: no new commits" entry (see Step 9) and continue.
 
+**Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up). Those never count as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be bookkeeping-only and there is nothing left to report, treat it exactly like this step's "no new commits" case: skip, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
+
 ## Step 5 — Gather Commit Detail
 
 ```bash
 git log "$LAST_SHA"..HEAD --reverse --format='%H%n%s%n%b%n---COMMIT-END---'
 ```
 
-Read the message and body of every commit in the range, oldest first. Then check whether `package.json` exists and, if so, walk every commit individually to get the ordered sequence of version values (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones):
+Read the message and body of every commit in the range, oldest first, and check which files each one touched:
+
+```bash
+git show --stat <commit-sha>
+```
+
+Discard any commit whose changed files are *only* `.bridge/email-config.json` — that is this skill's own bookkeeping, never user-facing content, and must never be turned into a bullet (see Step 4's note above for what to do if this empties the whole range).
+
+Then check whether `package.json` exists and, if so, walk every commit individually to get the ordered sequence of version values (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones):
 
 ```bash
 for sha in $(git log "$LAST_SHA"..HEAD --reverse --format='%H'); do
