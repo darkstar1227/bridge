@@ -473,7 +473,11 @@ git log "$LAST_SHA"..HEAD --oneline
 ```
 
 If this prints nothing: no new commits since the last send. Skip this repo — no email, `lastSentSha` unchanged. In batch mode, record this as a "skipped: no new commits" entry (see Step 9) and continue.
+
+**Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up). Those never count as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be bookkeeping-only and there is nothing left to report, treat it exactly like this step's "no new commits" case: skip, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
 ```
+
+*(Note added after Task 7's fixture testing surfaced this — see that task's Step 3/4 below. Written here directly so this file matches what actually ships in Steps 4-5 rather than leaving the plan out of sync with its own deliverable.)*
 
 - [ ] **Step 7: Confirm the file was written correctly**
 
@@ -583,7 +587,15 @@ Append this after the existing "Step 4 — Check for New Commits" section:
 git log "$LAST_SHA"..HEAD --reverse --format='%H%n%s%n%b%n---COMMIT-END---'
 ```
 
-Read the message and body of every commit in the range, oldest first. Then check whether `package.json` exists and, if so, walk every commit individually to get the ordered sequence of version values (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones):
+Read the message and body of every commit in the range, oldest first, and check which files each one touched:
+
+```bash
+git show --stat <commit-sha>
+```
+
+Discard any commit whose changed files are *only* `.bridge/email-config.json` — that is this skill's own bookkeeping, never user-facing content, and must never be turned into a bullet (see Step 4's note above for what to do if this empties the whole range).
+
+Then check whether `package.json` exists and, if so, walk every commit individually to get the ordered sequence of version values (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones):
 
 ```bash
 for sha in $(git log "$LAST_SHA"..HEAD --reverse --format='%H'); do
@@ -897,7 +909,7 @@ rm -rf /tmp/bridge-batch-send-test
 mkdir -p /tmp/bridge-batch-send-test
 cd /tmp/bridge-batch-send-test
 
-# repo-configured: has config, has a new commit since lastSentSha
+# repo-configured: has config, has a genuine new commit (real file change) since lastSentSha
 git init --bare configured-remote.git -q
 git clone configured-remote.git repo-configured -q
 cd repo-configured
@@ -907,7 +919,8 @@ mkdir -p .bridge
 jq -n --argjson recipients '["me@example.com"]' --arg sha "$FIRST_SHA" \
   '{recipients: $recipients, lastSentSha: $sha, lastSentAt: null}' > .bridge/email-config.json
 git add .bridge/email-config.json && git commit -q -m "chore: init bridge email config"
-git commit --allow-empty -m "feat: new thing" -q
+echo "new feature code" > feature.txt
+git add feature.txt && git commit -q -m "feat: new thing"
 git push -q 2>&1 | tail -1
 cd ..
 
@@ -919,7 +932,7 @@ git commit --allow-empty -m "initial" -q
 git push -q 2>&1 | tail -1
 cd ..
 
-# repo-up-to-date: has config, HEAD equals lastSentSha (no new commits)
+# repo-up-to-date: has config, only its own bookkeeping commit since lastSentSha (no real changes)
 git init --bare up-to-date-remote.git -q
 git clone up-to-date-remote.git repo-up-to-date -q
 cd repo-up-to-date
@@ -935,7 +948,7 @@ cd ..
 ls -d */
 ```
 
-Expected: three subdirectories — `repo-configured`, `repo-no-config`, `repo-up-to-date` — plus the three `*-remote.git` bare repos.
+Expected: three subdirectories — `repo-configured`, `repo-no-config`, `repo-up-to-date` — plus the three `*-remote.git` bare repos. Note that `repo-up-to-date`'s config was written with `lastSentSha` captured *before* its own `chore: init bridge email config` commit landed — the same sequence `setup-email-updates` always follows — so its raw commit range is not actually empty; that's the point of this fixture (see Step 2).
 
 - [ ] **Step 2: Validate the full scan + per-repo classification**
 
@@ -946,7 +959,7 @@ for dir in */; do
   if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
     if [ -f "$dir/.bridge/email-config.json" ]; then
       LAST_SHA=$(jq -r '.lastSentSha' "$dir/.bridge/email-config.json")
-      COUNT=$(git -C "$dir" log "$LAST_SHA"..HEAD --oneline | wc -l | tr -d ' ')
+      COUNT=$(git -C "$dir" log "$LAST_SHA"..HEAD --oneline -- . ':(exclude).bridge' | wc -l | tr -d ' ')
       if [ "$COUNT" -gt 0 ]; then
         echo "$dir: WOULD_SEND ($COUNT new commits)"
       else
@@ -959,12 +972,24 @@ for dir in */; do
 done
 ```
 
+This mirrors the real skill's Step 4/5 bookkeeping-exclusion rule (the `-- . ':(exclude).bridge'` pathspec is a mechanical proxy for "discard commits that only touch `.bridge/email-config.json`" — Claude applies that same rule semantically when reading full commit diffs, per Step 5's note).
+
 Expected output (order may vary):
 ```
-repo-configured: WOULD_SEND (2 new commits)
+repo-configured: WOULD_SEND (1 new commits)
 repo-no-config: SKIP (no config)
 repo-up-to-date: SKIP (no new commits)
 ```
+
+**Why `repo-up-to-date` is not a trivial case:** its raw `git log "$LAST_SHA"..HEAD --oneline` (no pathspec) actually shows 1 commit — its own `chore: init bridge email config` — because `lastSentSha` was captured before that commit was made. Verify this yourself to see the distinction the exclusion rule is making:
+
+```bash
+cd /tmp/bridge-batch-send-test/repo-up-to-date
+LAST_SHA=$(jq -r '.lastSentSha' .bridge/email-config.json)
+git log "$LAST_SHA"..HEAD --oneline
+```
+
+Expected: prints the one `chore: init bridge email config` commit — confirming that without the exclusion rule, this repo would be wrongly classified as `WOULD_SEND`.
 
 - [ ] **Step 3: Append batch mode, summary, and the error-handling reference to `skills/send-update-email/SKILL.md`**
 
