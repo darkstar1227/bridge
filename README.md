@@ -52,7 +52,7 @@ Creates or edits the `.bridge/email-config.json` a repo needs before `/bridge:se
 
 ### `/bridge:send-update-email`
 
-Sends a readable, bullet-point update email via [Resend](https://resend.com) summarizing everything a repo shipped since the last send — grouped by version and by root cause, not listed commit-by-commit. Works on a single repo (run manually near the end of a session) or in batch across a parent folder of repos (run on a schedule via `/loop`). Requires `RESEND_API_KEY` and `BRIDGE_EMAIL_FROM` environment variables, and a `.bridge/email-config.json` created via `/bridge:setup-email-updates`.
+Sends a readable, bullet-point update email via [Resend](https://resend.com) summarizing everything a repo shipped since the last send — grouped by version and by root cause, not listed commit-by-commit. Works on a single repo (run manually near the end of a session) or in batch across a parent folder of repos (run on a schedule via `/loop`). Sends through the Resend MCP server (`claude mcp add --transport http resend https://mcp.resend.com` — one-time setup per machine), plus a `BRIDGE_EMAIL_FROM` environment variable and a `.bridge/email-config.json` created via `/bridge:setup-email-updates`.
 
 **Triggers:**
 - `/bridge:send-update-email`
@@ -64,7 +64,7 @@ Sends a readable, bullet-point update email via [Resend](https://resend.com) sum
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`
 - [superpowers](https://github.com/obra/superpowers) — for `writing-plans`
-- [Resend](https://resend.com) account — for `/bridge:send-update-email`
+- [Resend](https://resend.com) account with the [Resend MCP server](https://resend.com/docs/mcp-server) connected (`claude mcp add --transport http resend https://mcp.resend.com`) — for `/bridge:send-update-email`
 
 ## License
 
