@@ -154,6 +154,14 @@ git remote get-url origin
 
 Wrap that structure in a light HTML shell (bold, larger text for version block headings; bold small labels for 新增/已修正/已優化; standard `<ul><li>` bullet lists; generous `line-height`; `font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; `max-width: 600px; margin: 0 auto;` wrapper). Produce a plain-text version with the same structure (no HTML tags) for the `text` field. Do not use a colored card/box background — this is a plain, document-style layout.
 
+In the sign-off line, make "Bridge" a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`) — not the repo being reported on. Style it to blend into the surrounding text rather than looking like a typical blue underlined link:
+
+```html
+<a href="https://github.com/darkstar1227/bridge" style="color: inherit; text-decoration: none;">Bridge</a> 自動通知
+```
+
+In the plain-text version, links can't be styled or hidden inline, so spell out the URL instead: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
+
 There is no `from` to build here — the repo's dedicated `resend-<repo-slug>` MCP server (registered by `/bridge:setup-email-updates`) already has a fixed `SENDER_EMAIL_ADDRESS` for this repo, so the tool sends under that sender automatically. The repo's identity still comes through clearly in the subject line and email body above.
 
 Locate the tool on this repo's own connection (see "Requirements" above):

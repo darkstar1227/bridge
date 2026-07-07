@@ -150,6 +150,8 @@ To: <recipients>
 
 Styling: light inline CSS only — bold larger text for version headings, bold small labels for 新增/已修正/已優化, standard bullet lists, generous line spacing, system font stack, `max-width` for readability. No colored box/card chrome. A plain-text version with equivalent structure is sent alongside the HTML body (Resend supports both `html` and `text` in one send). Timezone is fixed to `Asia/Taipei (UTC+8)` — not configurable, since all current recipients are in the same timezone.
 
+The sign-off's "Bridge" is a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`, not the repo being reported on), styled to blend into the surrounding text (`color: inherit; text-decoration: none;`) rather than reading as a typical blue underlined link. The plain-text version spells out the URL instead, since plain text can't carry a styled/hidden link: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
+
 ## Setup Skill: `/bridge:setup-email-updates`
 
 A separate skill (`skills/setup-email-updates/SKILL.md`) responsible only for creating/editing `.bridge/email-config.json`. `send-update-email` never writes this file itself — clean separation of "configure" vs. "send".
