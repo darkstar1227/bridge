@@ -66,7 +66,10 @@ test -f .bridge/email-config.json && cat .bridge/email-config.json || echo "NO_C
 RECIPIENTS=$(jq -c '.recipients' .bridge/email-config.json)
 LAST_SHA=$(jq -r '.lastSentSha' .bridge/email-config.json)
 MCP_SERVER_NAME=$(jq -r '.mcpServerName' .bridge/email-config.json)
+SENDER_NAME=$(jq -r '.senderName // empty' .bridge/email-config.json)
 ```
+
+`SENDER_NAME` can come back empty for a config created before this field existed. If so, skip the sender-name sign-off line entirely in Step 7 (just the "Bridge 自動通知" line) rather than printing a blank or literal "null".
 
 ## Step 4 — Check for New Commits
 
@@ -179,6 +182,11 @@ After the opening, add the release time line, then the feature/fix blocks from S
 
 修正
 • xxx
+
+—
+查看完整 commit 記錄: <git remote get-url origin 的輸出，轉成瀏覽器可開啟的 URL>
+— <SENDER_NAME>
+— Bridge 自動通知
 ```
 
 Get the HEAD commit time and repo remote URL for the template:
@@ -192,13 +200,18 @@ Wrap that structure in a light HTML shell (bold, larger text for block headings;
 
 **Optional live-URL line:** if you know this repo's deployed/production URL (not something this skill currently reads from config — only include it if the user has told you the URL some other way), add a `🔗 <url>` line directly after the release-time line. Otherwise omit it entirely; don't guess a URL.
 
-In the sign-off line, make "Bridge" a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`) — not the repo being reported on. Style it to blend into the surrounding text rather than looking like a typical blue underlined link:
+The sign-off has two lines: the human sender's name (`SENDER_NAME` from Step 3), then the automated-tool line. In the "Bridge" line, make "Bridge" a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`) — not the repo being reported on. Style it to blend into the surrounding text rather than looking like a typical blue underlined link:
 
 ```html
-<a href="https://github.com/darkstar1227/bridge" style="color: inherit; text-decoration: none;">Bridge</a> 自動通知
+— <SENDER_NAME 值><br>
+— <a href="https://github.com/darkstar1227/bridge" style="color: inherit; text-decoration: none;">Bridge</a> 自動通知
 ```
 
-In the plain-text version, links can't be styled or hidden inline, so spell out the URL instead: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
+In the plain-text version, links can't be styled or hidden inline, so spell out the URL instead:
+```
+— <SENDER_NAME 值>
+— Bridge (https://github.com/darkstar1227/bridge) 自動通知
+```
 
 There is no `from` to build here — the repo's dedicated `resend-<repo-slug>` MCP server (registered by `/bridge:setup-email-updates`) already has a fixed `SENDER_EMAIL_ADDRESS` for this repo, so the tool sends under that sender automatically. The repo's identity still comes through clearly in the subject line and email body above.
 

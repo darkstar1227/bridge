@@ -69,7 +69,9 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
    RECIPIENTS=$(jq -c '.recipients' .bridge/email-config.json)
    LAST_SHA=$(jq -r '.lastSentSha' .bridge/email-config.json)
    MCP_SERVER_NAME=$(jq -r '.mcpServerName' .bridge/email-config.json)
+   SENDER_NAME=$(jq -r '.senderName // empty' .bridge/email-config.json)
    ```
+   `SENDER_NAME` can be empty for a config predating this field — if so, skip the sender-name sign-off line in step 6 (just the "Bridge 自動通知" line).
 
 3. **Check for new commits.**
    ```bash
@@ -120,6 +122,7 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
 
    —
    查看完整 commit 記錄: <git remote get-url origin 的輸出，轉成瀏覽器可開啟的 URL>
+   — <SENDER_NAME>
    — Bridge 自動通知
    ```
    Get the values needed:
@@ -129,11 +132,16 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
    ```
    Wrap in a light HTML shell (bold larger text for block headings; bold small labels for any subsections actually used; `<ul><li>` bullets; generous line-height; system font stack; `max-width: 600px; margin: 0 auto;`). Produce a matching plain-text version for the `text` field. No colored card/box background. Optional: a `🔗 <url>` line after the release-time line if you already know this repo's deployed URL from elsewhere — never guess one.
 
-   In the sign-off, link "Bridge" to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`), styled to blend into surrounding text:
+   The sign-off has two lines: `SENDER_NAME` (skip this line entirely if empty — see step 2), then the automated-tool line with "Bridge" linked to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`), styled to blend into surrounding text:
    ```html
-   <a href="https://github.com/darkstar1227/bridge" style="color: inherit; text-decoration: none;">Bridge</a> 自動通知
+   — <SENDER_NAME 值><br>
+   — <a href="https://github.com/darkstar1227/bridge" style="color: inherit; text-decoration: none;">Bridge</a> 自動通知
    ```
-   Plain-text version spells out the URL instead: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
+   Plain-text version spells out the URL instead:
+   ```
+   — <SENDER_NAME 值>
+   — Bridge (https://github.com/darkstar1227/bridge) 自動通知
+   ```
 
    There is no `from` to build — the repo's `resend-<repo-slug>` MCP server already has a fixed `SENDER_EMAIL_ADDRESS`.
 

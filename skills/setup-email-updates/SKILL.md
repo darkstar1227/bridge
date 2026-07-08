@@ -48,6 +48,11 @@ test -f .bridge/email-config.json && cat .bridge/email-config.json || echo "NO_C
 Ask the user for:
 1. The recipient email addresses (they can list as many as they want).
 2. The sender "from" string to use for this repo's emails, e.g. `Bridge Bot (FlightPath) <noreply@yourdomain.com>`. Suggest a default of `Bridge Bot (<repo name>) <their verified domain address>` if they don't already have one in mind, but let them override it freely — this is a per-repo value, not derived automatically.
+3. The human name to sign off the email with (shown alongside the "Bridge 自動通知" line — see `send-update-email`'s Step 7). Default to the local git config's name and let them confirm or override:
+   ```bash
+   git config user.name
+   ```
+   If this prints something, offer it as the suggested default. If it's empty, just ask directly with no suggested default.
 
 Derive a slug for this repo and check whether a dedicated MCP connection already exists for it:
 
@@ -67,17 +72,17 @@ claude mcp add "$MCP_SERVER_NAME" -e RESEND_API_KEY="$RESEND_API_KEY" -e SENDER_
 
 Replace the `SENDER_EMAIL_ADDRESS` value with the exact sender string the user gave you. If `RESEND_API_KEY` isn't set in your environment, stop and tell the user to export it before continuing — do not proceed to registration without it.
 
-Now write the config, including the MCP connection name so `send-update-email` knows which one belongs to this repo:
+Now write the config, including the MCP connection name and sender name so `send-update-email` knows which connection belongs to this repo and who to sign the email from:
 
 ```bash
 mkdir -p .bridge
 HEAD_SHA=$(git rev-parse HEAD)
-jq -n --argjson recipients '["alice@example.com", "bob@example.com"]' --arg sha "$HEAD_SHA" --arg mcp "$MCP_SERVER_NAME" \
-  '{recipients: $recipients, lastSentSha: $sha, lastSentAt: null, mcpServerName: $mcp}' \
+jq -n --argjson recipients '["alice@example.com", "bob@example.com"]' --arg sha "$HEAD_SHA" --arg mcp "$MCP_SERVER_NAME" --arg sender "Justin Lee" \
+  '{recipients: $recipients, lastSentSha: $sha, lastSentAt: null, mcpServerName: $mcp, senderName: $sender}' \
   > .bridge/email-config.json
 ```
 
-Replace the `--argjson recipients` value with the actual addresses the user gave you, as a JSON array literal (e.g. `'["alice@example.com","carol@example.com"]'`). Leave `lastSentAt` as `null` — `send-update-email` fills it in after the first real send.
+Replace the `--argjson recipients` value with the actual addresses the user gave you, as a JSON array literal (e.g. `'["alice@example.com","carol@example.com"]'`), and the `--arg sender` value with the sign-off name from step 3 above. Leave `lastSentAt` as `null` — `send-update-email` fills it in after the first real send.
 
 Then commit and push:
 
@@ -89,20 +94,20 @@ git push
 
 ## Step 4 — Single-repo: Edit Existing Config
 
-Show the user the `recipients` array from the `cat` output in Step 2. Ask whether to add, remove, or replace any addresses. Rewrite only `recipients` — `lastSentSha`, `lastSentAt`, and `mcpServerName` must be preserved exactly as they were, so a re-run of this skill can never cause a duplicate send, a gap, or an orphaned MCP connection:
+Show the user the `recipients` array and `senderName` from the `cat` output in Step 2. Ask whether to add/remove/replace any recipients, and whether to change the sign-off name. Rewrite only `recipients` and `senderName` — `lastSentSha`, `lastSentAt`, and `mcpServerName` must be preserved exactly as they were, so a re-run of this skill can never cause a duplicate send, a gap, or an orphaned MCP connection:
 
 ```bash
-jq --argjson recipients '["alice@example.com", "carol@example.com"]' \
-  '.recipients = $recipients' \
+jq --argjson recipients '["alice@example.com", "carol@example.com"]' --arg sender "Justin Lee" \
+  '.recipients = $recipients | .senderName = $sender' \
   .bridge/email-config.json > .bridge/email-config.json.tmp
 mv .bridge/email-config.json.tmp .bridge/email-config.json
 ```
 
-Replace the `--argjson recipients` value with the user's final list. Then commit and push:
+Replace the `--argjson recipients` value with the user's final list and `--arg sender` with their chosen sign-off name (unchanged if they didn't want to update it). Then commit and push:
 
 ```bash
 git add .bridge/email-config.json
-git commit -m "chore: update bridge email config recipients"
+git commit -m "chore: update bridge email config"
 git push
 ```
 

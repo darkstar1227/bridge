@@ -82,7 +82,8 @@ Location: `.bridge/email-config.json` inside each target repo, committed to git.
   ],
   "lastSentSha": "a1b2c3d4e5f6...",
   "lastSentAt": "2026-07-01T09:00:00Z",
-  "mcpServerName": "resend-flightpath"
+  "mcpServerName": "resend-flightpath",
+  "senderName": "Justin Lee"
 }
 ```
 
@@ -90,6 +91,7 @@ Location: `.bridge/email-config.json` inside each target repo, committed to git.
 - `lastSentSha`: HEAD commit at the time of the last successful send; the anchor for the next `git log` range.
 - `lastSentAt`: informational only, for human debugging — not used in any logic branch.
 - `mcpServerName`: the name of this repo's dedicated Resend MCP connection (see "Sending Mechanism and Secrets" below), set once at creation and never edited afterward — changing a repo's sender requires re-registering the connection, not editing this field directly.
+- `senderName`: the human name shown in the email sign-off, alongside the "Bridge 自動通知" line. Asked at setup time, defaulting to `git config user.name` if set; editable later (unlike `mcpServerName`, this is a display-only value with no state-integrity concerns). Configs created before this field existed read back as empty — the sign-off falls back to just the "Bridge 自動通知" line in that case.
 
 ### Sending Mechanism and Secrets
 
@@ -153,6 +155,7 @@ To: <recipients>
 
 —
 查看完整 commit 記錄: <repo remote URL>
+— <senderName>
 — Bridge 自動通知
 ```
 
@@ -160,7 +163,7 @@ Styling: light inline CSS only — bold larger text for block headings, bold sma
 
 Optional: a `🔗 <live app URL>` line right after the release-time line — seen in one of the six reference emails. Not implemented as a required field (this skill has no data source for a repo's deployed URL today); only include it if the user has supplied the URL some other way, never guess one.
 
-The sign-off's "Bridge" is a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`, not the repo being reported on), styled to blend into the surrounding text (`color: inherit; text-decoration: none;`) rather than reading as a typical blue underlined link. The plain-text version spells out the URL instead, since plain text can't carry a styled/hidden link: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
+The sign-off has two lines: `senderName` (the human name from Config Schema above — omitted entirely if empty, e.g. a config predating this field), then "Bridge 自動通知" with "Bridge" hyperlinked to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`, not the repo being reported on), styled to blend into the surrounding text (`color: inherit; text-decoration: none;`) rather than reading as a typical blue underlined link. The plain-text version spells out the URL instead, since plain text can't carry a styled/hidden link: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
 
 ## Setup Skill: `/bridge:setup-email-updates`
 
@@ -171,8 +174,8 @@ A separate skill (`skills/setup-email-updates/SKILL.md`) responsible only for cr
 `setup-email-updates` is inherently interactive (it asks for recipients) and is meant to be run by a human on demand — unlike `send-update-email-batch`, it is not designed to be scheduled under `/loop`.
 
 **Single-repo mode:**
-1. If `.bridge/email-config.json` already exists: show the current `recipients` list and ask whether to add/remove/replace any. `lastSentSha` is left untouched by any edit here — only `recipients` can change, so re-running setup can never cause a duplicate send or a gap.
-2. If it does not exist: ask the user for the recipient email list and the sender string to use for this repo, register a dedicated `resend-<repo-slug>` MCP connection with that sender (skipped if one already exists for this slug), then create the file with `lastSentSha` set to current HEAD (so tracking starts from "now" — this run does not retroactively email the full historical log) and `mcpServerName` set to the connection just registered.
+1. If `.bridge/email-config.json` already exists: show the current `recipients` and `senderName` and ask whether to update either. `lastSentSha` and `mcpServerName` are left untouched by any edit here, so re-running setup can never cause a duplicate send, a gap, or an orphaned MCP connection.
+2. If it does not exist: ask the user for the recipient email list, the sender "from" string for this repo, and the sign-off name (`senderName`, defaulting to `git config user.name` if set — see Config Schema above). Register a dedicated `resend-<repo-slug>` MCP connection with the sender string (skipped if one already exists for this slug), then create the file with `lastSentSha` set to current HEAD (so tracking starts from "now" — this run does not retroactively email the full historical log), `mcpServerName` set to the connection just registered, and `senderName` set to the chosen sign-off name.
 3. `git add`, `commit` (e.g. `chore: init bridge email config`), and `push` the new/updated file.
 
 **Batch mode (parent folder):**
