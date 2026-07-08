@@ -116,6 +116,8 @@ Within a version block, commits are read (message + diff) and judged by Claude f
 
 If `package.json` does not exist (non-npm repo): skip version-number-based titling; use the commit-time range as the block boundary/heading instead, and keep applying Level 2 same-root-cause bullet merging based on commit semantics.
 
+**Content filter (applied before Level 1/2 grouping):** the email is themed around features, not housekeeping. Beyond discarding `.bridge/email-config.json`-only bookkeeping commits (see Config Schema / Sending Mechanism above), also discard commits that are purely deployment/infrastructure/CI changes with no user-facing effect, or routine documentation/informational edits (wording tweaks, typo fixes, changelog housekeeping). Exception: a genuinely significant documentation update (a new architecture/design doc, or a substantial rewrite of a core doc) is still included as its own bullet or block — judgment call on "significant," but a one-line doc fix never qualifies. If every commit in range is excluded this way, treat it the same as no new commits at all: skip, no email, state unchanged.
+
 ## Email Template
 
 Modeled on the user-provided reference example — a clean, document-style layout (not a colored card/box design):

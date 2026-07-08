@@ -75,7 +75,7 @@ git log "$LAST_SHA"..HEAD --oneline
 
 If this prints nothing: no new commits since the last send. Skip this repo — no email, `lastSentSha` unchanged. In batch mode, record this as a "skipped: no new commits" entry (see Step 9) and continue.
 
-**Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up). Those never count as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be bookkeeping-only and there is nothing left to report, treat it exactly like this step's "no new commits" case: skip, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
+**Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up) — as well as routine deployment/infra/doc commits that Step 5 also discards (see below). Neither ever counts as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be excluded and there is nothing left to report, treat it exactly like this step's "no new commits" case: skip, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
 
 ## Step 5 — Gather Commit Detail
 
@@ -90,6 +90,12 @@ git show --stat <commit-sha>
 ```
 
 Discard any commit whose changed files are *only* `.bridge/email-config.json` — that is this skill's own bookkeeping, never user-facing content, and must never be turned into a bullet (see Step 4's note above for what to do if this empties the whole range).
+
+**The email is themed around features — routine housekeeping doesn't belong in it.** Also discard commits that are purely:
+- deployment/infrastructure/CI changes with no user-facing effect (deploy scripts, pipeline config, environment/env-var wiring, build tooling)
+- routine informational or documentation edits unrelated to functionality (wording tweaks, typo fixes, comment-only changes, changelog housekeeping)
+
+**Exception:** a genuinely significant documentation update — e.g. a new architecture/design doc, or a substantial rewrite of an existing core doc (a README overhaul, a major spec revision) — is still worth telling colleagues about even though it isn't a code feature. Include it as its own bullet (or its own version block, if nothing else in the range shares its theme) rather than silently dropping it. Use judgment on "significant": a one-line doc fix is routine and excluded; a doc a reader would actually want to know exists is included.
 
 Then check whether `package.json` exists and, if so, walk every commit individually to get the ordered sequence of version values (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones):
 
