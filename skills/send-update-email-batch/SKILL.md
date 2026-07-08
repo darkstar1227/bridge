@@ -87,24 +87,35 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
    ```
    No `package.json` in range → use the commit date range as the block boundary instead (see step 5).
 
-5. **Group into version blocks and bullets.** Two levels of merging:
-   - **Level 1:** collapse a consecutive run of versions that are all fixes/optimizations for the same theme into one block, titled with the *last* version in the run plus a one-line theme (e.g. `v3.1.2 — 憑證與金鑰安全性修正`). An independent new feature gets its own block, titled after that feature. No `package.json` → title blocks by commit date range instead (e.g. `2026-06-20 ~ 2026-07-06 — <theme>`).
-   - **Level 2:** within a block, commits sharing a root cause/class of issue (judged from message + diff, no commit-convention requirement) collapse into a single bullet describing the user/system-visible effect. Sort bullets under whichever of `新增` / `已修正` / `已優化` actually apply — omit empty subsections.
+5. **Group into feature/fix blocks and bullets — organized around what changed, never by version.** Version numbers never appear on block headings; they only show up once, in the opening paragraph (step 6).
+   - **Level 1:** cluster commits by real-world topic ("AI Providers self-service key," "database health monitoring") regardless of which version(s) touched it — never title a block with a version number or range. Small unrelated fixes that don't cluster into a named theme go in a catch-all block titled `修正` (all bug fixes) or `其他` (genuine mix), instead of forcing an artificial theme name.
+   - **Level 2:** commits sharing a root cause (judged from message + diff, no commit-convention requirement) collapse into a single bullet, written as natural prose (short mini-label + explanation in one flowing line) — most blocks should be a flat bullet list with no subsection labels. Only add `新增` / `已修正` / `已優化` (or a combined label like `新增 / 強化`) when a block genuinely mixes distinct categories and separating them reads more clearly than one flat list.
+   - Calibration (the real tone/structure to match):
+     ```
+     自助申請個人 LLM API Key
+     到側欄「AI Providers」→「LiteLLM 自助金鑰」按「申請新的 key」，即可拿到個人 API key，直接使用公司中央 LLM。
+     key 只顯示一次，請立即複製保存；同頁可列出、撤銷自己的 key。
 
-6. **Render the email.** Build in this structure (Traditional Chinese):
+     資料庫健康監控強化
+     新增 / 強化
+     每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。
+
+     修正
+     戰績儀表板篩選：切換時間範圍時，人員／專案的篩選不再殘留舊選擇而把新範圍的資料藏起來。
+     ```
+
+6. **Render the email.** Subject: `<repo 名稱> 已更新到 <最新版本號>` (or a range, e.g. `<repo 名稱> 更新 v2.9.5–v2.9.9`, if this batch spans multiple versions). Body opens with a greeting, then one to two natural sentences mentioning the version(s) once — compactly, not as a rigid leading slot — and headlining whatever is most worth knowing. Do not mechanically write "本封合併 N 版更新，含 vX ~ vY" every time. Match these real openings (version placement varies naturally):
    ```
-   主旨: <repo 名稱> 已更新到 <最新版本號>
-
-   大家好,
-
-   <repo 名稱> 發布了 <最新版本號>（本封合併 <N> 版更新，含 <最早版本號> ~ <最新版本號>）。
-
+   FlightPath 發布了 v3.4.6。這批更新的主角是「AI Providers」頁全面升級——每個人都能自助申請自己的 LLM API key。
+   FlightPath 這次更新針對管理員後台的「資料庫健康」頁做了幾項強化（v3.3.1–v3.3.2）。
+   FlightPath 發布了 v3.3.0，本封整理自上次公告（v3.2.0）之後的更新。
+   FlightPath 發布了 v2.9.5–v2.9.9 一系列穩定性更新，重點如下：
+   ```
+   Then the release-time line, then the feature/fix blocks from step 5, each just their bare topic heading followed by bullets — no version anywhere in a block:
+   ```
    發布時間: <HEAD commit 的 committer 時間，轉換為 Asia/Taipei UTC+8> (Asia/Taipei, UTC+8)
 
-   <版本區塊 1 標題>
-   新增
-   • xxx
-   已修正
+   <功能/主題區塊 1 標題>
    • xxx
 
    —
@@ -116,7 +127,7 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
    git log -1 --format=%cI HEAD
    git remote get-url origin
    ```
-   Wrap in a light HTML shell (bold larger text for version headings; bold small labels for 新增/已修正/已優化; `<ul><li>` bullets; generous line-height; system font stack; `max-width: 600px; margin: 0 auto;`). Produce a matching plain-text version for the `text` field. No colored card/box background.
+   Wrap in a light HTML shell (bold larger text for block headings; bold small labels for any subsections actually used; `<ul><li>` bullets; generous line-height; system font stack; `max-width: 600px; margin: 0 auto;`). Produce a matching plain-text version for the `text` field. No colored card/box background. Optional: a `🔗 <url>` line after the release-time line if you already know this repo's deployed URL from elsewhere — never guess one.
 
    In the sign-off, link "Bridge" to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`), styled to blend into surrounding text:
    ```html

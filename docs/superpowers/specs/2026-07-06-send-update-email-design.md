@@ -107,43 +107,48 @@ If this repo's `resend-<repo-slug>` connection isn't found: `send-update-email` 
 
 ## Commit / Version Grouping Logic
 
-Two levels of merging, modeled directly on the reference email the user provided:
+> **Revised post-implementation:** the original version below put version numbers on block headings (`v3.1.5 — <theme>`). After the user shared six real reference emails, that turned out to be backwards — every real example clusters purely by feature/fix topic, with the version number appearing only once, in the opening paragraph, never on a block heading. `新增`/`已修正`/`已優化` subsection labels also turned out to be used inconsistently in practice (often skipped entirely, sometimes combined, sometimes `修正`/`其他` stand alone as a top-level block for unrelated small fixes). The rule below reflects what's actually shipped in `skills/send-update-email/SKILL.md` and `skills/send-update-email-batch/SKILL.md`.
 
-**Level 1 — consecutive small version bumps → one version block.**
-Extract `package.json` version changes across the commit range (e.g. v3.1.1 → v3.1.2 → ... → v3.1.5). If a consecutive run of versions all revolve around the same theme (e.g., all are fixes/optimizations for the same underlying area), collapse them into a single version block. The block heading uses the *latest* version number in that run, plus a one-line theme summary written by Claude (e.g., "v3.1.5 — 平台安全性與穩定性修正"). A version that introduces an independent new feature gets its own block, titled after that feature.
+Two levels of merging, followed by a content filter applied before either:
 
-**Level 2 — same-root-cause commits → one bullet.**
-Within a version block, commits are read (message + diff) and judged by Claude for shared root cause / same class of issue (no reliance on Conventional Commits or any enforced message format). Commits sharing a root cause collapse into a single bullet describing the fix's effect on users/system, not a per-commit list. Each block groups its bullets under whichever of **新增 / 已修正 / 已優化** subsections apply (subsections with nothing to report are omitted, not shown empty).
+**Level 1 — cluster by real-world topic, never by version.**
+Read every commit surviving the content filter (below) and group by what a person would actually call the change — "AI Providers self-service key," "database health monitoring" — regardless of which version(s) touched it or whether those versions were consecutive. Title each block with that short, concrete name. No version number, "vX.X.X", or version range ever appears in a block heading — that information belongs only in the opening paragraph. Small unrelated fixes that don't cluster into a named theme go in a catch-all block titled `修正` (all bug fixes) or `其他` (genuine mix) rather than forcing an artificial theme name.
 
-If `package.json` does not exist (non-npm repo): skip version-number-based titling; use the commit-time range as the block boundary/heading instead, and keep applying Level 2 same-root-cause bullet merging based on commit semantics.
+**Level 2 — write bullets as natural prose; subsection labels are the exception, not the default.**
+Within a block, commits sharing a root cause (judged from message + diff, no commit-convention requirement) collapse into a single bullet — a short mini-label plus explanation in one flowing line, the way a person would describe it in chat. Real examples mostly have zero subsection structure. Only add `新增` / `已修正` / `已優化` (or a combined label like `新增 / 強化`) when a block genuinely mixes distinct categories of change and separating them reads more clearly than a flat list.
+
+If `package.json` does not exist (non-npm repo): the clustering rule is unchanged — cluster by topic, use commit dates only to help read the timeline, never in a heading.
 
 **Content filter (applied before Level 1/2 grouping):** the email is themed around features, not housekeeping. Beyond discarding `.bridge/email-config.json`-only bookkeeping commits (see Config Schema / Sending Mechanism above), also discard commits that are purely deployment/infrastructure/CI changes with no user-facing effect, or routine documentation/informational edits (wording tweaks, typo fixes, changelog housekeeping). Exception: a genuinely significant documentation update (a new architecture/design doc, or a substantial rewrite of a core doc) is still included as its own bullet or block — judgment call on "significant," but a one-line doc fix never qualifies. If every commit in range is excluded this way, treat it the same as no new commits at all: skip, no email, state unchanged.
 
 ## Email Template
 
-Modeled on the user-provided reference example — a clean, document-style layout (not a colored card/box design):
+> **Revised post-implementation:** the opening paragraph below ("本封合併 N 版更新，含 vX ~ vY") is no longer the pattern — it named versions too mechanically. The user's six real reference emails show a natural one-to-two sentence opening that mentions the version(s) once, in whatever position reads best, and headlines the most notable thing about the release. See `skills/send-update-email/SKILL.md` Step 7 for the calibration examples now in use.
+
+Modeled on the user-provided reference emails — a clean, document-style layout (not a colored card/box design), organized entirely around features/fixes:
 
 ```
-Subject: <repo 名稱> 已更新到 <最新版本號>
-From: <BRIDGE_EMAIL_FROM display name>（<repo 名稱>）<BRIDGE_EMAIL_FROM email>
+Subject: <repo 名稱> 已更新到 <最新版本號>（或版本範圍，如 v2.9.5–v2.9.9）
+From: (fixed per-repo sender from the repo's own resend-<repo-slug> MCP connection — see Sending Mechanism above)
 To: <recipients>
 
 大家好,
 
-<repo 名稱> 發布了 <最新版本號>（本封合併 <N> 版更新，含 vX.X.X ~ vY.Y.Y）。
+<一到兩句自然語句，帶出版本號（位置依語句而定，不是固定開頭欄位）與這批更新最值得一提的重點>
 
 發布時間: <最新 commit 時間> (Asia/Taipei, UTC+8)
 
-<版本號> — <這批更新的一句話主題>
-新增
+<功能/主題區塊 1 標題>
 • xxx
-已修正
-• xxx（合併同根因的多個 commit）
+• xxx
 
-<版本號> — <另一批更新的主題>
+<功能/主題區塊 2 標題>
+新增 / 強化
+• xxx
 已修正
 • xxx
-已優化
+
+修正
 • xxx
 
 —
@@ -151,7 +156,9 @@ To: <recipients>
 — Bridge 自動通知
 ```
 
-Styling: light inline CSS only — bold larger text for version headings, bold small labels for 新增/已修正/已優化, standard bullet lists, generous line spacing, system font stack, `max-width` for readability. No colored box/card chrome. A plain-text version with equivalent structure is sent alongside the HTML body (Resend supports both `html` and `text` in one send). Timezone is fixed to `Asia/Taipei (UTC+8)` — not configurable, since all current recipients are in the same timezone.
+Styling: light inline CSS only — bold larger text for block headings, bold small labels for any subsections actually used, standard bullet lists, generous line spacing, system font stack, `max-width` for readability. No colored box/card chrome. A plain-text version with equivalent structure is sent alongside the HTML body (Resend supports both `html` and `text` in one send). Timezone is fixed to `Asia/Taipei (UTC+8)` — not configurable, since all current recipients are in the same timezone.
+
+Optional: a `🔗 <live app URL>` line right after the release-time line — seen in one of the six reference emails. Not implemented as a required field (this skill has no data source for a repo's deployed URL today); only include it if the user has supplied the URL some other way, never guess one.
 
 The sign-off's "Bridge" is a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`, not the repo being reported on), styled to blend into the surrounding text (`color: inherit; text-decoration: none;`) rather than reading as a typical blue underlined link. The plain-text version spells out the URL instead, since plain text can't carry a styled/hidden link: `— Bridge (https://github.com/darkstar1227/bridge) 自動通知`.
 

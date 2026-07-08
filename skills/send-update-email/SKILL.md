@@ -108,48 +108,77 @@ done
 
 If this prints nothing at all (no `package.json` in any commit in range), skip version extraction entirely — this repo uses the no-`package.json` fallback described in Step 6.
 
-## Step 6 — Group Into Version Blocks and Bullets
+## Step 6 — Group Into Feature/Fix Blocks and Bullets
 
-Two levels of merging apply, in this order:
+The email is organized entirely around what changed — features and fixes are the structure. Version numbers never appear on block headings; they only show up once, woven naturally into the opening paragraph in Step 7. Two levels of merging apply, in this order:
 
-**Level 1 — consecutive small version bumps become one version block.** Walk the ordered version sequence from Step 5. When a run of consecutive versions is all fixes/optimizations for the same underlying theme, collapse that whole run into a single block. Label the block with the *last* version number in the run, plus a one-line theme you write yourself by reading the commits in that run (e.g. `v3.1.2 — 憑證與金鑰安全性修正`). A version that introduces an independent new feature — not a continuation of a fix/optimize run — gets its own block, titled after that feature (e.g. `v3.2.0 — 專案負責人自助移交`).
+**Level 1 — cluster commits by real-world topic, not by version.** Read every commit surviving Step 5's filter and group them by the thing a person would actually call it — "AI Providers self-service key," "database health monitoring," "subdomain-change reliability" — regardless of which version(s) touched it or whether those versions were consecutive. Title each block with that short, concrete, natural-language name. Never put a version number, "v3.1.2", or any version-range in a block heading — that information belongs only in the opening paragraph (Step 7).
 
-If there is no `package.json` (Step 5 fallback): use the commit date range as the block boundary instead of a version number, e.g. `2026-06-20 ~ 2026-07-06 — <theme>`.
+Small, unrelated fixes that don't cluster into any single named feature/topic can be grouped into a catch-all block instead of forcing them into an artificial theme — title it `修正` if everything in it is a bug fix, or `其他` if it's a genuine mix. This matches real usage: a batch of unrelated small fixes doesn't need a manufactured feature name.
 
-**Level 2 — same-root-cause commits become one bullet.** Within a block, read each commit's message and diff and judge whether it shares a root cause / class of issue with any other commit in that block (no reliance on any commit message convention — pure semantic judgment). Commits sharing a root cause become a single bullet describing the user/system-visible effect, not a list of the individual commits. Sort each block's bullets under whichever of these subsections actually apply — omit a subsection entirely if this block has nothing for it, never show it empty:
+If there is no `package.json`: this rule doesn't change — cluster by topic exactly the same way, using commit content and dates only to help you read the timeline, never as part of any heading.
 
-- `新增` (Added / new feature)
-- `已修正` (Fixed)
-- `已優化` (Optimized)
+**Level 2 — write bullets in natural prose; use 新增/已修正/已優化 labels only when they add clarity, not by default.** Within a block, commits sharing a root cause (judged from message + diff, no commit-convention requirement) become a single bullet describing the user/system-visible effect. Real examples mostly skip subsection labels entirely — write the bullet as a short mini-label plus explanation, in one flowing line (e.g. `每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。`), the same way a person would describe it in chat. Only add `新增` / `已修正` / `已優化` subsection labels (or a combined one like `新增 / 強化`) when a single block genuinely mixes distinct categories of change and separating them reads more clearly than one flat list — never add empty subsections, and never force labels on a block that's naturally one flat list.
+
+**Calibration — study these real examples before writing bullets** (this is the actual tone/structure to match, not a template to fill in mechanically):
+
+```
+自助申請個人 LLM API Key
+到側欄「AI Providers」→「LiteLLM 自助金鑰」按「申請新的 key」，即可拿到個人 API key，直接使用公司中央 LLM（相容 OpenAI／Anthropic API，Claude、GPT、Gemini 等多種模型）。
+key 只顯示一次，請立即複製保存；同頁可列出、撤銷自己的 key。
+每把 key：rpm 120、tpm 300k、90 天到期（到期回同頁再申請）。
+
+資料庫健康監控強化
+新增 / 強化
+每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。
+點進單一資料庫看詳情：新增專案詳情頁，顯示目前健康狀態，以及記憶體／磁碟的歷史趨勢圖（近 7 天，系統會定時自動存檔）。
+
+修正
+戰績儀表板篩選：切換時間範圍時，人員／專案的篩選不再殘留舊選擇而把新範圍的資料藏起來。
+「失敗卻顯示成功」修正：AI 服務設定的儲存、以及管理後台的離職等操作，失敗時會正確顯示錯誤，不再誤報成功。
+
+其他
+平台資料庫結構已納入版本控制，日後除錯與稽核更透明。
+系統通知文字已支援多語系架構（目前顯示繁體中文，未來可依個人語言顯示）。
+```
 
 ## Step 7 — Render Email
 
-Build the subject and body in this structure (Traditional Chinese, matching the reference template):
+Subject: `<repo 名稱> 已更新到 <最新版本號>` — if this batch spans multiple versions, use the range instead, e.g. `<repo 名稱> 更新 v2.9.5–v2.9.9`.
+
+Body opens with a greeting, then **one to two natural sentences** that mention the version(s) once — compactly, not as a rigid leading slot — and headline whatever is actually most worth knowing about this release. Do not mechanically write "本封合併 N 版更新，含 vX ~ vY" every time; that's exactly the version-first framing this template is moving away from. Match the tone and structure of these real examples (each is a complete, valid opening — notice the version placement varies naturally sentence to sentence):
 
 ```
-主旨: <repo 名稱> 已更新到 <最新版本號>
+FlightPath 發布了 v3.4.6。這批更新的主角是「AI Providers」頁全面升級——每個人都能自助申請自己的 LLM API key。
 
-大家好,
+FlightPath 這次更新針對管理員後台的「資料庫健康」頁做了幾項強化（v3.3.1–v3.3.2）。
 
-<repo 名稱> 發布了 <最新版本號>（本封合併 <N> 版更新，含 <最早版本號> ~ <最新版本號>）。
+FlightPath 發布了 v3.3.0，本封整理自上次公告（v3.2.0）之後的更新。
 
+FlightPath 發布了 v3.0.0，兩個頁面有大更新：
+
+FlightPath 發布了 v2.9.5–v2.9.9 一系列穩定性更新，重點如下：
+```
+
+Pick whichever pattern fits what actually happened: a single standout feature gets "這批更新的主角是..."; a focused set of related changes gets "這次更新針對...做了幾項強化"; a routine accumulation gets "整理自上次公告之後的更新" or "重點如下" with no single headline claimed.
+
+After the opening, add the release time line, then the feature/fix blocks from Step 6, each just their bare topic heading followed directly by bullets (no version anywhere in the block):
+
+```
 發布時間: <HEAD commit 的 committer 時間，轉換為 Asia/Taipei UTC+8> (Asia/Taipei, UTC+8)
 
-<版本區塊 1 標題>
-新增
+<功能/主題區塊 1 標題>
+• xxx
+• xxx
+
+<功能/主題區塊 2 標題>
+新增 / 強化
 • xxx
 已修正
 • xxx
 
-<版本區塊 2 標題>
-已修正
+修正
 • xxx
-已優化
-• xxx
-
-—
-查看完整 commit 記錄: <git remote get-url origin 的輸出，轉成瀏覽器可開啟的 URL>
-— Bridge 自動通知
 ```
 
 Get the HEAD commit time and repo remote URL for the template:
@@ -159,7 +188,9 @@ git log -1 --format=%cI HEAD
 git remote get-url origin
 ```
 
-Wrap that structure in a light HTML shell (bold, larger text for version block headings; bold small labels for 新增/已修正/已優化; standard `<ul><li>` bullet lists; generous `line-height`; `font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; `max-width: 600px; margin: 0 auto;` wrapper). Produce a plain-text version with the same structure (no HTML tags) for the `text` field. Do not use a colored card/box background — this is a plain, document-style layout.
+Wrap that structure in a light HTML shell (bold, larger text for block headings; bold small labels for any subsections you did use; standard `<ul><li>` bullet lists; generous `line-height`; `font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; `max-width: 600px; margin: 0 auto;` wrapper). Produce a plain-text version with the same structure (no HTML tags) for the `text` field. Do not use a colored card/box background — this is a plain, document-style layout.
+
+**Optional live-URL line:** if you know this repo's deployed/production URL (not something this skill currently reads from config — only include it if the user has told you the URL some other way), add a `🔗 <url>` line directly after the release-time line. Otherwise omit it entirely; don't guess a URL.
 
 In the sign-off line, make "Bridge" a hyperlink to this plugin's own GitHub repo (`https://github.com/darkstar1227/bridge`) — not the repo being reported on. Style it to blend into the surrounding text rather than looking like a typical blue underlined link:
 
