@@ -90,18 +90,18 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
 5. **Group into feature/fix blocks and bullets — organized around what changed, never by version.** Version numbers never appear on block headings; they only show up once, in the opening paragraph (step 6).
    - **Level 1:** cluster commits by real-world topic ("AI Providers self-service key," "database health monitoring") regardless of which version(s) touched it — never title a block with a version number or range. Small unrelated fixes that don't cluster into a named theme go in a catch-all block titled `修正` (all bug fixes) or `其他` (genuine mix), instead of forcing an artificial theme name.
    - **Level 2:** commits sharing a root cause (judged from message + diff, no commit-convention requirement) collapse into a single bullet, written as natural prose (short mini-label + explanation in one flowing line) — most blocks should be a flat bullet list with no subsection labels. Only add `新增` / `已修正` / `已優化` (or a combined label like `新增 / 強化`) when a block genuinely mixes distinct categories and separating them reads more clearly than one flat list.
-   - Calibration (the real tone/structure to match):
+   - Calibration (the real tone/structure to match — every content line is a bullet; bullets are never optional):
      ```
      自助申請個人 LLM API Key
-     到側欄「AI Providers」→「LiteLLM 自助金鑰」按「申請新的 key」，即可拿到個人 API key，直接使用公司中央 LLM。
-     key 只顯示一次，請立即複製保存；同頁可列出、撤銷自己的 key。
+     • 到側欄「AI Providers」→「LiteLLM 自助金鑰」按「申請新的 key」，即可拿到個人 API key，直接使用公司中央 LLM。
+     • key 只顯示一次，請立即複製保存；同頁可列出、撤銷自己的 key。
 
      資料庫健康監控強化
      新增 / 強化
-     每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。
+     • 每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。
 
      修正
-     戰績儀表板篩選：切換時間範圍時，人員／專案的篩選不再殘留舊選擇而把新範圍的資料藏起來。
+     • 戰績儀表板篩選：切換時間範圍時，人員／專案的篩選不再殘留舊選擇而把新範圍的資料藏起來。
      ```
 
 6. **Render the email.** Subject: `<repo 名稱> 已更新到 <最新版本號>` (or a range, e.g. `<repo 名稱> 更新 v2.9.5–v2.9.9`, if this batch spans multiple versions). Body opens with a greeting, then one to two natural sentences mentioning the version(s) once — compactly, not as a rigid leading slot — and headlining whatever is most worth knowing. Do not mechanically write "本封合併 N 版更新，含 vX ~ vY" every time. Match these real openings (version placement varies naturally):

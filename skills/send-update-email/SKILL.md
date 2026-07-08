@@ -120,26 +120,26 @@ If there is no `package.json`: this rule doesn't change — cluster by topic exa
 
 **Level 2 — write bullets in natural prose; use 新增/已修正/已優化 labels only when they add clarity, not by default.** Within a block, commits sharing a root cause (judged from message + diff, no commit-convention requirement) become a single bullet describing the user/system-visible effect. Real examples mostly skip subsection labels entirely — write the bullet as a short mini-label plus explanation, in one flowing line (e.g. `每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。`), the same way a person would describe it in chat. Only add `新增` / `已修正` / `已優化` subsection labels (or a combined one like `新增 / 強化`) when a single block genuinely mixes distinct categories of change and separating them reads more clearly than one flat list — never add empty subsections, and never force labels on a block that's naturally one flat list.
 
-**Calibration — study these real examples before writing bullets** (this is the actual tone/structure to match, not a template to fill in mechanically):
+**Calibration — study these real examples before writing bullets** (this is the actual tone/structure to match, not a template to fill in mechanically — note every content line is a bullet; bullets are never optional, even when there's no subsection label):
 
 ```
 自助申請個人 LLM API Key
-到側欄「AI Providers」→「LiteLLM 自助金鑰」按「申請新的 key」，即可拿到個人 API key，直接使用公司中央 LLM（相容 OpenAI／Anthropic API，Claude、GPT、Gemini 等多種模型）。
-key 只顯示一次，請立即複製保存；同頁可列出、撤銷自己的 key。
-每把 key：rpm 120、tpm 300k、90 天到期（到期回同頁再申請）。
+• 到側欄「AI Providers」→「LiteLLM 自助金鑰」按「申請新的 key」，即可拿到個人 API key，直接使用公司中央 LLM（相容 OpenAI／Anthropic API，Claude、GPT、Gemini 等多種模型）。
+• key 只顯示一次，請立即複製保存；同頁可列出、撤銷自己的 key。
+• 每把 key：rpm 120、tpm 300k、90 天到期（到期回同頁再申請）。
 
 資料庫健康監控強化
 新增 / 強化
-每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。
-點進單一資料庫看詳情：新增專案詳情頁，顯示目前健康狀態，以及記憶體／磁碟的歷史趨勢圖（近 7 天，系統會定時自動存檔）。
+• 每個專案獨立的刷新按鈕：資料庫健康頁每張卡片可單獨刷新該專案，不必整頁重抓。
+• 點進單一資料庫看詳情：新增專案詳情頁，顯示目前健康狀態，以及記憶體／磁碟的歷史趨勢圖（近 7 天，系統會定時自動存檔）。
 
 修正
-戰績儀表板篩選：切換時間範圍時，人員／專案的篩選不再殘留舊選擇而把新範圍的資料藏起來。
-「失敗卻顯示成功」修正：AI 服務設定的儲存、以及管理後台的離職等操作，失敗時會正確顯示錯誤，不再誤報成功。
+• 戰績儀表板篩選：切換時間範圍時，人員／專案的篩選不再殘留舊選擇而把新範圍的資料藏起來。
+• 「失敗卻顯示成功」修正：AI 服務設定的儲存、以及管理後台的離職等操作，失敗時會正確顯示錯誤，不再誤報成功。
 
 其他
-平台資料庫結構已納入版本控制，日後除錯與稽核更透明。
-系統通知文字已支援多語系架構（目前顯示繁體中文，未來可依個人語言顯示）。
+• 平台資料庫結構已納入版本控制，日後除錯與稽核更透明。
+• 系統通知文字已支援多語系架構（目前顯示繁體中文，未來可依個人語言顯示）。
 ```
 
 ## Step 7 — Render Email
