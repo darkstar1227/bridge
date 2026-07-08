@@ -1,6 +1,6 @@
 ---
 name: setup-email-updates
-description: Create or edit the .bridge/email-config.json that send-update-email needs — recipients and last-sent tracking — for a single repo or in bulk across a parent folder.
+description: Create or edit the .bridge/email-config.json that send-update-email and send-update-email-batch need — recipients, last-sent tracking, and a per-repo Resend MCP connection — for a single repo or in bulk across a parent folder.
 triggers:
   - setup email updates
   - configure update email recipients
@@ -19,7 +19,7 @@ allowed-tools:
 
 ## Purpose
 
-`send-update-email` refuses to run against a repo that has no `.bridge/email-config.json`. This skill is the only thing that creates or edits that file — recipients, the `lastSentSha` tracking marker, and (on first setup) a dedicated per-repo Resend MCP connection so each repo can send under its own sender name.
+Both `send-update-email` and `send-update-email-batch` refuse to run against a repo that has no `.bridge/email-config.json`. This skill is the only thing that creates or edits that file — recipients, the `lastSentSha` tracking marker, and (on first setup) a dedicated per-repo Resend MCP connection so each repo can send under its own sender name.
 
 ## Requirements
 
@@ -122,6 +122,6 @@ For each repo name printed, `cd` into it and run Steps 2-4 for that repo only, o
 ## Notes
 
 - This skill never sets `lastSentSha` to anything other than the current `HEAD` at creation time — it never touches `lastSentSha` on an edit.
-- This skill is interactive by design. Do not schedule it under `/loop`; that's `send-update-email`'s job.
-- Each repo gets its own dedicated Resend MCP connection (named `resend-<repo-slug>`) so it can send under its own sender name — this is why `send-update-email` never needs `RESEND_API_KEY` itself. Changing an existing repo's sender name isn't handled by this skill; to do that, run `claude mcp remove resend-<repo-slug>` first, then re-run this skill's create flow (Step 3) to register it fresh with the new sender.
-- Every machine that will run `send-update-email` for a given repo (including any machine running `/loop`) needs that repo's `resend-<repo-slug>` MCP connection registered on it — this lives in the local Claude Code config, not in git, so it does not travel with `git clone`. Re-run this skill on any new machine before expecting sends to work there.
+- This skill is interactive by design. Do not schedule it under `/loop`; that's `/bridge:send-update-email-batch`'s job — it processes a parent folder of already-configured repos unattended, using the config and MCP connection this skill sets up.
+- Each repo gets its own dedicated Resend MCP connection (named `resend-<repo-slug>`) so it can send under its own sender name — this is why neither `send-update-email` nor `send-update-email-batch` ever needs `RESEND_API_KEY` itself. Changing an existing repo's sender name isn't handled by this skill; to do that, run `claude mcp remove resend-<repo-slug>` first, then re-run this skill's create flow (Step 3) to register it fresh with the new sender.
+- Every machine that will run `send-update-email` or `send-update-email-batch` for a given repo (including any machine running `/loop`) needs that repo's `resend-<repo-slug>` MCP connection registered on it — this lives in the local Claude Code config, not in git, so it does not travel with `git clone`. Re-run this skill on any new machine before expecting sends to work there.

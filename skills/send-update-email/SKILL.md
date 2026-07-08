@@ -1,6 +1,6 @@
 ---
 name: send-update-email
-description: Send a readable, version-grouped update email via Resend for accumulated commits since the last send, for a single repo or in batch across a parent folder.
+description: Send a readable, version-grouped update email via Resend for a single repo's accumulated commits since the last send — shows the rendered content and waits for confirmation before actually sending.
 triggers:
   - send update email
   - email changelog
@@ -20,28 +20,30 @@ allowed-tools:
 
 ## Purpose
 
-Sends colleagues a readable, bullet-point update email summarizing everything that changed in a repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via the Resend MCP server (not a raw API key + `curl`).
+Sends colleagues a readable, bullet-point update email summarizing everything that changed in this repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via the Resend MCP server. Always shows you the rendered subject/recipients/body and waits for explicit confirmation before sending anything.
+
+This skill only works inside a single repo. For unattended sending across a parent folder of repos (e.g. scheduled via `/loop`), use `/bridge:send-update-email-batch` instead — it shares this skill's core logic (Steps 2-7, 9, 10 below) but skips the confirmation step, since there's no one to ask when it's running unattended. **When editing the core logic here (commit gathering, content filtering, grouping, the email template, or the send/state-update mechanics), make the same edit in `skills/send-update-email-batch/SKILL.md`** — the two are meant to stay behaviorally identical apart from the confirmation gate and the parent-folder loop.
 
 ## Requirements
 
-- **A dedicated Resend MCP connection for this repo.** This skill never holds a Resend API key or a sender address itself — both live inside a per-repo MCP server (named `resend-<repo-slug>`) that `/bridge:setup-email-updates` registers once, with a fixed `SENDER_EMAIL_ADDRESS` for that repo. `.bridge/email-config.json`'s `mcpServerName` field (read in Step 3) names the exact connection to use. If it's missing on the current machine, that's a setup problem, not something this skill can fix — see Step 3 and Step 7.
+- **A dedicated Resend MCP connection for this repo.** This skill never holds a Resend API key or a sender address itself — both live inside a per-repo MCP server (named `resend-<repo-slug>`) that `/bridge:setup-email-updates` registers once, with a fixed `SENDER_EMAIL_ADDRESS` for that repo. `.bridge/email-config.json`'s `mcpServerName` field (read in Step 3) names the exact connection to use. If it's missing on the current machine, that's a setup problem, not something this skill can fix — see Step 3 and Step 9.
 
-At the start of Step 7 (not before — no need to check this until you're actually about to send), locate the tool on the connection named by `mcpServerName`:
+At the start of Step 9 (not before — no need to check this until you're actually about to send), locate the tool on the connection named by `mcpServerName`:
 
 ```
 ToolSearch query: "<mcpServerName> send email"
 ```
 
-If nothing matches: in single-repo mode, stop and tell the user that the `<mcpServerName>` MCP connection isn't registered on this machine, and that re-running `/bridge:setup-email-updates` will register it. In batch mode, log the error and skip sending for the current run (see Step 9) — never send silently without this check.
+If nothing matches: stop and tell the user that the `<mcpServerName>` MCP connection isn't registered on this machine, and that re-running `/bridge:setup-email-updates` will register it.
 
-## Step 1 — Detect Mode
+## Step 1 — Require Single-Repo Context
 
 ```bash
 git rev-parse --is-inside-work-tree 2>/dev/null
 ```
 
-- Prints `true` → **single-repo mode**: go to Step 2, then stop after Step 8.
-- Errors (not a git repo) → **batch mode**: skip straight to Step 9.
+- Prints `true` → continue to Step 2.
+- Errors (not a git repo): stop. This skill only works `cd`'d into a single repo — tell the user to run it from inside the target repo, or to use `/bridge:send-update-email-batch` if they want to process a whole parent folder of repos.
 
 ## Step 2 — Pull Latest
 
@@ -49,7 +51,7 @@ git rev-parse --is-inside-work-tree 2>/dev/null
 git pull
 ```
 
-If this fails (conflict, network error, non-zero exit): stop, tell the user the pull failed and why. Do not proceed to Step 3. In batch mode this only skips the current repo — see Step 9.
+If this fails (conflict, network error, non-zero exit): stop, tell the user the pull failed and why. Do not proceed to Step 3.
 
 ## Step 3 — Read Config
 
@@ -57,8 +59,7 @@ If this fails (conflict, network error, non-zero exit): stop, tell the user the 
 test -f .bridge/email-config.json && cat .bridge/email-config.json || echo "NO_CONFIG"
 ```
 
-- `NO_CONFIG` in single-repo mode: stop, tell the user to run `/bridge:setup-email-updates` first. Do not create the file yourself — that is not this skill's job.
-- `NO_CONFIG` in batch mode: skip this repo silently (see Step 9), continue to the next.
+- `NO_CONFIG`: stop, tell the user to run `/bridge:setup-email-updates` first. Do not create the file yourself — that is not this skill's job.
 - Otherwise, extract the fields you need:
 
 ```bash
@@ -73,9 +74,9 @@ MCP_SERVER_NAME=$(jq -r '.mcpServerName' .bridge/email-config.json)
 git log "$LAST_SHA"..HEAD --oneline
 ```
 
-If this prints nothing: no new commits since the last send. Skip this repo — no email, `lastSentSha` unchanged. In batch mode, record this as a "skipped: no new commits" entry (see Step 9) and continue.
+If this prints nothing: no new commits since the last send. Stop — no email, `lastSentSha` unchanged.
 
-**Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up) — as well as routine deployment/infra/doc commits that Step 5 also discards (see below). Neither ever counts as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be excluded and there is nothing left to report, treat it exactly like this step's "no new commits" case: skip, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
+**Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up) — as well as routine deployment/infra/doc commits that Step 5 also discards (see below). Neither ever counts as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be excluded and there is nothing left to report, treat it exactly like this step's "no new commits" case: stop, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
 
 ## Step 5 — Gather Commit Detail
 
@@ -121,7 +122,7 @@ If there is no `package.json` (Step 5 fallback): use the commit date range as th
 - `已修正` (Fixed)
 - `已優化` (Optimized)
 
-## Step 7 — Render Email and Send via Resend
+## Step 7 — Render Email
 
 Build the subject and body in this structure (Traditional Chinese, matching the reference template):
 
@@ -170,23 +171,38 @@ In the plain-text version, links can't be styled or hidden inline, so spell out 
 
 There is no `from` to build here — the repo's dedicated `resend-<repo-slug>` MCP server (registered by `/bridge:setup-email-updates`) already has a fixed `SENDER_EMAIL_ADDRESS` for this repo, so the tool sends under that sender automatically. The repo's identity still comes through clearly in the subject line and email body above.
 
+## Step 8 — Confirm With User Before Sending
+
+Before calling any send tool, show the user exactly what's about to go out:
+- The subject line
+- The recipient list (`RECIPIENTS` from Step 3)
+- The rendered plain-text body from Step 7 (easiest to read in chat — mention that an equivalent HTML version will also be sent, but don't dump raw HTML into the conversation)
+
+Ask directly: does this look right to send? If the user wants changes — wording, a bullet added/removed/reworded, a different grouping — revise the content and show it again. Repeat until they approve or explicitly cancel.
+
+If they cancel: stop. No email, `lastSentSha` unchanged, nothing else touched.
+
+Do not proceed to Step 9 without an explicit approval.
+
+## Step 9 — Send via Resend
+
 Locate the tool on this repo's own connection (see "Requirements" above):
 
 ```
 ToolSearch query: "<MCP_SERVER_NAME> send email"
 ```
 
-If nothing matches: stop and report the missing `<MCP_SERVER_NAME>` MCP connection (single-repo mode) or log it and skip sending for this repo (batch mode) — see the "Requirements" section above and Step 9.
+If nothing matches: stop and report the missing `<MCP_SERVER_NAME>` MCP connection — see the "Requirements" section above.
 
 Call the resolved tool directly with:
 - `to`: the `recipients` array from Step 3
-- `subject`: the subject line built above
-- `html`: the rendered HTML body
-- `text`: the rendered plain-text body
+- `subject`: the subject line from Step 7
+- `html`: the rendered HTML body from Step 7
+- `text`: the rendered plain-text body from Step 7 (the one the user approved in Step 8)
 
-Do not pass a `from` argument — the connection's fixed sender applies automatically, and the tool's own schema will refuse or ignore an override attempt depending on how the server was configured. Do not build a raw HTTP payload or call `curl` — the MCP tool call *is* the send. Check its result: a successful send returns the sent email's id with no error. Anything else (an `error` field, a thrown tool error, etc.) means failure: do not update state, do not commit (Step 8). Report the error to the user (single-repo mode) or record it for the batch summary (Step 9), including the repo name.
+Do not pass a `from` argument — the connection's fixed sender applies automatically, and the tool's own schema will refuse or ignore an override attempt depending on how the server was configured. Do not build a raw HTTP payload or call `curl` — the MCP tool call *is* the send. Check its result: a successful send returns the sent email's id with no error. Anything else (an `error` field, a thrown tool error, etc.) means failure: do not update state, do not commit (Step 10). Report the error to the user.
 
-## Step 8 — Update State on Success
+## Step 10 — Update State on Success
 
 ```bash
 HEAD_SHA=$(git rev-parse HEAD)
@@ -203,36 +219,15 @@ git push
 
 If this `commit`/`push` fails after the email already sent successfully: explicitly warn the user that the email went out but the state file wasn't persisted, and that the next run may re-send this same commit range. Do not silently swallow this — it's the one case where the email and the repo's tracked state can disagree.
 
-## Step 9 — Batch Mode
-
-```bash
-for dir in */; do
-  dir="${dir%/}"
-  if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
-    echo "$dir"
-  fi
-done
-```
-
-For each repo name printed, `cd` into it and run Steps 2-8 for that repo. Never invoke `/bridge:setup-email-updates` on a repo's behalf — a repo with no config is simply skipped (recorded as "skipped: no config"). A single repo's pull failure, send failure, or state-persist failure must not stop processing of the remaining repos — record the outcome and move to the next directory.
-
-After every subdirectory has been processed, print a summary:
-
-```
-Sent: <repo>, <repo>, ...
-Skipped (no config): <repo>, ...
-Skipped (no new commits): <repo>, ...
-Failed: <repo> — <reason>, ...
-```
-
 ## Error Handling Reference
 
 | Situation | Handling |
 |---|---|
-| `git pull` fails | Skip repo — no email, no state change. Batch mode continues to next repo. |
-| `.bridge/email-config.json` missing | Single mode: stop, tell user to run `/bridge:setup-email-updates`. Batch mode: skip silently, never auto-invoke setup. |
-| No new commits since `lastSentSha` (including ranges that are bookkeeping-only, see Step 4) | Skip — no email, state unchanged. |
-| This repo's `resend-<repo-slug>` MCP tool not found | Single mode: stop, tell the user to re-run `/bridge:setup-email-updates` to register it on this machine. Batch mode: log error, skip sending. |
-| Resend MCP tool call returns an error | Do not update state, do not commit. Report error (with repo name). |
+| `git pull` fails | Stop — no email, no state change. |
+| `.bridge/email-config.json` missing | Stop, tell the user to run `/bridge:setup-email-updates`. |
+| No new commits since `lastSentSha` (including ranges that are bookkeeping/routine-only, see Step 4) | Stop — no email, state unchanged. |
+| This repo's `resend-<repo-slug>` MCP tool not found | Stop, tell the user to re-run `/bridge:setup-email-updates` to register it on this machine. |
+| User declines to send at the Step 8 confirmation | Stop — no email, state unchanged. |
+| Resend MCP tool call returns an error | Do not update state, do not commit. Report the error to the user. |
 | `package.json` absent | Use commit-date-range block titles; keep root-cause bullet merging. |
-| State commit/push fails after a successful send | Warn user explicitly: email sent, state not persisted. |
+| State commit/push fails after a successful send | Warn the user explicitly: email sent, state not persisted. |
