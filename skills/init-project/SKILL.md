@@ -40,3 +40,53 @@ git rev-parse --is-inside-work-tree 2>/dev/null && echo "GIT: repo confirmed"
 For any module with no positive signal, ask the user a single yes/no question: "This project doesn't show signs of using <X>. Do you want it set up here?" Skip the module entirely on "no". The Git/Env module always runs — every project handled by this skill is expected to be a git repo.
 
 Record which modules are active before continuing; every later step is gated by this list.
+
+## Step 2 — Python Module (if active)
+
+1. No `pyproject.toml` → run `uv init`.
+2. Check for a `[tool.ruff]` table in `pyproject.toml` (or a `ruff.toml`/`.ruff.toml` file). If missing, add to `pyproject.toml`:
+
+```toml
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]
+```
+
+3. Check for `.pre-commit-config.yaml` with a `ruff` hook. If missing, create it:
+
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+      - id: ruff-format
+```
+
+Tell the user to run `pre-commit install` — do not run it for them (it mutates their local git hooks config).
+
+4. Check for a version-bump `commit-msg` hook at `.git/hooks/commit-msg`. If missing, create it (mode `755`):
+
+```bash
+#!/bin/sh
+MSG_FILE="$1"
+FIRST_LINE=$(head -n1 "$MSG_FILE")
+case "$FIRST_LINE" in
+  feat:*|fix:*)
+    if [ -f pyproject.toml ]; then
+      CURRENT=$(grep -m1 '^version' pyproject.toml | sed -E 's/version *= *"([^"]+)"/\1/')
+      if [ -n "$CURRENT" ]; then
+        IFS='.' read -r MAJ MIN PATCH <<EOF
+$CURRENT
+EOF
+        NEW="$MAJ.$MIN.$((PATCH + 1))"
+        sed -i.bak -E "s/^version *= *\"$CURRENT\"/version = \"$NEW\"/" pyproject.toml
+        rm -f pyproject.toml.bak
+        git add pyproject.toml
+      fi
+    fi
+    ;;
+esac
+```
