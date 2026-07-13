@@ -151,3 +151,45 @@ If the current layout doesn't match:
 2. For each Python file being moved, `grep -rn` the whole repo for `import`/`from` references to its module path and list those as "needs reference update" alongside the move.
 3. Present the full move list (paths + reference updates) to the user and stop. Do NOT move anything until the user confirms.
 4. On confirmation, execute moves with `git mv` (preserves history) one at a time, then apply the corresponding import-path edits, then verify nothing else references the old path (`grep -rn "<old_module_path>"` returns empty).
+
+## Step 7 — Write CLAUDE.md Conventions Block
+
+1. Read the target project's `CLAUDE.md` (treat as empty if it doesn't exist).
+2. Build a conventions block containing only sections for modules that were actually active this run — omit sections for skipped modules entirely.
+3. Write/replace only the region between these markers, leaving everything else in the file untouched:
+
+```markdown
+<!-- bridge:conventions:start -->
+## Conventions (managed by bridge:init-project)
+
+<module sections here — Python/ruff, Docker profiles, Supabase, Git/Env>
+
+_Last updated: <today's date> by bridge:init-project_
+<!-- bridge:conventions:end -->
+```
+
+If the markers don't exist yet, append the whole block to the end of the file. If they exist, replace only the content between them.
+
+4. After writing, invoke `claude-md-management:claude-md-improver` against the target `CLAUDE.md` as a **read-only, post-hoc quality pass** — do not let it perform a second auto-write. Capture its quality report for the output report in Step 8.
+
+## Step 8 — Write the Report
+
+Save to: `docs/init-project-report-YYYY-MM-DD.md` (today's date, in the target project).
+
+```markdown
+# Init Project Report — <date>
+
+## Modules Detected
+<list of active modules and why they were detected/confirmed>
+
+## Actions Taken
+<per module: what was created/modified, with file paths>
+
+## Pending Decisions
+<folder move list awaiting confirmation, profile-set choice if unresolved, anything else needing user input>
+
+## CLAUDE.md Quality Review (via claude-md-improver)
+<paste the improver's quality report verbatim>
+```
+
+Do not implement any application code as part of this skill — it only sets up tooling/config/docs.
