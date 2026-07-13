@@ -115,3 +115,10 @@ prod:
 ```
 
 If a `Makefile` already exists, show the proposed `dev`/`prod`/`infra-up` targets as a diff and ask before merging — never blindly overwrite an existing Makefile.
+
+## Step 4 — Supabase Module (if active)
+
+1. Check the CLI is available: `supabase --version`. If missing, tell the user to install it (`brew install supabase/tap/supabase`) — do not install it for them.
+2. Check `supabase/config.toml` exists. If not, run `supabase init`.
+3. Do not modify anything under `supabase/migrations/` — this skill only confirms the directory exists.
+4. Record for the CLAUDE.md conventions block: "Schema/DB changes go through Supabase migrations (`supabase migration new <name>`), never manual DB edits."
