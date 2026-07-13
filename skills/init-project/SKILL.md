@@ -122,3 +122,32 @@ If a `Makefile` already exists, show the proposed `dev`/`prod`/`infra-up` target
 2. Check `supabase/config.toml` exists. If not, run `supabase init`.
 3. Do not modify anything under `supabase/migrations/` — this skill only confirms the directory exists.
 4. Record for the CLAUDE.md conventions block: "Schema/DB changes go through Supabase migrations (`supabase migration new <name>`), never manual DB edits."
+
+## Step 5 — Git/Env Module (always runs)
+
+1. Confirm `.gitignore` contains `.env` (add the line if missing; create `.gitignore` if it doesn't exist).
+2. Scan for environment variable usage:
+
+```bash
+grep -rhoE '(os\.environ\[.[A-Z_]+.\]|os\.getenv\(.[A-Z_]+.|process\.env\.[A-Z_]+)' --include="*.py" --include="*.ts" --include="*.js" . 2>/dev/null
+```
+
+Normalize the matches to bare variable names, then diff against keys already in `.env.example` (create the file if missing). Add any missing keys with an empty value and a `# TODO: set value` comment. Never overwrite existing values in `.env.example`.
+3. Record for the CLAUDE.md conventions block: Conventional Commits (`feat:`/`fix:`/`chore:`/etc.) and `type/short-desc` branch naming — documented as convention, not enforced by the skill.
+
+## Step 6 — Folder Structure Module (if Python or Docker modules are active)
+
+Compare current layout against mainstream per-ecosystem conventions:
+
+| Stack | Convention |
+|---|---|
+| Python | src-layout: `src/<package>/`, `tests/` |
+| Docker | `docker/` for Dockerfile + compose overrides (see Step 3) |
+| Supabase | untouched — whatever `supabase init` produces |
+
+If the current layout doesn't match:
+
+1. Build a move list: `source path -> destination path`.
+2. For each Python file being moved, `grep -rn` the whole repo for `import`/`from` references to its module path and list those as "needs reference update" alongside the move.
+3. Present the full move list (paths + reference updates) to the user and stop. Do NOT move anything until the user confirms.
+4. On confirmation, execute moves with `git mv` (preserves history) one at a time, then apply the corresponding import-path edits, then verify nothing else references the old path (`grep -rn "<old_module_path>"` returns empty).
