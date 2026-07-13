@@ -90,3 +90,28 @@ EOF
     ;;
 esac
 ```
+
+## Step 3 — Docker Module (if active)
+
+1. If no compose file exists, ask the user: "Which profile set does this project need — `dev/prod` or `dev/staging/prod`?" There is no default; always ask.
+2. Lay out files under `docker/`:
+   - `docker/Dockerfile`
+   - `docker-compose.yml` (base: app + stateful services, no profiles)
+   - `docker-compose.dev.yml` / `docker-compose.prod.yml` (and `.staging.yml` if chosen) — override files for the app service only
+3. In the base compose file, put stateful services (db, redis, queue, etc.) under a `profiles: ["infra"]` key, separate from the app service. This means `docker compose up app` never touches them.
+4. Generate/update `Makefile`:
+
+```makefile
+.PHONY: dev prod infra-up
+
+infra-up:
+	docker compose --profile infra up -d
+
+dev:
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --no-deps --build app
+
+prod:
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps --build app
+```
+
+If a `Makefile` already exists, show the proposed `dev`/`prod`/`infra-up` targets as a diff and ask before merging — never blindly overwrite an existing Makefile.
