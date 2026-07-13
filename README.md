@@ -40,6 +40,18 @@ Reads the latest gstack-approved plan from your project, extracts structured inf
 - "convert gstack plan"
 - "handoff to superpowers"
 
+### `/bridge:init-project`
+
+Detects a project's stack (Python/uv, Docker, Supabase, Git) and initializes or audits it against standard conventions — ruff/PEP8, docker-compose profiles that never recreate stateful services, Supabase migrations, `.env`/`.env.example` hygiene, commit and branch naming, and folder layout — then writes the result into a managed block in the project's `CLAUDE.md`. Each module is independently optional based on what's actually detected; folder moves always require confirmation before executing. Finishes by running `claude-md-management:claude-md-improver` as a read-only quality pass and writes a full report to `docs/init-project-report-YYYY-MM-DD.md`.
+
+**Triggers:**
+- `/bridge:init-project`
+- "initialize project"
+- "init project"
+- "setup my project"
+- "check my project setup"
+- "project checkup"
+
 ### `/bridge:setup-email-updates`
 
 Creates or edits the `.bridge/email-config.json` a repo needs before `/bridge:send-update-email` or `/bridge:send-update-email-batch` will work — who gets notified, and (on first setup) registers a dedicated `resend-<repo-slug>` MCP connection with its own sender name, so each repo sends under its own identity. Works on a single repo, or in bulk when run from a parent folder containing multiple repos (asks one repo at a time). Interactive by design — not meant to run under `/loop`; that's `/bridge:send-update-email-batch`'s job. Requires `RESEND_API_KEY` in your environment at setup time only.
