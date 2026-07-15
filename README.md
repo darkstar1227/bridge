@@ -82,11 +82,22 @@ The unattended counterpart to `/bridge:send-update-email` — run from a parent 
 - "loop send update emails"
 - "batch email changelog"
 
+### `/bridge:opencode-bridge`
+
+Delegates a coding task to [OpenCode](https://opencode.ai) and gets back a structured handoff report — done/failed/timed-out, files changed, implementation summary — using OpenCode's own CLI (`opencode run --format json`) instead of custom polling/HTTP/registry infrastructure. Wraps the OpenCode subprocess in its own process group, classifies the outcome from OpenCode's JSON event stream (not just its exit code — a bad model name or auth failure both exit 0), guards against retrying once files have already been mutated, retries/falls back across a configured model chain for safe/transient failures, and manages a `(repo, topic) → session_id` mapping so follow-up dispatches resume the same OpenCode session. First run prompts once (via `AskUserQuestion`) for a default model, fallback models, and per-attempt/chain timeouts, written to `~/.opencode-bridge/config.json`. Useful as an OpenCode-backed implementer step inside `subagent-driven-development` or `executing-plans`.
+
+**Triggers:**
+- `/bridge:opencode-bridge`
+- "delegate to opencode"
+- "use opencode for this task"
+- "opencode bridge"
+
 ## Requirements
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`
 - [superpowers](https://github.com/obra/superpowers) — for `writing-plans`
 - [Resend](https://resend.com) account and API key, plus [`resend-mcp`](https://github.com/resend/resend-mcp) available via `npx` — for `/bridge:setup-email-updates`, which registers one dedicated MCP connection per repo (neither `send-update-email` nor `send-update-email-batch` needs an API key itself)
+- [`opencode`](https://opencode.ai) CLI on `PATH`, plus [`uv`](https://docs.astral.sh/uv/) — for `/bridge:opencode-bridge`
 
 ## License
 
