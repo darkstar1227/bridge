@@ -39,7 +39,6 @@ import signal
 import subprocess
 import tempfile
 import time
-import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -145,7 +144,7 @@ def parse_events(stdout: str, allow_truncated_last_line: bool) -> list[dict]:
 
 def has_terminal_stop_event(events: list[dict]) -> bool:
     return any(
-        e.get("type") == "step_finish" and e.get("part", {}).get("reason") == "stop"
+        e.get("type") == "step_finish" and (e.get("part") or {}).get("reason") == "stop"
         for e in events
     )
 
@@ -160,8 +159,9 @@ def find_error_event(events: list[dict]) -> dict | None:
 
 
 def _error_event_message(error_event: dict) -> str:
-    error = error_event.get("error", {})
-    message = error.get("data", {}).get("message") or error.get("name") or "unknown error"
+    error = error_event.get("error") or {}
+    data = error.get("data") or {}
+    message = data.get("message") or error.get("name") or "unknown error"
     return str(message)
 
 
@@ -206,51 +206,60 @@ class DispatchOutcome:
 
 
 def run_opencode(cmd: list[str], timeout: float) -> DispatchOutcome:
+    # Popen (not subprocess.run) so we retain the pid for a process-group kill
+    # on timeout -- subprocess.run's own TimeoutExpired never carries .pid,
+    # which would make the kill unreachable (verified empirically: a real
+    # TimeoutExpired instance has no `pid` attribute at all).
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        start_new_session=True,
+    )
     try:
-        result = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout,
-            start_new_session=True,
+        stdout, stderr = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        try:
+            pgid = os.getpgid(proc.pid)
+            os.killpg(pgid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        proc.communicate()  # reap the now-killed process
+        return DispatchOutcome(
+            classification="TIMED_OUT", reason="timeout elapsed, process group killed",
+            retryable=True,
         )
-    except subprocess.TimeoutExpired as exc:
-        pid = getattr(exc, "pid", None)
-        if pid is not None:
-            try:
-                pgid = os.getpgid(pid)
-                os.killpg(pgid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-        return DispatchOutcome(classification="TIMED_OUT", reason="timeout elapsed, process group killed")
+
+    returncode = proc.returncode
 
     # Parse whatever JSON events we can find. A total parse failure (e.g. the
     # permission-denied case, which emits plain ANSI text, no JSON at all) is
     # not a ProtocolError here -- it's classified from the raw text instead.
     try:
-        events = parse_events(result.stdout, allow_truncated_last_line=False)
+        events = parse_events(stdout, allow_truncated_last_line=False)
     except ProtocolError:
         events = []
 
     error_event = find_error_event(events)
     if error_event is not None:
         message = _error_event_message(error_event)
-        retryable = classify_failure(result.returncode, message) == "retryable"
+        retryable = classify_failure(returncode, message) == "retryable"
         return DispatchOutcome(
             classification="FAILED", reason=message, retryable=retryable, events=events,
         )
 
     if not events:
-        raw_text = (result.stdout or "") + (result.stderr or "")
+        raw_text = (stdout or "") + (stderr or "")
         if raw_text.strip():
-            retryable = classify_failure(result.returncode, raw_text) == "retryable"
+            retryable = classify_failure(returncode, raw_text) == "retryable"
             return DispatchOutcome(
                 classification="FAILED",
                 reason=raw_text.strip(),
                 retryable=retryable,
             )
 
-    if result.returncode != 0:
-        retryable = classify_failure(result.returncode, result.stderr) == "retryable"
+    if returncode != 0:
+        retryable = classify_failure(returncode, stderr) == "retryable"
         return DispatchOutcome(
-            classification="FAILED", reason=result.stderr.strip() or f"exit code {result.returncode}",
+            classification="FAILED", reason=(stderr or "").strip() or f"exit code {returncode}",
             retryable=retryable,
         )
 
@@ -289,21 +298,24 @@ def dispatch_with_retry(task, repo, topic, models, per_attempt_timeout, chain_ti
             outcome = run_opencode(cmd, timeout=per_attempt_timeout)
 
             if outcome.classification == "DONE":
-                new_session_id = _extract_session_id(outcome.events) or session_id or str(uuid.uuid4())
-                update_session_mapping(repo, topic, new_session_id)
+                new_session_id = _extract_session_id(outcome.events) or session_id
+                if new_session_id:
+                    update_session_mapping(repo, topic, new_session_id)
                 after = git_status_snapshot(repo)
                 outcome.files_changed = sorted(diff_snapshots(before, after))
                 return outcome
 
             after = git_status_snapshot(repo)
-            mutated = bool(diff_snapshots(before, after))
+            changed = diff_snapshots(before, after)
+            mutated = bool(changed)
             failure_reasons.append(f"{model}: {outcome.reason}")
 
             if mutated:
                 outcome.reason = f"stopped after mutation -- {outcome.reason}"
+                outcome.files_changed = sorted(changed)
                 return outcome
             if not outcome.retryable:
-                return outcome
+                break  # non-retryable: stop retrying this model, advance to the next
             # retryable + clean tree: retry same model once with a fresh session
             session_id = None  # fresh temp session for the retry attempt
 
@@ -325,7 +337,7 @@ def build_handoff_report(outcome: DispatchOutcome, session_id: str | None) -> di
     final_text = ""
     for e in outcome.events:
         if e.get("type") == "text":
-            final_text = e.get("part", {}).get("text", final_text)
+            final_text = (e.get("part") or {}).get("text", final_text)
 
     test_match = re.search(r"tests?[:\s]+\d+/\d+\s+passing", final_text, re.IGNORECASE)
     test_results = test_match.group(0) if test_match else "not reported by OpenCode"
@@ -355,10 +367,16 @@ def dispatch(task: str, repo: str, topic: str) -> dict:
     per_attempt_timeout = config.get("per_attempt_timeout_seconds", 300)
     chain_timeout = config.get("chain_timeout_seconds", 600)
 
-    outcome = dispatch_with_retry(
-        task=task, repo=repo, topic=topic, models=models,
-        per_attempt_timeout=per_attempt_timeout, chain_timeout=chain_timeout,
-    )
+    try:
+        outcome = dispatch_with_retry(
+            task=task, repo=repo, topic=topic, models=models,
+            per_attempt_timeout=per_attempt_timeout, chain_timeout=chain_timeout,
+        )
+    except (subprocess.CalledProcessError, OSError) as exc:
+        outcome = DispatchOutcome(
+            classification="FAILED",
+            reason=f"could not run git status against --repo {repo!r}: {exc}",
+        )
     session_id = resolve_session(repo, topic)
     return build_handoff_report(outcome, session_id=session_id)
 
