@@ -1,0 +1,36 @@
+{
+  "run_id": "eval-quiet-logging-with_skill",
+  "expectations": [
+    {
+      "text": "None of the 4 steps marked as a confirmed pass (\u2705) given the lack of log evidence",
+      "passed": true,
+      "evidence": "All 4 rows in Step-by-Step Results marked '\u26a0\ufe0f unverifiable', none marked \u2705."
+    },
+    {
+      "text": "Logging Quality section explicitly flags: no per-step lines, no log levels, no identifying context",
+      "passed": true,
+      "evidence": "'Every step is invisible.' / 'No log levels are used at all.' / 'No identifying context anywhere.'"
+    },
+    {
+      "text": "Overall verdict carries an explicit caveat, not an unqualified PASS",
+      "passed": true,
+      "evidence": "'PASS WITH WARNINGS \u2014 ... gives zero verifiable evidence for any of the 4 designed steps...'"
+    },
+    {
+      "text": "Output Value Checks section explicitly states the checks could not be performed",
+      "passed": true,
+      "evidence": "'Cannot be performed.' with a table marking all 3 checks '\u274c cannot verify'."
+    },
+    {
+      "text": "Output is saved as a structured report file",
+      "passed": true,
+      "evidence": "report.md written matching the skill's full template."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

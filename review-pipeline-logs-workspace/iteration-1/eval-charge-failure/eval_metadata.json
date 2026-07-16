@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-charge-failure",
+  "prompt": "剛跑完 order-processing pipeline，plan 在 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md，log 在 review-pipeline-logs-workspace/fixtures/order-pipeline-failure/run.log，幫我確認這次執行有沒有問題。",
+  "assertions": []
+}

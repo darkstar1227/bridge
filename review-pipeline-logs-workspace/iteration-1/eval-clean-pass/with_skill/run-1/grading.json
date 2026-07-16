@@ -1,0 +1,36 @@
+{
+  "run_id": "eval-clean-pass-with_skill",
+  "expectations": [
+    {
+      "text": "Verdict is a clear, unqualified PASS",
+      "passed": true,
+      "evidence": "\"PASS \u2014 all four steps ran, in the designed order, with success signals and output values matching the plan; no errors found.\""
+    },
+    {
+      "text": "All 4 steps individually marked as ran & succeeded, each with quoted log-line evidence",
+      "passed": true,
+      "evidence": "Step-by-Step Results table: all 4 rows marked '\u2705 ran & succeeded' with quoted log lines."
+    },
+    {
+      "text": "item_count (2) and quantity_decremented (2) explicitly compared and confirmed to match",
+      "passed": true,
+      "evidence": "Output Value Checks table row 3: 'quantity_decremented=2 vs item_count=2 | \u2705 matches'"
+    },
+    {
+      "text": "Report explicitly states no errors/exceptions were found",
+      "passed": true,
+      "evidence": "'None found. Scanned for ERROR, FATAL, Exception, Traceback, panic, and non-2xx-style status codes \u2014 no hits...'"
+    },
+    {
+      "text": "Output is saved as a structured report file",
+      "passed": true,
+      "evidence": "report.md written matching the skill's full template (Verdict, Step-by-Step, Logging Quality, Errors, Output Values, Fixes, Assumptions)."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "run_id": "eval-quiet-logging-without_skill",
+  "expectations": [
+    {
+      "text": "None of the 4 steps marked as a confirmed pass given the lack of log evidence",
+      "passed": true,
+      "evidence": "'4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931... \u6c92\u6709\u4efb\u4f55\u4e00\u884c\u63d0\u5230 validate\u3001charge\u3001inventory\u3001email' \u2014 treated as unverifiable, not passed."
+    },
+    {
+      "text": "Logging Quality section explicitly flags: no per-step lines, no log levels, no identifying context",
+      "passed": true,
+      "evidence": "'\u6c92\u6709\u4efb\u4f55\u53ef\u8ffd\u8e64\u6b04\u4f4d' and '4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931', though not organized under a distinct labeled section \u2014 woven into \u767c\u73fe\u7684\u554f\u984c instead."
+    },
+    {
+      "text": "Overall verdict carries an explicit caveat, not an unqualified PASS",
+      "passed": true,
+      "evidence": "'\u9019\u4efd log \u56b4\u91cd\u4e0d\u8db3\uff0c\u7121\u6cd5\u7528\u4f86\u9a57\u8b49 pipeline \u662f\u5426\u7167 plan \u57f7\u884c' \u2014 does not issue a PASS at all, arguably stricter than with_skill's 'PASS WITH WARNINGS'."
+    },
+    {
+      "text": "Output Value Checks section explicitly states the checks could not be performed",
+      "passed": false,
+      "evidence": "No distinct output-value-checks section; covers the idea generally ('\u7121\u6cd5\u5224\u65b7\u662f\u5426\u6b63\u78ba\u57f7\u884c') but doesn't walk through the plan's specific 3 output-value expectations one by one."
+    },
+    {
+      "text": "Output is saved as a structured report file",
+      "passed": false,
+      "evidence": "Only chat_summary.md was produced; no persisted report file."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  }
+}

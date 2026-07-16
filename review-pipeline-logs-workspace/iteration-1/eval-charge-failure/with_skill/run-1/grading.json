@@ -1,0 +1,41 @@
+{
+  "run_id": "eval-charge-failure-with_skill",
+  "expectations": [
+    {
+      "text": "Step 1 (validate order) is marked as ran & succeeded",
+      "passed": true,
+      "evidence": "Table row 1: '\u2705 ran & succeeded'"
+    },
+    {
+      "text": "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor",
+      "passed": true,
+      "evidence": "Table row 2: '\u274c failed' \u2014 'reason=card_declined' + 'CardDeclinedError: do_not_honor'"
+    },
+    {
+      "text": "The traceback / exception detail is quoted, not just summarized",
+      "passed": true,
+      "evidence": "Full Python traceback (file/line numbers) quoted verbatim in Step-by-Step Results and repeated in Errors & Exceptions."
+    },
+    {
+      "text": "Steps 3 and 4 explicitly reported as never reached / not executed, not silently assumed to have passed",
+      "passed": true,
+      "evidence": "Table rows 3-4: '\u274c missing (expected \u2014 never reached)', plus explicit note: 'Steps 3 and 4 are marked missing rather than unverifiable-by-silence... this is a correct halt, not a silent skip.'"
+    },
+    {
+      "text": "Report distinguishes the charge decline from the pipeline's own abort behavior, rather than treating the abort as a second bug",
+      "passed": true,
+      "evidence": "Errors & Exceptions lists the decline as 'unexpected failure' and the abort line separately as 'expected/handled \u2014 the pipeline's own controlled shutdown... not a second, independent bug.'"
+    },
+    {
+      "text": "Output is saved as a structured report file",
+      "passed": true,
+      "evidence": "report.md written matching the skill's full template."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

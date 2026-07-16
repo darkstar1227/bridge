@@ -1,0 +1,36 @@
+{
+  "run_id": "eval-clean-pass-without_skill",
+  "expectations": [
+    {
+      "text": "Verdict is a clear, unqualified PASS",
+      "passed": true,
+      "evidence": "'\u7d50\u8ad6\uff1a\u9019\u6b21\u57f7\u884c\u5b8c\u5168\u7167\u8a2d\u8a08\u8dd1\u5c0d\uff0cVerdict = PASS\u3002'"
+    },
+    {
+      "text": "All 4 steps individually marked as ran & succeeded, each with quoted log-line evidence",
+      "passed": true,
+      "evidence": "Prose list covers all 4 steps with quoted log fragments, though not in a structured table."
+    },
+    {
+      "text": "item_count (2) and quantity_decremented (2) explicitly compared and confirmed to match",
+      "passed": true,
+      "evidence": "'decremented quantity\uff082\uff09\u8207 step 1 \u7684 item_count\uff082\uff09\u76f8\u7b26'"
+    },
+    {
+      "text": "Report explicitly states no errors/exceptions were found",
+      "passed": true,
+      "evidence": "'\u6c92\u6709\u932f\u8aa4\u3001\u91cd\u8a66\u6216\u975e\u9810\u671f\u72c0\u614b\uff1brun finished status=success \u6536\u5c3e\u6b63\u5e38\u3002'"
+    },
+    {
+      "text": "Output is saved as a structured report file",
+      "passed": false,
+      "evidence": "Only chat_summary.md was produced; no separate persisted report file, no fixed template/sections, nothing saved for later reference."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "run_id": "eval-charge-failure-without_skill",
+  "expectations": [
+    {
+      "text": "Step 1 (validate order) is marked as ran & succeeded",
+      "passed": true,
+      "evidence": "'Step 1\uff08\u9a57\u8b49\u8a02\u55ae\uff0citem_count=3\uff09\u901a\u904e'"
+    },
+    {
+      "text": "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor",
+      "passed": true,
+      "evidence": "'payment gateway \u56de\u50b3 CardDeclinedError: do_not_honor\uff08\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\uff09'"
+    },
+    {
+      "text": "The traceback / exception detail is quoted, not just summarized",
+      "passed": true,
+      "evidence": "report.md cites 'raised from payments/gateway.py:41, propagated through payments/charge.py:88' \u2014 specific but not the verbatim multi-line traceback block the with_skill run quoted."
+    },
+    {
+      "text": "Steps 3 and 4 explicitly reported as never reached / not executed",
+      "passed": true,
+      "evidence": "'\u6c92\u6709\u7e7c\u7e8c\u57f7\u884c Step 3\uff08\u66f4\u65b0\u5eab\u5b58\uff09\u6216 Step 4\uff08\u5bc4\u9001\u78ba\u8a8d\u4fe1\uff09'"
+    },
+    {
+      "text": "Report distinguishes the charge decline from the pipeline's own abort behavior",
+      "passed": true,
+      "evidence": "'\u9019\u662f\u5916\u90e8\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\u5c0e\u81f4\u7684\u696d\u52d9\u5c64\u5931\u6557\uff0c\u4e0d\u662f pipeline \u908f\u8f2f\u6216\u7a0b\u5f0f\u78bc\u7684 bug' \u2014 separates external cause from pipeline behavior, though frames the whole thing as one non-issue rather than as two distinct classified events."
+    },
+    {
+      "text": "Output is saved as a structured report file",
+      "passed": true,
+      "evidence": "Wrote its own report.md (unguided, agent's own choice) with Verdict/What Happened/Assessment/Conclusion sections \u2014 a different template than the skill's, but still a saved file."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

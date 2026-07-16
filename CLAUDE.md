@@ -4,14 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A Claude Code plugin that bridges gstack-reviewed plans into Superpowers `writing-plans` format. No build step, no runtime — pure skill definitions and plugin metadata.
+A Claude Code plugin that bundles three unrelated skill families under one `bridge` namespace: gstack-plan → Superpowers `writing-plans` bridging, Resend-based repo update-email digests, and pipeline log review against a design doc. No build step, no runtime — pure skill definitions and plugin metadata.
 
 ## Plugin structure
 
 ```
-.claude-plugin/plugin.json   — plugin manifest (name, version, description)
-skills/<skill-name>/SKILL.md — one skill per directory; SKILL.md is the full skill prompt
-README.md                    — user-facing install and usage docs
+.claude-plugin/plugin.json      — plugin manifest (name, version, description)
+.claude-plugin/marketplace.json — local marketplace descriptor, used to install/test this plugin from a GitHub URL or local path
+skills/<skill-name>/SKILL.md    — one skill per directory; SKILL.md is the full skill prompt
+README.md                       — user-facing install and usage docs
 ```
 
 Claude Code reads `skills/*/SKILL.md` automatically when the plugin is installed. The frontmatter (`---` block) controls `name`, `description`, `triggers`, and `allowed-tools`.
@@ -38,3 +39,9 @@ uv run script.py
 - Skills must **not** implement code themselves — they instruct Claude how to act.
 - Every skill that produces files must specify the output path (e.g. `docs/superpowers/input/`).
 - Explicit `[ASSUMPTION: ...]` markers are preferred over silent gap-filling.
+
+## Known output paths and shared config
+
+- `docs/superpowers/{plans,specs}/` — gstack-to-plan handoff files
+- `docs/pipeline-reviews/` — review-pipeline-logs reports
+- `.bridge/email-config.json` (per target repo) — recipients, last-sent tracking, and Resend MCP connection; shared by `setup-email-updates`, `send-update-email`, and `send-update-email-batch`

@@ -1,0 +1,48 @@
+{
+  "skill_name": "review-pipeline-logs",
+  "evals": [
+    {
+      "id": 1,
+      "name": "eval-clean-pass",
+      "prompt": "我剛做完 order-processing pipeline 的開發，plan 在 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md，實際跑完的 log 在 review-pipeline-logs-workspace/fixtures/order-pipeline-clean/run.log。幫我 review 這次跑的結果是不是照設計跑對了。",
+      "expected_output": "A report where every one of the 4 plan steps is marked as ran-and-succeeded, output values (item_count=2 matching quantity_decremented=2, charge amount matching order total) checked and matching, no unexpected errors, overall verdict PASS.",
+      "files": [],
+      "assertions": [
+        "Verdict is a clear, unqualified PASS",
+        "All 4 steps (validate, charge, inventory, email) are individually marked as ran & succeeded, each with quoted log-line evidence",
+        "item_count (2) and quantity_decremented (2) are explicitly compared and confirmed to match",
+        "Report explicitly states no errors/exceptions were found (not just silence on the topic)",
+        "Output is saved as a structured report file, not just a chat-only response"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "eval-charge-failure",
+      "prompt": "剛跑完 order-processing pipeline，plan 在 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md，log 在 review-pipeline-logs-workspace/fixtures/order-pipeline-failure/run.log，幫我確認這次執行有沒有問題。",
+      "expected_output": "A report identifying: validate order succeeded, charge payment failed (card_declined / do_not_honor, with the traceback quoted), inventory update and confirmation email steps never ran (correctly reported as not-reached/missing rather than assumed fine), overall verdict FAIL.",
+      "files": [],
+      "assertions": [
+        "Step 1 (validate order) is marked as ran & succeeded",
+        "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor",
+        "The traceback / exception detail is quoted, not just summarized as 'an error occurred'",
+        "Steps 3 and 4 are explicitly reported as never reached / not executed, not silently assumed to have passed",
+        "The report distinguishes the charge decline itself from the pipeline's own abort-and-stop behavior, rather than treating the abort as a second unrelated bug",
+        "Output is saved as a structured report file, not just a chat-only response"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "eval-quiet-logging",
+      "prompt": "幫我 review 一下這個 pipeline 的 log，plan 在 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md，log 在 review-pipeline-logs-workspace/fixtures/order-pipeline-quiet/run.log。",
+      "expected_output": "A report that cannot verify most of the 4 individual steps from the log (only 'processing order' and 'done' exist, no per-step evidence), calls this out clearly in the Logging Quality section as a significant gap (no levels, no step breakdown, no order id/context), and does NOT mark unverifiable steps as a plain pass — verdict should reflect the uncertainty (e.g. PASS WITH WARNINGS or similar), not a clean PASS.",
+      "files": [],
+      "assertions": [
+        "None of the 4 steps are marked as a confirmed pass (✅) given the lack of log evidence — each is marked unverifiable/missing instead",
+        "Logging Quality section explicitly flags: no per-step log lines, no log levels used, and no identifying context (order id, amounts, etc.)",
+        "Overall verdict carries an explicit caveat (not an unqualified PASS) reflecting that correctness could not actually be verified",
+        "Output Value Checks section explicitly states the checks could not be performed, rather than omitting the section or silently marking them fine",
+        "Output is saved as a structured report file, not just a chat-only response"
+      ]
+    }
+  ]
+}

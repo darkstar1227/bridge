@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-clean-pass",
+  "prompt": "我剛做完 order-processing pipeline 的開發，plan 在 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md，實際跑完的 log 在 review-pipeline-logs-workspace/fixtures/order-pipeline-clean/run.log。幫我 review 這次跑的結果是不是照設計跑對了。",
+  "assertions": []
+}

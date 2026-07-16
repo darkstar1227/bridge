@@ -40,6 +40,26 @@ Write the answers to `~/.opencode-bridge/config.json`:
 
 Do this only once — do not re-ask on subsequent invocations once the file exists and parses.
 
+## Step 1b: Check the Bash permission allowlist
+
+This skill's Step 2 shells out to `uv run .../dispatch.py`, which in turn invokes the `opencode` CLI — an external coding agent. Without an allow rule, some permission configurations (or hook-based classifiers layered on top of Claude Code's own permission system) may flag or prompt on this pattern every time, since it looks like handing code/tasks to a third-party tool.
+
+Check whether the current project's `.claude/settings.local.json` (or `.claude/settings.json`) already allows this Bash pattern:
+```bash
+grep -r "uv run" .claude/settings.local.json .claude/settings.json 2>/dev/null
+```
+
+If no matching rule exists, ask the user via AskUserQuestion whether to add one:
+- **Question**: "This skill needs to run `uv run .../dispatch.py` without a permission prompt each time. Add a Bash allow rule to `.claude/settings.local.json`?"
+- If yes, add (creating the file/`permissions.allow` array if absent):
+  ```json
+  { "permissions": { "allow": ["Bash(uv run *)"] } }
+  ```
+  (merge into any existing `permissions.allow` array rather than overwriting it).
+- If the user declines, proceed anyway — Step 2 will simply prompt for permission on each dispatch call.
+
+Do this only once per project — do not re-ask once the rule is present.
+
 ## Step 2: Dispatch
 
 Run (substituting the actual task description, target repo absolute path, and a short topic string identifying this line of work — e.g. the feature/branch name):

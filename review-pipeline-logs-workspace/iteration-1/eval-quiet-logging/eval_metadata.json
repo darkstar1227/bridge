@@ -1,0 +1,6 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-quiet-logging",
+  "prompt": "幫我 review 一下這個 pipeline 的 log，plan 在 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md，log 在 review-pipeline-logs-workspace/fixtures/order-pipeline-quiet/run.log。",
+  "assertions": []
+}

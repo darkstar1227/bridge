@@ -1,0 +1,10 @@
+2026-07-08T09:00:01Z INFO run started order_id=ORD-1001
+2026-07-08T09:00:01Z INFO validating order order_id=ORD-1001
+2026-07-08T09:00:01Z INFO order validated order_id=ORD-1001 item_count=2
+2026-07-08T09:00:02Z INFO charging payment order_id=ORD-1001 amount=59.98
+2026-07-08T09:00:02Z INFO charge succeeded order_id=ORD-1001 charge_id=ch_9182 amount=59.98
+2026-07-08T09:00:02Z INFO updating inventory order_id=ORD-1001 sku=WIDGET-A
+2026-07-08T09:00:03Z INFO inventory updated order_id=ORD-1001 sku=WIDGET-A quantity_decremented=2
+2026-07-08T09:00:03Z INFO sending confirmation email order_id=ORD-1001
+2026-07-08T09:00:03Z INFO confirmation email sent order_id=ORD-1001 recipient=jane@example.com
+2026-07-08T09:00:03Z INFO run finished order_id=ORD-1001 status=success

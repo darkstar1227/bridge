@@ -1,0 +1,333 @@
+{
+  "metadata": {
+    "skill_name": "review-pipeline-logs",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-07-08T16:39:09Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 83.2,
+        "tokens": 60989,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Step 1 (validate order) is marked as ran & succeeded",
+          "passed": true,
+          "evidence": "Table row 1: '\u2705 ran & succeeded'"
+        },
+        {
+          "text": "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor",
+          "passed": true,
+          "evidence": "Table row 2: '\u274c failed' \u2014 'reason=card_declined' + 'CardDeclinedError: do_not_honor'"
+        },
+        {
+          "text": "The traceback / exception detail is quoted, not just summarized",
+          "passed": true,
+          "evidence": "Full Python traceback (file/line numbers) quoted verbatim in Step-by-Step Results and repeated in Errors & Exceptions."
+        },
+        {
+          "text": "Steps 3 and 4 explicitly reported as never reached / not executed, not silently assumed to have passed",
+          "passed": true,
+          "evidence": "Table rows 3-4: '\u274c missing (expected \u2014 never reached)', plus explicit note: 'Steps 3 and 4 are marked missing rather than unverifiable-by-silence... this is a correct halt, not a silent skip.'"
+        },
+        {
+          "text": "Report distinguishes the charge decline from the pipeline's own abort behavior, rather than treating the abort as a second bug",
+          "passed": true,
+          "evidence": "Errors & Exceptions lists the decline as 'unexpected failure' and the abort line separately as 'expected/handled \u2014 the pipeline's own controlled shutdown... not a second, independent bug.'"
+        },
+        {
+          "text": "Output is saved as a structured report file",
+          "passed": true,
+          "evidence": "report.md written matching the skill's full template."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 69.8,
+        "tokens": 60015,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Verdict is a clear, unqualified PASS",
+          "passed": true,
+          "evidence": "\"PASS \u2014 all four steps ran, in the designed order, with success signals and output values matching the plan; no errors found.\""
+        },
+        {
+          "text": "All 4 steps individually marked as ran & succeeded, each with quoted log-line evidence",
+          "passed": true,
+          "evidence": "Step-by-Step Results table: all 4 rows marked '\u2705 ran & succeeded' with quoted log lines."
+        },
+        {
+          "text": "item_count (2) and quantity_decremented (2) explicitly compared and confirmed to match",
+          "passed": true,
+          "evidence": "Output Value Checks table row 3: 'quantity_decremented=2 vs item_count=2 | \u2705 matches'"
+        },
+        {
+          "text": "Report explicitly states no errors/exceptions were found",
+          "passed": true,
+          "evidence": "'None found. Scanned for ERROR, FATAL, Exception, Traceback, panic, and non-2xx-style status codes \u2014 no hits...'"
+        },
+        {
+          "text": "Output is saved as a structured report file",
+          "passed": true,
+          "evidence": "report.md written matching the skill's full template (Verdict, Step-by-Step, Logging Quality, Errors, Output Values, Fixes, Assumptions)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 79.6,
+        "tokens": 59657,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "None of the 4 steps marked as a confirmed pass (\u2705) given the lack of log evidence",
+          "passed": true,
+          "evidence": "All 4 rows in Step-by-Step Results marked '\u26a0\ufe0f unverifiable', none marked \u2705."
+        },
+        {
+          "text": "Logging Quality section explicitly flags: no per-step lines, no log levels, no identifying context",
+          "passed": true,
+          "evidence": "'Every step is invisible.' / 'No log levels are used at all.' / 'No identifying context anywhere.'"
+        },
+        {
+          "text": "Overall verdict carries an explicit caveat, not an unqualified PASS",
+          "passed": true,
+          "evidence": "'PASS WITH WARNINGS \u2014 ... gives zero verifiable evidence for any of the 4 designed steps...'"
+        },
+        {
+          "text": "Output Value Checks section explicitly states the checks could not be performed",
+          "passed": true,
+          "evidence": "'Cannot be performed.' with a table marking all 3 checks '\u274c cannot verify'."
+        },
+        {
+          "text": "Output is saved as a structured report file",
+          "passed": true,
+          "evidence": "report.md written matching the skill's full template."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 69.2,
+        "tokens": 55504,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Step 1 (validate order) is marked as ran & succeeded",
+          "passed": true,
+          "evidence": "'Step 1\uff08\u9a57\u8b49\u8a02\u55ae\uff0citem_count=3\uff09\u901a\u904e'"
+        },
+        {
+          "text": "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor",
+          "passed": true,
+          "evidence": "'payment gateway \u56de\u50b3 CardDeclinedError: do_not_honor\uff08\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\uff09'"
+        },
+        {
+          "text": "The traceback / exception detail is quoted, not just summarized",
+          "passed": true,
+          "evidence": "report.md cites 'raised from payments/gateway.py:41, propagated through payments/charge.py:88' \u2014 specific but not the verbatim multi-line traceback block the with_skill run quoted."
+        },
+        {
+          "text": "Steps 3 and 4 explicitly reported as never reached / not executed",
+          "passed": true,
+          "evidence": "'\u6c92\u6709\u7e7c\u7e8c\u57f7\u884c Step 3\uff08\u66f4\u65b0\u5eab\u5b58\uff09\u6216 Step 4\uff08\u5bc4\u9001\u78ba\u8a8d\u4fe1\uff09'"
+        },
+        {
+          "text": "Report distinguishes the charge decline from the pipeline's own abort behavior",
+          "passed": true,
+          "evidence": "'\u9019\u662f\u5916\u90e8\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\u5c0e\u81f4\u7684\u696d\u52d9\u5c64\u5931\u6557\uff0c\u4e0d\u662f pipeline \u908f\u8f2f\u6216\u7a0b\u5f0f\u78bc\u7684 bug' \u2014 separates external cause from pipeline behavior, though frames the whole thing as one non-issue rather than as two distinct classified events."
+        },
+        {
+          "text": "Output is saved as a structured report file",
+          "passed": true,
+          "evidence": "Wrote its own report.md (unguided, agent's own choice) with Verdict/What Happened/Assessment/Conclusion sections \u2014 a different template than the skill's, but still a saved file."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 29.7,
+        "tokens": 53054,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Verdict is a clear, unqualified PASS",
+          "passed": true,
+          "evidence": "'\u7d50\u8ad6\uff1a\u9019\u6b21\u57f7\u884c\u5b8c\u5168\u7167\u8a2d\u8a08\u8dd1\u5c0d\uff0cVerdict = PASS\u3002'"
+        },
+        {
+          "text": "All 4 steps individually marked as ran & succeeded, each with quoted log-line evidence",
+          "passed": true,
+          "evidence": "Prose list covers all 4 steps with quoted log fragments, though not in a structured table."
+        },
+        {
+          "text": "item_count (2) and quantity_decremented (2) explicitly compared and confirmed to match",
+          "passed": true,
+          "evidence": "'decremented quantity\uff082\uff09\u8207 step 1 \u7684 item_count\uff082\uff09\u76f8\u7b26'"
+        },
+        {
+          "text": "Report explicitly states no errors/exceptions were found",
+          "passed": true,
+          "evidence": "'\u6c92\u6709\u932f\u8aa4\u3001\u91cd\u8a66\u6216\u975e\u9810\u671f\u72c0\u614b\uff1brun finished status=success \u6536\u5c3e\u6b63\u5e38\u3002'"
+        },
+        {
+          "text": "Output is saved as a structured report file",
+          "passed": false,
+          "evidence": "Only chat_summary.md was produced; no separate persisted report file, no fixed template/sections, nothing saved for later reference."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 38.0,
+        "tokens": 53333,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "None of the 4 steps marked as a confirmed pass given the lack of log evidence",
+          "passed": true,
+          "evidence": "'4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931... \u6c92\u6709\u4efb\u4f55\u4e00\u884c\u63d0\u5230 validate\u3001charge\u3001inventory\u3001email' \u2014 treated as unverifiable, not passed."
+        },
+        {
+          "text": "Logging Quality section explicitly flags: no per-step lines, no log levels, no identifying context",
+          "passed": true,
+          "evidence": "'\u6c92\u6709\u4efb\u4f55\u53ef\u8ffd\u8e64\u6b04\u4f4d' and '4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931', though not organized under a distinct labeled section \u2014 woven into \u767c\u73fe\u7684\u554f\u984c instead."
+        },
+        {
+          "text": "Overall verdict carries an explicit caveat, not an unqualified PASS",
+          "passed": true,
+          "evidence": "'\u9019\u4efd log \u56b4\u91cd\u4e0d\u8db3\uff0c\u7121\u6cd5\u7528\u4f86\u9a57\u8b49 pipeline \u662f\u5426\u7167 plan \u57f7\u884c' \u2014 does not issue a PASS at all, arguably stricter than with_skill's 'PASS WITH WARNINGS'."
+        },
+        {
+          "text": "Output Value Checks section explicitly states the checks could not be performed",
+          "passed": false,
+          "evidence": "No distinct output-value-checks section; covers the idea generally ('\u7121\u6cd5\u5224\u65b7\u662f\u5426\u6b63\u78ba\u57f7\u884c') but doesn't walk through the plan's specific 3 output-value expectations one by one."
+        },
+        {
+          "text": "Output is saved as a structured report file",
+          "passed": false,
+          "evidence": "Only chat_summary.md was produced; no persisted report file."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 77.5333,
+        "stddev": 6.9349,
+        "min": 69.8,
+        "max": 83.2
+      },
+      "tokens": {
+        "mean": 60220.3333,
+        "stddev": 689.3311,
+        "min": 59657,
+        "max": 60989
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.8,
+        "stddev": 0.2,
+        "min": 0.6,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 45.6333,
+        "stddev": 20.827,
+        "min": 29.7,
+        "max": 69.2
+      },
+      "tokens": {
+        "mean": 53963.6667,
+        "stddev": 1341.2421,
+        "min": 53054,
+        "max": 55504
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.20",
+      "time_seconds": "+31.9",
+      "tokens": "+6257"
+    }
+  },
+  "notes": []
+}

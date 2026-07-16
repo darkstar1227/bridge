@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "review-pipeline-logs", "runs": [{"id": "eval-clean-pass-with_skill", "prompt": "\u6211\u525b\u505a\u5b8c order-processing pipeline \u7684\u958b\u767c\uff0cplan \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md\uff0c\u5be6\u969b\u8dd1\u5b8c\u7684 log \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline-clean/run.log\u3002\u5e6b\u6211 review \u9019\u6b21\u8dd1\u7684\u7d50\u679c\u662f\u4e0d\u662f\u7167\u8a2d\u8a08\u8dd1\u5c0d\u4e86\u3002", "eval_id": 1, "outputs": [{"name": "chat_summary.md", "type": "text", "content": "**Verdict: PASS** \u2705\n\n\u8dd1\u5b8c\u7684 log\uff08`run.log`\uff0corder_id=ORD-1001\uff09\u56db\u500b\u6b65\u9a5f\u90fd\u7167 plan \u7684\u9806\u5e8f\u5b8c\u6574\u8dd1\u5b8c\uff0c\u4e14\u6bcf\u6b65\u90fd\u6709 start + success \u5169\u884c log\uff1a\n\n1. **Validate order** \u2014 `item_count=2`\uff08\u7b26\u5408 \u22651 \u7684\u8981\u6c42\uff09\n2. **Charge payment** \u2014 `charge_id=ch_9182`, `amount=59.98`\n3. **Update inventory** \u2014 `sku=WIDGET-A`, `quantity_decremented=2`\uff08\u8ddf step 1 \u7684 item_count \u4e00\u81f4\uff09\n4. **Send confirmation email** \u2014 `recipient=jane@example.com`\n\nLog \u88e1\u6c92\u6709\u4efb\u4f55 ERROR/FATAL/Exception\uff0c\u6700\u5f8c\u4ee5 `run finished ... status=success` \u6536\u5c3e\u3002Logging \u54c1\u8cea\u6574\u9ad4\u4e0d\u932f\uff08\u6bcf\u6b65\u90fd\u6709 order_id \u53ef\u8ffd\u8e64\u3001\u6709\u5177\u9ad4\u6578\u503c\uff09\uff0c\u4f46\u6c92\u6709\u8a18\u9304\u8017\u6642\uff08duration\uff09\uff0c\u4e5f\u6c92\u6709\u7368\u7acb\u8a18\u9304\u300corder total\u300d\u9019\u500b\u503c\u2014\u2014\u76ee\u524d\u53ea\u80fd\u9a57\u8b49 charge \u91d1\u984d\u524d\u5f8c\u4e00\u81f4\uff0c\u6c92\u8fa6\u6cd5\u5c0d\u7167\u4e00\u500b\u7368\u7acb\u4f86\u6e90\u78ba\u8a8d\u91d1\u984d\u771f\u7684\u7b49\u65bc\u8a02\u55ae\u7e3d\u984d\u3002\n\n**\u5efa\u8b70\u5fae\u8abf\uff08\u975e\u963b\u65b7\uff09\uff1a**\n- \u5728 validate \u968e\u6bb5\u9806\u4fbf\u628a order total \u8a18\u4e0b\u4f86\uff0c\u65b9\u4fbf\u4e4b\u5f8c\u7368\u7acb\u9a57\u8b49 charge \u91d1\u984d\u662f\u5426\u6b63\u78ba\n- \u6bcf\u6b65\u52a0\u4e0a\u8017\u6642\uff08duration\uff09\u65b9\u4fbf\u6548\u80fd\u9664\u932f\n- \u9019\u4efd log \u53ea\u6db5\u84cb\u6210\u529f\u8def\u5f91\uff0c\u5efa\u8b70\u4e4b\u5f8c\u627e\u4e00\u7b46\u5931\u6557\u6848\u4f8b\uff08\u4f8b\u5982\u4ed8\u6b3e\u88ab\u62d2\uff09\u78ba\u8a8d\u932f\u8aa4\u8def\u5f91\u7684 log \u54c1\u8cea\n\n\u5b8c\u6574\u5831\u544a\u5df2\u5beb\u5165 `docs/pipeline-reviews/pipeline-review-2026-07-09-order-processing-pipeline.md`\u3002\n"}, {"name": "report.md", "type": "text", "content": "# Pipeline Log Review: Order Processing Pipeline\n\n_Design doc: review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md_\n_Log source: review-pipeline-logs-workspace/fixtures/order-pipeline-clean/run.log \u2014 single run, \"run started\" (line 1) to \"run finished\" (line 10), order_id=ORD-1001_\n_Reviewed: 2026-07-09_\n\n## Verdict\n\nPASS \u2014 all four steps ran, in the designed order, with success signals and output values matching the plan; no errors found.\n\n## Step-by-Step Results\n\n| Step | Expected | Found in log? | Status | Evidence |\n|------|----------|---------------|--------|----------|\n| 1. Validate order | Triggered by incoming order event; logs `order validated` with order id + item count; item count \u2265 1 | Yes \u2014 lines 2\u20133 | \u2705 ran & succeeded | `INFO validating order order_id=ORD-1001` / `INFO order validated order_id=ORD-1001 item_count=2` |\n| 2. Charge payment | Triggered after validation succeeds; logs `charge succeeded` with charge id + amount; amount matches order total | Yes \u2014 lines 4\u20135 | \u2705 ran & succeeded | `INFO charging payment order_id=ORD-1001 amount=59.98` / `INFO charge succeeded order_id=ORD-1001 charge_id=ch_9182 amount=59.98` |\n| 3. Update inventory | Triggered after charge succeeds; logs `inventory updated` with SKU + quantity decremented; quantity = item count from step 1 | Yes \u2014 lines 6\u20137 | \u2705 ran & succeeded | `INFO updating inventory order_id=ORD-1001 sku=WIDGET-A` / `INFO inventory updated order_id=ORD-1001 sku=WIDGET-A quantity_decremented=2` |\n| 4. Send confirmation email | Triggered after inventory update succeeds; logs `confirmation email sent` with recipient address | Yes \u2014 lines 8\u20139 | \u2705 ran & succeeded | `INFO sending confirmation email order_id=ORD-1001` / `INFO confirmation email sent order_id=ORD-1001 recipient=jane@example.com` |\n\nSteps appear in the exact order the plan specifies, with timestamps strictly increasing (09:00:01 \u2192 09:00:03) and no interleaving with any other order, consistent with each step being triggered by the prior step's success. The run closes with `run finished order_id=ORD-1001 status=success` (line 10).\n\n## Logging Quality\n\n- Every one of the 4 designed steps emits both a start line (`validating order`, `charging payment`, `updating inventory`, `sending confirmation email`) and a completion line (`order validated`, `charge succeeded`, `inventory updated`, `confirmation email sent`) \u2014 matches the plan's \"Verification Expectations\" section requiring start + completion logging for every step.\n- Log levels are used sensibly for this run: everything is INFO, which is appropriate since nothing failed \u2014 no routine progress incorrectly screaming as WARN/ERROR.\n- Lines carry actionable context: order_id on every line (good correlation key), item_count, charge_id, amount, sku, quantity_decremented, recipient \u2014 enough to debug this specific order without re-running the pipeline.\n- Gap: no duration/latency field on any line (only wall-clock timestamps, which can be diff'd manually). Not required by the plan, but worth adding for performance debugging.\n- This log only shows the happy path, so error-path logging quality (stack traces, retry detail) is unverified \u2014 see Assumptions/Open Questions.\n\n## Errors & Exceptions\n\nNone found. Scanned for `ERROR`, `FATAL`, `Exception`, `Traceback`, `panic`, and non-2xx-style status codes \u2014 no hits in the isolated run block. `run finished ... status=success` confirms a clean exit.\n\n## Output Value Checks\n\n| Expected (per plan) | Actual (logged) | Result |\n|---|---|---|\n| Item count \u2265 1 (step 1) | `item_count=2` | \u2705 matches |\n| Charge amount matches order total (step 2) | `amount=59.98` (same value logged at both charge-start and charge-succeeded) | \u26a0\ufe0f internally consistent, but unverifiable against an independent \"order total\" \u2014 see Open Questions |\n| Quantity decremented == item count from step 1 (step 3) | `quantity_decremented=2` vs `item_count=2` | \u2705 matches |\n| Recipient address present (step 4) | `recipient=jane@example.com` | \u2705 present, well-formed |\n\n## Suggested Fixes\n\n1. Log the order total explicitly at validation or order-received time (e.g. `order validated order_id=... item_count=2 order_total=59.98`) so \"charge amount matches order total\" can be verified from the log itself rather than by trusting the charge step's own numbers.\n2. Add a duration or elapsed-ms field per step (or at minimum a per-step \"completed in Xms\") to support performance debugging without hand-diffing timestamps.\n3. No error path is exercised in this log \u2014 recommend also reviewing a failure-case run (e.g. payment decline, inventory shortage) to confirm ERROR/FATAL levels and stack-trace detail are actually emitted when something breaks, since this run can't prove that.\n\n## Assumptions / Open Questions\n\n- [ASSUMPTION] Treated `review-pipeline-logs-workspace/fixtures/order-pipeline-clean/run.log` as containing exactly one run (single `run started`/`run finished` pair for ORD-1001) \u2014 reviewed the whole file as that one run.\n- [OPEN] The plan requires \"charge amount must match the order total,\" but no order total is logged anywhere independent of the charge step itself. Confirm whether order total is computed/logged elsewhere (e.g. upstream order-creation service) so this check can be made meaningfully rather than just checking the charge step agrees with itself.\n"}], "grading": null}, {"id": "eval-clean-pass-without_skill", "prompt": "\u6211\u525b\u505a\u5b8c order-processing pipeline \u7684\u958b\u767c\uff0cplan \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md\uff0c\u5be6\u969b\u8dd1\u5b8c\u7684 log \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline-clean/run.log\u3002\u5e6b\u6211 review \u9019\u6b21\u8dd1\u7684\u7d50\u679c\u662f\u4e0d\u662f\u7167\u8a2d\u8a08\u8dd1\u5c0d\u4e86\u3002", "eval_id": 1, "outputs": [{"name": "chat_summary.md", "type": "text", "content": "Review \u7d50\u679c\uff1a\u9019\u6b21\u8dd1\u7684 order-processing pipeline **\u7b26\u5408\u8a2d\u8a08**\uff0c\u6c92\u6709\u767c\u73fe\u554f\u984c\u3002\n\n\u6bd4\u5c0d `plan.md` \u8207 `run.log`\uff08order_id=ORD-1001\uff09\uff1a\n\n1. **Validate order** \u2014 `validating order` \u2192 `order validated item_count=2`\u3002item_count=2 \u2265 1\uff0c\u7b26\u5408\u9810\u671f\u3002\n2. **Charge payment** \u2014 `charging payment amount=59.98` \u2192 `charge succeeded charge_id=ch_9182 amount=59.98`\u3002charge amount \u8207 charging \u6642\u7684 order \u91d1\u984d\u4e00\u81f4\u3002\n3. **Update inventory** \u2014 `updating inventory sku=WIDGET-A` \u2192 `inventory updated sku=WIDGET-A quantity_decremented=2`\u3002decremented quantity\uff082\uff09\u8207 step 1 \u7684 item_count\uff082\uff09\u76f8\u7b26\u3002\n4. **Send confirmation email** \u2014 `sending confirmation email` \u2192 `confirmation email sent recipient=jane@example.com`\u3002\n\n\u89c0\u5bdf\u91cd\u9ede\uff1a\n- \u56db\u500b\u6b65\u9a5f\u90fd\u4f9d\u7167 plan \u898f\u5b9a\u7684\u9806\u5e8f\u57f7\u884c\uff08validate \u2192 charge \u2192 inventory \u2192 email\uff09\uff0c\u6642\u9593\u6233\u905e\u589e\u3001\u7121\u8df3\u6b65\u6216\u91cd\u8907\u3002\n- \u6bcf\u500b\u6b65\u9a5f\u90fd\u6709 start \u8207 success/completion \u5169\u884c log\uff0c\u4e14\u90fd\u5e36\u6709\u8db3\u4ee5\u9664\u932f\u55ae\u7b46\u8a02\u55ae\u7684\u7d30\u7bc0\uff08order_id\u3001amount\u3001charge_id\u3001SKU\u3001quantity\u3001recipient\uff09\uff0c\u7b26\u5408 plan \u4e2d\u300cVerification Expectations\u300d\u7684\u8981\u6c42\u3002\n- \u6c92\u6709\u932f\u8aa4\u3001\u91cd\u8a66\u6216\u975e\u9810\u671f\u72c0\u614b\uff1b`run finished status=success` \u6536\u5c3e\u6b63\u5e38\u3002\n\n\u7d50\u8ad6\uff1a\u9019\u6b21\u57f7\u884c\u5b8c\u5168\u7167\u8a2d\u8a08\u8dd1\u5c0d\uff0cVerdict = PASS\u3002\n"}], "grading": null}, {"id": "eval-charge-failure-with_skill", "prompt": "\u525b\u8dd1\u5b8c order-processing pipeline\uff0cplan \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md\uff0clog \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline-failure/run.log\uff0c\u5e6b\u6211\u78ba\u8a8d\u9019\u6b21\u57f7\u884c\u6709\u6c92\u6709\u554f\u984c\u3002", "eval_id": 2, "outputs": [{"name": "chat_summary.md", "type": "text", "content": "**Verdict: FAIL** \u2014 order-processing pipeline for ORD-1042 did not complete.\n\n- Step 1 (validate order): \u2705 succeeded \u2014 item_count=3.\n- Step 2 (charge payment): \u274c failed \u2014 payment gateway declined the card (`reason=card_declined`, `CardDeclinedError: do_not_honor`), full traceback logged.\n- Step 3 (update inventory) and Step 4 (send confirmation email): never ran \u2014 the pipeline correctly aborted right after the charge failure (`run aborted ... stage=charge_payment`) instead of continuing, so no partial/incorrect fulfillment happened.\n\nLogging quality is good: every step that ran logged both a start and a completion/failure line, error levels are used correctly, and the traceback gives enough detail to debug without re-running. One gap: the log never states an independent \"order total,\" so I couldn't verify the charge amount (142.50) actually matched the order total \u2014 the charge never succeeded anyway.\n\nRoot cause: card declined by the payment gateway (`do_not_honor`) \u2014 not a pipeline bug, but the order is now stuck unpaid.\n\nSuggested next steps:\n1. Confirm there's a follow-up process for declined charges (retry, notify customer, or cancel the order) \u2014 nothing in this log shows one happening.\n2. Log an explicit `order_total` field at validation time so future reviews can verify charge-amount-vs-total independently.\n3. Consider logging whether a retry was attempted on decline, to distinguish \"single attempt, no retry\" from a configured retry policy.\n\nFull report saved to `docs/pipeline-reviews/pipeline-review-2026-07-09-order-processing.md`.\n"}, {"name": "report.md", "type": "text", "content": "# Pipeline Log Review: Order Processing Pipeline\n\n_Design doc: review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md_\n_Log source: review-pipeline-logs-workspace/fixtures/order-pipeline-failure/run.log \u2014 single run, order_id=ORD-1042, from the \"run started\" marker (line 1) to EOF (line 12)_\n_Reviewed: 2026-07-09_\n\n## Verdict\n\n**FAIL** \u2014 the pipeline correctly halted after the payment charge was declined, but the order (ORD-1042) was never completed: inventory was never decremented and no confirmation email was sent.\n\n## Step-by-Step Results\n\n| Step | Expected | Found in log? | Status | Evidence |\n|------|----------|---------------|--------|----------|\n| 1. Validate order | Logs `order validated` with order id and item count; item count >= 1 | Line 2 (start), line 3 (success) | \u2705 ran & succeeded | `validating order order_id=ORD-1042` / `order validated order_id=ORD-1042 item_count=3` |\n| 2. Charge payment | Logs `charge succeeded` with charge id and amount; amount matches order total | Line 4 (start), line 5 (failure, not success) | \u274c failed | `charging payment order_id=ORD-1042 amount=142.50` \u2192 `ERROR charge failed order_id=ORD-1042 reason=card_declined` + traceback: `payments.gateway.CardDeclinedError: do_not_honor` |\n| 3. Update inventory | Logs `inventory updated` with SKU and quantity decremented == item count | No lines found | \u274c missing (expected \u2014 never reached) | not present after line 12 |\n| 4. Send confirmation email | Logs `confirmation email sent` with recipient address | No lines found | \u274c missing (expected \u2014 never reached) | not present after line 12 |\n\nSteps 3 and 4 are marked missing rather than unverifiable-by-silence: line 12 (`run aborted ... stage=charge_payment`) is explicit evidence the pipeline stopped at step 2 and intentionally never invoked steps 3/4, so this is a correct halt, not a silent skip.\n\n## Logging Quality\n\n- Steps 1 and 2 each log both a start line and a completion/failure line, matching the plan's verification expectation (\"every step should log both a start and a completion/success line\").\n- Log levels are used meaningfully: routine progress is INFO, the decline and the abort are both ERROR \u2014 nothing is buried.\n- The failure carries strong debugging context: `reason=card_declined`, a full Python traceback with file/line numbers, and the concrete exception type/code (`CardDeclinedError: code=\"do_not_honor\"`). This is enough to diagnose the failure without re-running the pipeline.\n- The final `run aborted` line explicitly names `stage=charge_payment`, which makes it unambiguous where the pipeline stopped and prevents mistaking steps 3/4 as silently skipped.\n- Minor gap: the log never surfaces an independent \"order total\" value at validation time, so the expected-output check for step 2 (charge amount == order total) can't be cross-verified from the log alone (see Output Value Checks).\n- No gap otherwise \u2014 this is one of the better-instrumented failure traces of this shape.\n\n## Errors & Exceptions\n\n1. **Line 5 + traceback (lines 6\u201311): `ERROR charge failed order_id=ORD-1042 reason=card_declined`, `CardDeclinedError: code=\"do_not_honor\"`.**\n   Classification: **unexpected failure** \u2014 this breaks step 2's success signal (`charge succeeded`) directly; the payment gateway declined the card.\n2. **Line 12: `ERROR run aborted order_id=ORD-1042 stage=charge_payment`.**\n   Classification: **expected/handled** \u2014 this is the pipeline's own controlled shutdown in response to the charge failure (not a second, independent bug). Aborting rather than proceeding to decrement inventory or send a confirmation for an uncharged order is the correct fail-safe behavior.\n\n## Output Value Checks\n\n| Step | Expected | Actual | Result |\n|------|----------|--------|--------|\n| 1. Validate order | item_count >= 1 | item_count=3 | \u2705 matches |\n| 2. Charge payment | charge amount == order total | amount=142.50 attempted, but charge did not succeed (declined) | \u26a0\ufe0f not verifiable \u2014 no independent \"order total\" value appears anywhere in the log to compare against, and the charge never completed, so there is no successful amount to check |\n| 3. Update inventory | quantity decremented == item_count (3) | n/a \u2014 step never ran | \u274c not applicable, step didn't execute |\n| 4. Send confirmation email | recipient address logged | n/a \u2014 step never ran | \u274c not applicable, step didn't execute |\n\n## Suggested Fixes\n\n1. **Business-level (priority 1):** ORD-1042 is currently an orphaned validated-but-unpaid order. Confirm there's a downstream process (retry, customer notification, or order cancellation) that picks this up \u2014 the plan doesn't specify what happens to an order after a declined charge, and nothing in this log shows the customer being informed.\n2. **Logging (priority 2):** Emit the order total as its own field at the \"order validated\" step (e.g. `order validated order_id=... item_count=3 order_total=142.50`). This lets future reviews verify \"charge amount == order total\" independently instead of inferring the total from the charge-attempt line.\n3. **Logging (priority 3):** Consider a `payment retry` or `payment declined \u2014 no retry configured` line distinguishing single-attempt-and-abort from a retry policy, so it's clear from the log alone whether a retry was even attempted.\n\n## Assumptions / Open Questions\n\n- [ASSUMPTION] Treated `amount=142.50` on the charge-attempt line as the intended order total, since no separate order-total field exists in the log to cross-check step 2's expected output (\"charge amount must match order total\").\n- [OPEN] Does the system retry a declined card or notify the customer/ops for ORD-1042? Not covered by this log or the plan.\n- [OPEN] Is \"abort the whole run on charge failure\" the intended design, or should validation/charge failures be isolated per-order in a batch context? The plan doesn't state pipeline scope (single order vs batch), so this can't be assessed from the doc alone.\n"}], "grading": null}, {"id": "eval-charge-failure-without_skill", "prompt": "\u525b\u8dd1\u5b8c order-processing pipeline\uff0cplan \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md\uff0clog \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline-failure/run.log\uff0c\u5e6b\u6211\u78ba\u8a8d\u9019\u6b21\u57f7\u884c\u6709\u6c92\u6709\u554f\u984c\u3002", "eval_id": 2, "outputs": [{"name": "chat_summary.md", "type": "text", "content": "\u6211\u770b\u4e86 plan.md \u548c run.log\uff0c\u9019\u6b21\u57f7\u884c**\u6c92\u6709 pipeline \u672c\u8eab\u7684\u554f\u984c**\uff0c\u662f\u6b63\u5e38\u7684\u5931\u6557\u8655\u7406\u3002\n\n**\u767c\u751f\u4e86\u4ec0\u9ebc\uff1a** \u8a02\u55ae ORD-1042 \u5728 Step 1\uff08\u9a57\u8b49\u8a02\u55ae\uff0citem_count=3\uff09\u901a\u904e\u5f8c\uff0c\u65bc Step 2\uff08\u6536\u6b3e\uff09\u5931\u6557 \u2014 payment gateway \u56de\u50b3 `CardDeclinedError: do_not_honor`\uff08\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\uff09\u3002Pipeline \u8a18\u9304\u4e86 `run aborted, stage=charge_payment` \u5f8c\u7acb\u5373\u505c\u6b62\uff0c**\u6c92\u6709**\u7e7c\u7e8c\u57f7\u884c Step 3\uff08\u66f4\u65b0\u5eab\u5b58\uff09\u6216 Step 4\uff08\u5bc4\u9001\u78ba\u8a8d\u4fe1\uff09\u3002\n\n**\u5c0d\u7167 plan \u6aa2\u67e5\uff1a** plan \u8981\u6c42\u5404\u6b65\u9a5f\u4f9d\u5e8f\u57f7\u884c\u4e14\u4e92\u76f8\u4f9d\u8cf4\uff08\u6536\u6b3e\u6210\u529f\u624d\u66f4\u65b0\u5eab\u5b58\uff0c\u5eab\u5b58\u66f4\u65b0\u6210\u529f\u624d\u5bc4\u4fe1\uff09\u3002Log \u986f\u793a pipeline \u78ba\u5be6\u9075\u5b88\u4e86\u9019\u500b\u4f9d\u8cf4\u95dc\u4fc2\uff0c\u6c92\u6709\u5728\u4ed8\u6b3e\u5931\u6557\u7684\u60c5\u6cc1\u4e0b\u8aa4\u6263\u5eab\u5b58\u6216\u5bc4\u51fa\u78ba\u8a8d\u4fe1\uff0c\u907f\u514d\u4e86\u8cc7\u6599\u4e0d\u4e00\u81f4\u3002\u6bcf\u500b\u57f7\u884c\u904e\u7684\u6b65\u9a5f\u4e5f\u90fd\u6709\u6e05\u695a\u7684 start/\u7d50\u679c log\uff08order id\u3001item_count\u3001amount\u3001\u5931\u6557\u539f\u56e0\u3001traceback\uff09\uff0c\u8db3\u4ee5\u5728\u4e0d\u91cd\u8dd1\u7684\u60c5\u6cc1\u4e0b\u6392\u67e5\u554f\u984c\u3002\n\n**\u7d50\u8ad6\uff1a** \u9019\u662f\u5916\u90e8\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\u5c0e\u81f4\u7684\u696d\u52d9\u5c64\u5931\u6557\uff0c\u4e0d\u662f pipeline \u908f\u8f2f\u6216\u7a0b\u5f0f\u78bc\u7684 bug\u3002\u5982\u679c\u9700\u8981\u5f8c\u7e8c\u52d5\u4f5c\uff0c\u61c9\u8a72\u662f\u901a\u77e5\u5ba2\u6236\u91cd\u65b0\u4ed8\u6b3e\u6216\u89f8\u767c\u300c\u4ed8\u6b3e\u5931\u6557\u300d\u63d0\u9192\uff0c\u800c\u975e\u4fee\u6539 pipeline\u3002\n"}, {"name": "report.md", "type": "text", "content": "# Order Processing Pipeline Review \u2014 ORD-1042\n\n## Verdict: No pipeline defect. Expected failure, correctly handled.\n\n## What happened\n\n1. `run started` \u2014 order_id=ORD-1042\n2. **Step 1 (Validate order)** \u2014 succeeded: `order validated`, item_count=3 (>= 1, per plan spec). OK\n3. **Step 2 (Charge payment)** \u2014 failed: `charge failed`, reason=`card_declined`, with a Python traceback showing `CardDeclinedError: do_not_honor` raised from `payments/gateway.py:41`, propagated through `payments/charge.py:88`.\n4. Pipeline logged `run aborted`, stage=`charge_payment`, and stopped.\n5. **Step 3 (Update inventory)** and **Step 4 (Send confirmation email)** never ran.\n\n## Assessment against the plan\n\n- The plan defines a strict sequential dependency: charge -> inventory -> email, each gated on the previous step's success.\n- The log shows the pipeline respected that dependency: it did **not** decrement inventory or send a confirmation email for an order whose payment failed. This is the correct/safe behavior \u2014 no risk of shipping an unpaid order or double-charging on retry.\n- Every executed step logged both a start and completion/failure line with enough detail (order id, item count, amount, error reason, stack trace) to debug the single order without re-running the pipeline, matching the plan's verification expectations.\n- The failure itself (`do_not_honor` / card declined) is an external condition from the payment gateway \u2014 a business-level payment failure, not a bug in the pipeline's code or logic.\n\n## Conclusion\n\nThe pipeline behaved correctly: it detected a declined card at the charge step and safely aborted before touching inventory or sending an email. There is no evidence of a pipeline bug, missing log, or out-of-order execution. The action item, if any, is on the business side \u2014 retrying payment with the customer or triggering a \"payment failed\" notification \u2014 not on the pipeline implementation.\n"}], "grading": null}, {"id": "eval-quiet-logging-with_skill", "prompt": "\u5e6b\u6211 review \u4e00\u4e0b\u9019\u500b pipeline \u7684 log\uff0cplan \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md\uff0clog \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline-quiet/run.log\u3002", "eval_id": 3, "outputs": [{"name": "chat_summary.md", "type": "text", "content": "**Verdict: PASS WITH WARNINGS**\n\nThe run finished cleanly \u2014 no ERROR/FATAL/exception text anywhere in the log, and it ends with `done` about 2 seconds after it started. So nothing visibly crashed.\n\nBut the logging itself is a real problem: the plan defines 4 steps (validate order, charge payment, update inventory, send confirmation email), each with a specific success-signal line and specific values to check (item count \u2265 1, charge amount == order total, quantity decremented == item count). The actual log has exactly two lines \u2014 `processing order` and `done` \u2014 with no order id, no step names, no counts, no charge/SKU/email details. None of the 4 steps' success signals appear, so I can't verify any of them individually, and none of the 3 expected output-value checks can be performed at all.\n\nBottom line: it *ran*, but if anything had gone subtly wrong (wrong charge amount, wrong SKU quantity, email never sent), this log would never have told you. Full report with the step matrix and suggested logging fixes is in the report file.\n"}, {"name": "report.md", "type": "text", "content": "# Pipeline Log Review: Order Processing Pipeline\n\n_Design doc: review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md_\n_Log source: review-pipeline-logs-workspace/fixtures/order-pipeline-quiet/run.log, entire file reviewed (only one run present, no run-start markers to bound further; spans 2026-07-08T14:02:17Z to 2026-07-08T14:02:19Z)_\n_Reviewed: 2026-07-09_\n\n## Verdict\n\n**PASS WITH WARNINGS** \u2014 the run finished in ~2s with no errors logged, but the log contains only two generic lines (\"processing order\" / \"done\") and gives zero verifiable evidence for any of the 4 designed steps or their required output values, making this run effectively undebuggable if something had gone wrong.\n\n## Step-by-Step Results\n\n| Step | Expected | Found in log? | Status | Evidence |\n|------|----------|---------------|--------|----------|\n| 1. Validate order | `order validated` line with order id + item count (item count \u2265 1) | Not found | \u26a0\ufe0f unverifiable | Log only shows generic `processing order` at 14:02:17Z \u2014 no order id, no item count, no explicit validation line |\n| 2. Charge payment | `charge succeeded` line with charge id + amount (amount == order total) | Not found | \u26a0\ufe0f unverifiable | No charge-related line anywhere in the log |\n| 3. Update inventory | `inventory updated` line with SKU + quantity decremented (== item count from step 1) | Not found | \u26a0\ufe0f unverifiable | No inventory-related line anywhere in the log |\n| 4. Send confirmation email | `confirmation email sent` line with recipient address | Not found | \u26a0\ufe0f unverifiable | No email-related line anywhere in the log |\n\nNone of the four steps produced their designated success signal. Because the log ends with a plain `done` and no `ERROR`/`FATAL`/exception text, the run did not visibly crash \u2014 but that is the only thing this log actually proves. Whether validation, charging, inventory update, and email send each individually succeeded (and with correct values) cannot be confirmed from this evidence.\n\n## Logging Quality\n\nThis is the core finding of this review \u2014 the pipeline fails the logging-quality bar even though nothing crashed:\n\n- **Every step is invisible.** The plan calls for a start + completion/success line per step (4 steps \u00d7 2 lines = 8+ expected lines). The actual log has 2 lines total, neither of which names a step.\n- **No log levels are used at all.** Both lines look like unlabeled/INFO text; there's no way to tell from the log format whether a failure would even be flagged as an error if one occurred.\n- **No identifying context anywhere.** No order id, item count, charge id, amount, SKU, quantity, or recipient address appears in the log. A future on-call engineer debugging a bad charge or a missed email for a specific order would have nothing to grep for.\n- **\"done\" is not a success signal.** It doesn't say what completed, whether all 4 steps ran, or point back to an order id \u2014 it's indistinguishable from a partial/silent-failure run that merely didn't throw.\n\n## Errors & Exceptions\n\nNone found. No `ERROR`, `FATAL`, `Exception`, `Traceback`, `panic`, or non-2xx status text appears anywhere in the reviewed block. There is nothing to classify as unexpected-failure or expected/handled \u2014 the log is simply silent, not alarming.\n\n## Output Value Checks\n\nCannot be performed. The plan commits to three specific checks:\n\n| Expected value | Expected source | Actual logged value | Result |\n|---|---|---|---|\n| Item count \u2265 1 | `order validated` line | Not logged | \u274c cannot verify |\n| Charge amount == order total | `charge succeeded` line | Not logged | \u274c cannot verify |\n| Quantity decremented == item count from step 1 | `inventory updated` line | Not logged | \u274c cannot verify |\n\nAll three checks are blocked by the same root cause: the values the plan requires were never emitted to the log.\n\n## Suggested Fixes\n\n1. Add an explicit log line per step matching the plan's stated success signals verbatim, e.g. `order validated order_id=<id> item_count=<n>`, `charge succeeded charge_id=<id> amount=<amt>`, `inventory updated sku=<sku> qty_decremented=<n>`, `confirmation email sent recipient=<addr>`.\n2. Add a start line per step as the plan requires (\"Every step should log both a start and a completion/success line\"), not just an overall `processing order` at pipeline entry.\n3. Introduce real log levels (INFO for step start/success, ERROR/FATAL for failures) so a silent crash and a slow success aren't both just \"no output.\"\n4. Include the order id on every line for the run so all lines for one order can be grepped/correlated together.\n5. Replace the terminal `done` with a structured summary line, e.g. `order <id> completed steps=4/4 charge=<amt> email=<addr>`, so a reader can confirm all steps ran without needing per-step lines (in addition to, not instead of, #1).\n\n## Assumptions / Open Questions\n\n- [ASSUMPTION] Treated the entire `run.log` file as the single run to review \u2014 the file has no run-start marker and contains only 2 lines total, so no boundary needed to be inferred.\n- [OPEN] Confirm whether this `run.log` is genuinely what production emits, or whether a more verbose log level/config exists that wasn't captured in this fixture \u2014 if so, that fuller log should be reviewed instead.\n- [OPEN] Confirm with the team whether the order actually completed correctly (validated, charged, inventory decremented, email sent) via another source (DB state, payment provider dashboard, email provider logs) \u2014 this review can only say the log doesn't prove it either way.\n"}], "grading": null}, {"id": "eval-quiet-logging-without_skill", "prompt": "\u5e6b\u6211 review \u4e00\u4e0b\u9019\u500b pipeline \u7684 log\uff0cplan \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md\uff0clog \u5728 review-pipeline-logs-workspace/fixtures/order-pipeline-quiet/run.log\u3002", "eval_id": 3, "outputs": [{"name": "chat_summary.md", "type": "text", "content": "## Pipeline Log Review\uff1aorder-pipeline-quiet\n\n**\u7d50\u8ad6\uff1a\u9019\u4efd log \u56b4\u91cd\u4e0d\u8db3\uff0c\u7121\u6cd5\u7528\u4f86\u9a57\u8b49 pipeline \u662f\u5426\u7167 plan \u57f7\u884c\uff0c\u4e5f\u7121\u6cd5\u7528\u4f86 debug \u4efb\u4f55\u4e00\u7b46\u8a02\u55ae\u3002**\n\n### Plan \u8981\u6c42 vs. \u5be6\u969b log\n\nPlan\uff08`review-pipeline-logs-workspace/fixtures/order-pipeline/plan.md`\uff09\u5b9a\u7fa9\u4e86 4 \u500b\u6b65\u9a5f\uff0c\u6bcf\u500b\u6b65\u9a5f\u90fd\u61c9\u8a72\u6709 start + completion/success \u5169\u884c log\uff0c\u4e26\u5e36\u6709\u53ef debug \u7684\u7d30\u7bc0\uff1a\n\n1. **Validate order** \u2014 \u61c9\u8a72\u770b\u5230 `order validated`\uff0c\u542b order id\u3001item count\n2. **Charge payment** \u2014 \u61c9\u8a72\u770b\u5230 `charge succeeded`\uff0c\u542b charge id\u3001amount\n3. **Update inventory** \u2014 \u61c9\u8a72\u770b\u5230 `inventory updated`\uff0c\u542b SKU\u3001decremented quantity\n4. **Send confirmation email** \u2014 \u61c9\u8a72\u770b\u5230 `confirmation email sent`\uff0c\u542b recipient address\n\n\u4f46\u5be6\u969b\u7684 log\uff08`review-pipeline-logs-workspace/fixtures/order-pipeline-quiet/run.log`\uff09\u53ea\u6709\u5169\u884c\uff1a\n\n```\n2026-07-08T14:02:17Z processing order\n2026-07-08T14:02:19Z done\n```\n\n### \u767c\u73fe\u7684\u554f\u984c\n\n- **4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931**\uff1a\u6c92\u6709\u4efb\u4f55\u4e00\u884c\u63d0\u5230 validate\u3001charge\u3001inventory\u3001email\uff0c\u4e5f\u6c92\u6709\u5c0d\u61c9\u7684 success \u95dc\u9375\u5b57\uff08`order validated` / `charge succeeded` / `inventory updated` / `confirmation email sent`\uff09\u3002\n- **\u6c92\u6709\u4efb\u4f55\u53ef\u8ffd\u8e64\u6b04\u4f4d**\uff1aorder id\u3001item count\u3001charge id\u3001amount\u3001SKU\u3001quantity\u3001recipient \u5168\u90e8\u6c92\u6709\u51fa\u73fe\u3002\u5982\u679c\u9019\u7b46\u8a02\u55ae\u51fa\u554f\u984c\uff0c\u5b8c\u5168\u7121\u6cd5\u56de\u982d\u67e5\u662f\u54ea\u500b\u6b65\u9a5f\u5931\u6557\u3001\u5931\u6557\u5728\u54ea\u500b\u74b0\u7bc0\u3002\n- **\u7121\u6cd5\u5224\u65b7\u300cdone\u300d\u4ee3\u8868\u4ec0\u9ebc**\uff1a`done` \u53ef\u80fd\u4ee3\u8868 4 \u500b\u6b65\u9a5f\u90fd\u6210\u529f\u57f7\u884c\u5b8c\uff0c\u4e5f\u53ef\u80fd\u53ea\u662f\u5916\u5c64 wrapper \u5370\u51fa\u7684\u8a0a\u606f\u3001\u8ddf\u5167\u90e8\u6b65\u9a5f\u662f\u5426\u771f\u7684\u57f7\u884c\u5b8c\u5168\u812b\u9264\u3002\u76ee\u524d\u7684 log \u7121\u6cd5\u5340\u5206\u300cpipeline \u771f\u7684\u7167 plan \u8dd1\u5b8c 4 \u6b65\u300d\u9084\u662f\u300c\u67d0\u500b\u6b65\u9a5f\u88ab\u8df3\u904e\u6216\u5931\u6557\u4f46\u5916\u5c64\u4ecd\u5370\u51fa done\u300d\u3002\n- \u5169\u884c log \u4e4b\u9593\u53ea\u9593\u9694 2 \u79d2\uff0c\u5c0d\u65bc\u300c\u9a57\u8b49 + \u6536\u55ae + \u6263\u5eab\u5b58 + \u5bc4\u4fe1\u300d4 \u500b\u5916\u90e8\u547c\u53eb\u4f86\u8aaa\u6642\u9593\u4e0a\u662f\u8aaa\u5f97\u901a\u7684\uff0c\u4f46\u9019\u53ea\u662f\u5de7\u5408\u5f0f\u7684\u4f50\u8b49\uff0c\u4e0d\u80fd\u66ff\u4ee3\u771f\u6b63\u7684\u6b65\u9a5f\u7d1a log\u3002\n\n### \u5efa\u8b70\n\n\u9019\u500b log \u4e0d\u7b26\u5408 plan \u4e2d\u300cVerification Expectations\u300d\u7684\u8981\u6c42\uff08\u6bcf\u500b\u6b65\u9a5f\u90fd\u8981\u6709 start/completion \u4e14\u542b\u9664\u932f\u7d30\u7bc0\uff09\u3002\u5efa\u8b70\uff1a\n1. \u5728\u6bcf\u500b\u6b65\u9a5f\u7684\u9032\u5165\u9ede\u8207\u5b8c\u6210\u9ede\u90fd\u52a0\u4e0a\u5e36\u6709 plan \u6307\u5b9a\u95dc\u9375\u5b57\u7684 log \u884c\uff08`order validated` / `charge succeeded` / `inventory updated` / `confirmation email sent`\uff09\u3002\n2. \u6bcf\u884c\u5e36\u4e0a\u5c0d\u61c9\u7684\u9664\u932f\u6b04\u4f4d\uff08order id\u3001item count\u3001charge id\u3001amount\u3001SKU\u3001quantity\u3001recipient\uff09\u3002\n3. \u5728\u88dc\u9f4a log \u4e4b\u524d\uff0c\u9019\u500b pipeline \u76ee\u524d\u7121\u6cd5\u901a\u904e\u4efb\u4f55\u5f62\u5f0f\u7684\u81ea\u52d5\u5316\u6216\u4eba\u5de5\u9a57\u8b49\u2014\u2014\u73fe\u6709\u7684\u5169\u884c log \u53ea\u80fd\u8b49\u660e\u300c\u9032\u4f86\u4e86\u3001\u7d50\u675f\u4e86\u300d\uff0c\u8b49\u660e\u4e0d\u4e86\u4e2d\u9593 4 \u6b65\u662f\u5426\u771f\u7684\u6b63\u78ba\u57f7\u884c\u3002\n"}], "grading": null}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "review-pipeline-logs", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-07-08T16:39:09Z", "evals_run": [1, 2, 3], "runs_per_configuration": 3}, "runs": [{"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 83.2, "tokens": 60989, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Step 1 (validate order) is marked as ran & succeeded", "passed": true, "evidence": "Table row 1: '\u2705 ran & succeeded'"}, {"text": "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor", "passed": true, "evidence": "Table row 2: '\u274c failed' \u2014 'reason=card_declined' + 'CardDeclinedError: do_not_honor'"}, {"text": "The traceback / exception detail is quoted, not just summarized", "passed": true, "evidence": "Full Python traceback (file/line numbers) quoted verbatim in Step-by-Step Results and repeated in Errors & Exceptions."}, {"text": "Steps 3 and 4 explicitly reported as never reached / not executed, not silently assumed to have passed", "passed": true, "evidence": "Table rows 3-4: '\u274c missing (expected \u2014 never reached)', plus explicit note: 'Steps 3 and 4 are marked missing rather than unverifiable-by-silence... this is a correct halt, not a silent skip.'"}, {"text": "Report distinguishes the charge decline from the pipeline's own abort behavior, rather than treating the abort as a second bug", "passed": true, "evidence": "Errors & Exceptions lists the decline as 'unexpected failure' and the abort line separately as 'expected/handled \u2014 the pipeline's own controlled shutdown... not a second, independent bug.'"}, {"text": "Output is saved as a structured report file", "passed": true, "evidence": "report.md written matching the skill's full template."}], "notes": []}, {"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 69.8, "tokens": 60015, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Verdict is a clear, unqualified PASS", "passed": true, "evidence": "\"PASS \u2014 all four steps ran, in the designed order, with success signals and output values matching the plan; no errors found.\""}, {"text": "All 4 steps individually marked as ran & succeeded, each with quoted log-line evidence", "passed": true, "evidence": "Step-by-Step Results table: all 4 rows marked '\u2705 ran & succeeded' with quoted log lines."}, {"text": "item_count (2) and quantity_decremented (2) explicitly compared and confirmed to match", "passed": true, "evidence": "Output Value Checks table row 3: 'quantity_decremented=2 vs item_count=2 | \u2705 matches'"}, {"text": "Report explicitly states no errors/exceptions were found", "passed": true, "evidence": "'None found. Scanned for ERROR, FATAL, Exception, Traceback, panic, and non-2xx-style status codes \u2014 no hits...'"}, {"text": "Output is saved as a structured report file", "passed": true, "evidence": "report.md written matching the skill's full template (Verdict, Step-by-Step, Logging Quality, Errors, Output Values, Fixes, Assumptions)."}], "notes": []}, {"eval_id": 3, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 79.6, "tokens": 59657, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "None of the 4 steps marked as a confirmed pass (\u2705) given the lack of log evidence", "passed": true, "evidence": "All 4 rows in Step-by-Step Results marked '\u26a0\ufe0f unverifiable', none marked \u2705."}, {"text": "Logging Quality section explicitly flags: no per-step lines, no log levels, no identifying context", "passed": true, "evidence": "'Every step is invisible.' / 'No log levels are used at all.' / 'No identifying context anywhere.'"}, {"text": "Overall verdict carries an explicit caveat, not an unqualified PASS", "passed": true, "evidence": "'PASS WITH WARNINGS \u2014 ... gives zero verifiable evidence for any of the 4 designed steps...'"}, {"text": "Output Value Checks section explicitly states the checks could not be performed", "passed": true, "evidence": "'Cannot be performed.' with a table marking all 3 checks '\u274c cannot verify'."}, {"text": "Output is saved as a structured report file", "passed": true, "evidence": "report.md written matching the skill's full template."}], "notes": []}, {"eval_id": 2, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 69.2, "tokens": 55504, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Step 1 (validate order) is marked as ran & succeeded", "passed": true, "evidence": "'Step 1\uff08\u9a57\u8b49\u8a02\u55ae\uff0citem_count=3\uff09\u901a\u904e'"}, {"text": "Step 2 (charge payment) is marked as failed, citing card_declined / do_not_honor", "passed": true, "evidence": "'payment gateway \u56de\u50b3 CardDeclinedError: do_not_honor\uff08\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\uff09'"}, {"text": "The traceback / exception detail is quoted, not just summarized", "passed": true, "evidence": "report.md cites 'raised from payments/gateway.py:41, propagated through payments/charge.py:88' \u2014 specific but not the verbatim multi-line traceback block the with_skill run quoted."}, {"text": "Steps 3 and 4 explicitly reported as never reached / not executed", "passed": true, "evidence": "'\u6c92\u6709\u7e7c\u7e8c\u57f7\u884c Step 3\uff08\u66f4\u65b0\u5eab\u5b58\uff09\u6216 Step 4\uff08\u5bc4\u9001\u78ba\u8a8d\u4fe1\uff09'"}, {"text": "Report distinguishes the charge decline from the pipeline's own abort behavior", "passed": true, "evidence": "'\u9019\u662f\u5916\u90e8\u4fe1\u7528\u5361\u88ab\u62d2\u7d55\u5c0e\u81f4\u7684\u696d\u52d9\u5c64\u5931\u6557\uff0c\u4e0d\u662f pipeline \u908f\u8f2f\u6216\u7a0b\u5f0f\u78bc\u7684 bug' \u2014 separates external cause from pipeline behavior, though frames the whole thing as one non-issue rather than as two distinct classified events."}, {"text": "Output is saved as a structured report file", "passed": true, "evidence": "Wrote its own report.md (unguided, agent's own choice) with Verdict/What Happened/Assessment/Conclusion sections \u2014 a different template than the skill's, but still a saved file."}], "notes": []}, {"eval_id": 1, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5, "time_seconds": 29.7, "tokens": 53054, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Verdict is a clear, unqualified PASS", "passed": true, "evidence": "'\u7d50\u8ad6\uff1a\u9019\u6b21\u57f7\u884c\u5b8c\u5168\u7167\u8a2d\u8a08\u8dd1\u5c0d\uff0cVerdict = PASS\u3002'"}, {"text": "All 4 steps individually marked as ran & succeeded, each with quoted log-line evidence", "passed": true, "evidence": "Prose list covers all 4 steps with quoted log fragments, though not in a structured table."}, {"text": "item_count (2) and quantity_decremented (2) explicitly compared and confirmed to match", "passed": true, "evidence": "'decremented quantity\uff082\uff09\u8207 step 1 \u7684 item_count\uff082\uff09\u76f8\u7b26'"}, {"text": "Report explicitly states no errors/exceptions were found", "passed": true, "evidence": "'\u6c92\u6709\u932f\u8aa4\u3001\u91cd\u8a66\u6216\u975e\u9810\u671f\u72c0\u614b\uff1brun finished status=success \u6536\u5c3e\u6b63\u5e38\u3002'"}, {"text": "Output is saved as a structured report file", "passed": false, "evidence": "Only chat_summary.md was produced; no separate persisted report file, no fixed template/sections, nothing saved for later reference."}], "notes": []}, {"eval_id": 3, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 38.0, "tokens": 53333, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "None of the 4 steps marked as a confirmed pass given the lack of log evidence", "passed": true, "evidence": "'4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931... \u6c92\u6709\u4efb\u4f55\u4e00\u884c\u63d0\u5230 validate\u3001charge\u3001inventory\u3001email' \u2014 treated as unverifiable, not passed."}, {"text": "Logging Quality section explicitly flags: no per-step lines, no log levels, no identifying context", "passed": true, "evidence": "'\u6c92\u6709\u4efb\u4f55\u53ef\u8ffd\u8e64\u6b04\u4f4d' and '4 \u500b\u6b65\u9a5f\u7684 log \u5168\u90e8\u7f3a\u5931', though not organized under a distinct labeled section \u2014 woven into \u767c\u73fe\u7684\u554f\u984c instead."}, {"text": "Overall verdict carries an explicit caveat, not an unqualified PASS", "passed": true, "evidence": "'\u9019\u4efd log \u56b4\u91cd\u4e0d\u8db3\uff0c\u7121\u6cd5\u7528\u4f86\u9a57\u8b49 pipeline \u662f\u5426\u7167 plan \u57f7\u884c' \u2014 does not issue a PASS at all, arguably stricter than with_skill's 'PASS WITH WARNINGS'."}, {"text": "Output Value Checks section explicitly states the checks could not be performed", "passed": false, "evidence": "No distinct output-value-checks section; covers the idea generally ('\u7121\u6cd5\u5224\u65b7\u662f\u5426\u6b63\u78ba\u57f7\u884c') but doesn't walk through the plan's specific 3 output-value expectations one by one."}, {"text": "Output is saved as a structured report file", "passed": false, "evidence": "Only chat_summary.md was produced; no persisted report file."}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 77.5333, "stddev": 6.9349, "min": 69.8, "max": 83.2}, "tokens": {"mean": 60220.3333, "stddev": 689.3311, "min": 59657, "max": 60989}}, "without_skill": {"pass_rate": {"mean": 0.8, "stddev": 0.2, "min": 0.6, "max": 1.0}, "time_seconds": {"mean": 45.6333, "stddev": 20.827, "min": 29.7, "max": 69.2}, "tokens": {"mean": 53963.6667, "stddev": 1341.2421, "min": 53054, "max": 55504}}, "delta": {"pass_rate": "+0.20", "time_seconds": "+31.9", "tokens": "+6257"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>
