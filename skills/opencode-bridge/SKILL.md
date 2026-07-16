@@ -1,6 +1,6 @@
 ---
 name: opencode-bridge
-description: Delegate a coding task to OpenCode and get back a structured handoff report (done/failed/timed-out, files changed, implementation summary) — for use as an OpenCode-backed implementer step in subagent-driven-development or executing-plans.
+description: Delegate a coding task to OpenCode and get back a structured handoff report (done/failed/timed-out, files changed, implementation summary) — for use as an OpenCode-backed implementer step in subagent-driven-development or executing-plans. For a full plan-execution loop with review gates already wired in, use bridge:opencode-subagent-driven-development instead of calling this standalone.
 allowed-tools:
   - Bash
   - AskUserQuestion
@@ -13,6 +13,19 @@ triggers:
 # OpenCode Bridge
 
 **Announce at start:** "I'm using the opencode-bridge skill to delegate this task to OpenCode."
+
+## Step 0: Check whether this should be a standalone call
+
+This skill only does one thing: hand a task to OpenCode and return a handoff report. It has **no spec-compliance review, no code-quality review, and no test enforcement** — `test_results` and `self_review_notes` in the report are literally "not reported by OpenCode". Those review gates only exist in `superpowers:subagent-driven-development` (or `superpowers:executing-plans`), which can use this skill as their implementer step instead of a Claude subagent.
+
+Before running Step 1, check: is this invocation already happening as the implementer step inside an active `/subagent-driven-development` or `/executing-plans` run for this task (i.e. that skill's process is already driving this task, and it will handle spec/quality review after this skill returns)?
+
+- **Yes** → proceed directly to Step 1, no prompt needed.
+- **No** (this is a bare/ad-hoc request to "delegate this to opencode" for a single task, with no surrounding plan-execution flow tracking review gates) → stop and ask the user via AskUserQuestion:
+  - **Question**: "opencode-bridge alone skips spec-compliance and code-quality review. Run this through `bridge:opencode-subagent-driven-development` instead (recommended — same review gates as subagent-driven-development, with OpenCode as the implementer), or continue standalone?"
+  - Options: "Use bridge:opencode-subagent-driven-development" (invoke that skill instead — it wraps `superpowers:subagent-driven-development`'s loop with this skill as the implementer step) vs. "Continue standalone anyway" (proceed to Step 1 as normal).
+
+Do not re-ask within the same standalone session once the user has picked "continue standalone" — only re-prompt for a genuinely new task/invocation.
 
 ## Step 1: Check config
 
