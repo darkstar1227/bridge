@@ -73,6 +73,17 @@ If no matching rule exists, ask the user via AskUserQuestion whether to add one:
 
 Do this only once per project — do not re-ask once the rule is present.
 
+## Step 1c: Parallel dispatch requires isolation
+
+`dispatch.py` shells out with `--dir <repo>` and diffs `git status` before/after directly against that repo path — it has no isolation of its own. Running two or more dispatches against the **same repo path** at the same time will race on git state (one call's in-flight edits pollute another's before/after snapshot).
+
+Before running Step 2, check: will this be the only dispatch running against this repo path at once?
+
+- **Yes (single dispatch, or multiple dispatches each against a different repo path)** → proceed directly to Step 2.
+- **No (multiple dispatches needed concurrently against the same repo)** → do not invoke Step 2 directly in parallel. Instead, use one of:
+  - **Worktree isolation**: create a separate `git worktree` per concurrent task (see `superpowers:using-git-worktrees`) and pass each worktree's absolute path as `--repo` — this gives each dispatch its own working tree and git state.
+  - **Subagent dispatch**: have Claude Code launch one Agent (subagent) per concurrent task, each running its own Step 2 `uv run dispatch.py` call scoped to its own worktree/repo path — do not fan out raw parallel Bash calls against one shared repo path from the main loop.
+
 ## Step 2: Dispatch
 
 Run (substituting the actual task description, target repo absolute path, and a short topic string identifying this line of work — e.g. the feature/branch name):
