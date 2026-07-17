@@ -44,4 +44,7 @@ uv run script.py
 
 - `docs/superpowers/{plans,specs}/` — gstack-to-plan handoff files
 - `docs/pipeline-reviews/` — review-pipeline-logs reports
+- `docs/autoresearch/plan/` — autoresearch-plan comparison logs (candidate approaches, metric, winner)
+- `docs/autoresearch/impl/` — autoresearch-impl iteration logs (round-by-round variant/metric/keep-or-discard)
+- `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
 - `.bridge/email-config.json` (per target repo) — recipients, last-sent tracking, and Resend MCP connection; shared by `setup-email-updates`, `send-update-email`, and `send-update-email-batch`

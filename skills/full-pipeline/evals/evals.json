@@ -1,0 +1,23 @@
+{
+  "skill_name": "full-pipeline",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "我剛用 /autoplan 把一個『訂單匯出功能』的 plan 定案了，plan 裡面比較了 sync 匯出 vs 背景 job 匯出兩種做法還沒決定選哪個。幫我把整個 pipeline 跑完，這個功能不會動到資料庫 schema。",
+      "expected_output": "Announces the full-pipeline sequence, runs autoresearch-plan (real alternatives exist), judges both DB checkpoints as no-signal and skips supabase review, explains each skip/run decision.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "plan 已經定案了，就只有一種做法沒有替代方案可比較，這個功能要新增一張 subscriptions 表跟一個 migration。跑一下完整 pipeline。",
+      "expected_output": "Skips autoresearch-plan with a stated reason (no real alternatives), triggers the DB checkpoint at both the plan stage and the implementation stage, invokes/mentions supabase:supabase-postgres-best-practices.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "跑到一半，implementation 那步我想用 opencode 來做而不是 claude subagent，不要跟我原本問的方式一樣（superpowers 預設用 claude subagent），你自己判斷一下就好，不用再問我。",
+      "expected_output": "Does not silently decide on the user's behalf despite being told to; surfaces the implementer choice as a decision per the skill's explicit rule, or clearly explains why it's confirming anyway.",
+      "files": []
+    }
+  ]
+}

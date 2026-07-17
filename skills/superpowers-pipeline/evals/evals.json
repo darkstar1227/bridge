@@ -1,0 +1,23 @@
+{
+  "skill_name": "superpowers-pipeline",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "幫我跑 superpowers 的流程，把這個 repo 裡的 XX 功能做完，不用經過 gstack 那些審查。",
+      "expected_output": "Follows Step 1's search order for an existing plan/spec, finds nothing, stops and asks the user for the spec/requirements instead of inventing scope.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "docs/spec.md 已經寫好了（裡面提到要加一個 audit_logs 表跟對應的 RLS policy），直接跑 superpowers-pipeline 幫我做完。",
+      "expected_output": "Triggers the DB checkpoint at the plan stage (spec text mentions a table + RLS policy) and again at the implementation stage (diff touches migration files), invoking/mentioning supabase:supabase-postgres-best-practices both times.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "跑到一半我改變主意了，這個其實有點大，我想要 CEO/design/eng 三重審查，你可以幫我加進去嗎？",
+      "expected_output": "Does not bolt gstack review steps onto superpowers-pipeline ad hoc; suggests switching to bridge:full-pipeline instead, per the skill's explicit rule.",
+      "files": []
+    }
+  ]
+}
