@@ -65,6 +65,8 @@ Once you have the right file, isolate the specific run to review (not the whole 
 - If the log has a recognizable "run started" marker, take the block from the **last** such marker to EOF (or to the next marker, if the user pointed at an older run)
 - Otherwise, use the tail of the file bounded by an obvious timestamp gap, or ask the user to help narrow it down
 
+For a large log file, do this isolation pass with context-mode (`ctx_execute_file`/`ctx_batch_execute`) instead of reading the whole file into the conversation — only the isolated run block (or the specific lines you'll quote in the report) should actually enter context. Use `Read` directly once the file is already small enough, or once you know exactly which lines you'll quote verbatim.
+
 ## Step 4 — Check the Run Against the Design
 
 Walk the expected steps from Step 2 in order. For each one, search the isolated log block for evidence of it and build a matrix:
@@ -92,6 +94,11 @@ Scan the isolated log block for error signals (`ERROR`, `FATAL`, `Exception`, `T
 
 - Quote the line(s) with surrounding context
 - Classify it: **unexpected failure** (breaks a Step 2 expectation) vs **expected/handled** (e.g. a logged retry that then succeeded) — state which and why
+
+If an error or stack trace points at source code in the project being reviewed, use codegraph (`codegraph_explore`/`codegraph_node`, or the `codegraph explore`/`codegraph node` CLI) to see what that code actually does, rather than `grep`/whole-file `Read`:
+
+- No `.codegraph/` directory in that project yet → run `codegraph init <path>` first (it builds the initial index as part of init), then query it.
+- `.codegraph/` already exists → run `codegraph sync <path>` first (or `codegraph index <path>` for a full rebuild if sync looks insufficient) so the index reflects the code as of this run, not a stale prior state — then query it.
 
 ## Step 7 — Check Output Values
 

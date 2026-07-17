@@ -40,7 +40,7 @@ uv run script.py
 - Every skill that produces files must specify the output path (e.g. `docs/superpowers/input/`).
 - Explicit `[ASSUMPTION: ...]` markers are preferred over silent gap-filling.
 - When a skill's own steps involve parsing, filtering, or summarizing a log file or other large text output (e.g. `review-pipeline-logs` isolating a run's log block), the step should say to use context-mode (`ctx_batch_execute`/`ctx_execute_file`) for that pass instead of raw `Read`/`Bash`/`Grep` — only the derived findings should enter the conversation, not the raw bytes. Still use `Read` when the exact text is needed afterward (e.g. quoting a line verbatim in a report).
-- When those findings point at source code (file paths, function names, stack traces) in a *target* repo the skill is operating on, and that repo has a `.codegraph/` directory, the step should say to use codegraph (`codegraph_explore`/`codegraph_node`, or the `codegraph explore`/`codegraph node` CLI) to locate the referenced code instead of `grep`/whole-file `Read`. If the target repo has no `.codegraph/`, skip it — indexing is the user's decision, not something a skill should assume or trigger.
+- When those findings point at source code (file paths, function names, stack traces) in a *target* repo the skill is operating on, use codegraph (`codegraph_explore`/`codegraph_node`, or the `codegraph explore`/`codegraph node` CLI) to locate the referenced code instead of `grep`/whole-file `Read`. If the target repo has no `.codegraph/` directory, run `codegraph init <path>` first — it builds the initial index automatically. If `.codegraph/` already exists, run `codegraph sync <path>` (or `codegraph index <path>` for a full rebuild) before querying it, since the code under review has often changed since the last index.
 
 ## Known output paths and shared config
 
@@ -50,3 +50,4 @@ uv run script.py
 - `docs/autoresearch/impl/` — autoresearch-impl iteration logs (round-by-round variant/metric/keep-or-discard)
 - `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
 - `.bridge/email-config.json` (per target repo) — recipients, last-sent tracking, and Resend MCP connection; shared by `setup-email-updates`, `send-update-email`, and `send-update-email-batch`
+- `docs/env-setup/claude-plugins-manifest.json` — user-scope Claude Code plugins/marketplaces + gstack snapshot, written/read by `setup-env`

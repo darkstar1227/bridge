@@ -1,0 +1,149 @@
+{
+  "generatedAt": "2026-07-17",
+  "marketplaces": [
+    {
+      "name": "bridge",
+      "repo": "darkstar1227/bridge"
+    },
+    {
+      "name": "buildwithclaude",
+      "repo": "davepoon/buildwithclaude"
+    },
+    {
+      "name": "claude-code-plugins",
+      "repo": "anthropics/claude-code"
+    },
+    {
+      "name": "claude-plugins-official",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    {
+      "name": "context-mode",
+      "repo": "mksglu/context-mode"
+    },
+    {
+      "name": "openai-codex",
+      "repo": "openai/codex-plugin-cc"
+    },
+    {
+      "name": "ponytail",
+      "repo": "DietrichGebert/ponytail"
+    },
+    {
+      "name": "superpowers-marketplace",
+      "repo": "obra/superpowers-marketplace"
+    },
+    {
+      "name": "ui-ux-pro-max-skill",
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+    }
+  ],
+  "plugins": [
+    {
+      "name": "agent-sdk-dev",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "agents-design-experience",
+      "marketplace": "buildwithclaude"
+    },
+    {
+      "name": "agents-development-architecture",
+      "marketplace": "buildwithclaude"
+    },
+    {
+      "name": "bridge",
+      "marketplace": "bridge"
+    },
+    {
+      "name": "claude-code-setup",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "claude-md-management",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "code-review",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "code-simplifier",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "codex",
+      "marketplace": "openai-codex"
+    },
+    {
+      "name": "context-mode",
+      "marketplace": "context-mode"
+    },
+    {
+      "name": "context7",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "frontend-design",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "github",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "linear",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "playwright",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "ponytail",
+      "marketplace": "ponytail"
+    },
+    {
+      "name": "ralph-loop",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "ralph-wiggum",
+      "marketplace": "claude-code-plugins"
+    },
+    {
+      "name": "resend",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "security-guidance",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "skill-creator",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "supabase",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "superpowers",
+      "marketplace": "claude-plugins-official"
+    },
+    {
+      "name": "superpowers-developing-for-claude-code",
+      "marketplace": "superpowers-marketplace"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "marketplace": "ui-ux-pro-max-skill"
+    }
+  ],
+  "gstack": {
+    "installed": true,
+    "cloneUrl": "https://github.com/garrytan/gstack.git",
+    "installPath": "~/.claude/skills/gstack",
+    "setupCommand": "git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup"
+  }
+}
