@@ -82,11 +82,65 @@ def test_build_command_includes_session_when_present():
     assert "ses_1" in cmd
 
 
+def test_build_ping_command_includes_model_and_scratch_dir():
+    cmd = dispatch.build_ping_command(model="opencode/kimi-k2.7-code", scratch_dir="/tmp/scratch")
+    assert cmd[:2] == ["opencode", "run"]
+    assert "-m" in cmd and "opencode/kimi-k2.7-code" in cmd
+    assert "--dir" in cmd and "/tmp/scratch" in cmd
+    assert "--session" not in cmd  # ping never continues a session
+
+
+def test_ping_model_uses_throwaway_dir_not_repo(monkeypatch):
+    seen = {}
+
+    def fake_run_opencode(cmd, timeout):
+        seen["cmd"] = cmd
+        seen["timeout"] = timeout
+        return dispatch.DispatchOutcome(
+            classification="DONE",
+            events=[{"type": "step_finish", "part": {"reason": "stop"}}],
+        )
+
+    monkeypatch.setattr(dispatch, "run_opencode", fake_run_opencode)
+    outcome = dispatch.ping_model(model="m1", timeout=5)
+    assert outcome.classification == "DONE"
+    assert seen["timeout"] == 5
+    dir_index = seen["cmd"].index("--dir") + 1
+    scratch_dir = seen["cmd"][dir_index]
+    assert scratch_dir != "" and "opencode-bridge-ping-" in scratch_dir
+    # the scratch dir must not be (or be inside) a real target repo path
+    assert scratch_dir != os.getcwd()
+
+
+def test_ping_model_propagates_failure_classification(monkeypatch):
+    monkeypatch.setattr(
+        dispatch, "run_opencode",
+        lambda cmd, timeout: dispatch.DispatchOutcome(
+            classification="FAILED", reason="unknown model", retryable=False,
+        ),
+    )
+    outcome = dispatch.ping_model(model="bad/model", timeout=5)
+    assert outcome.classification == "FAILED"
+    assert outcome.reason == "unknown model"
+
+
 def _init_git_repo(path):
     import subprocess
 
     subprocess.run(["git", "init", "-q"], cwd=path, check=True)
     subprocess.run(["git", "commit", "-q", "--allow-empty", "-m", "init"], cwd=path, check=True)
+
+
+def _stub_ping_ok(monkeypatch):
+    """Make every model pass the pre-dispatch ping check, so existing
+    attempt/retry/fallback tests exercise only the real-dispatch path."""
+    monkeypatch.setattr(
+        dispatch, "ping_model",
+        lambda model, timeout: dispatch.DispatchOutcome(
+            classification="DONE",
+            events=[{"type": "step_finish", "part": {"reason": "stop"}}],
+        ),
+    )
 
 
 def test_git_status_snapshot_empty_repo(tmp_path):
@@ -294,6 +348,7 @@ def test_run_opencode_zero_exit_non_json_output_is_failed(monkeypatch):
 
 def test_dispatch_chain_stops_on_mutation_after_failure(monkeypatch, tmp_path):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
 
     call_count = {"n": 0}
 
@@ -315,6 +370,7 @@ def test_dispatch_chain_stops_on_mutation_after_failure(monkeypatch, tmp_path):
 
 def test_dispatch_chain_mutation_reports_files_changed(monkeypatch, tmp_path):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
 
     def fake_run_opencode(cmd, timeout):
         (tmp_path / "partial.txt").write_text("half-done")
@@ -330,6 +386,7 @@ def test_dispatch_chain_mutation_reports_files_changed(monkeypatch, tmp_path):
 
 def test_dispatch_chain_retries_same_model_then_advances(monkeypatch, tmp_path):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
     seen_models = []
 
     def fake_build_command(task, repo, model, session_id):
@@ -358,6 +415,7 @@ def test_dispatch_chain_retries_same_model_then_advances(monkeypatch, tmp_path):
 
 def test_dispatch_chain_non_retryable_advances_to_fallback_model(monkeypatch, tmp_path):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
     seen_models = []
 
     def fake_build_command(task, repo, model, session_id):
@@ -385,6 +443,7 @@ def test_dispatch_chain_non_retryable_advances_to_fallback_model(monkeypatch, tm
 
 def test_dispatch_chain_exhausted_returns_failed(monkeypatch, tmp_path):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
     monkeypatch.setattr(
         dispatch, "run_opencode",
         lambda cmd, timeout: dispatch.DispatchOutcome(classification="FAILED", reason="conn refused", retryable=True),
@@ -397,8 +456,60 @@ def test_dispatch_chain_exhausted_returns_failed(monkeypatch, tmp_path):
     assert "m1" in result.reason and "m2" in result.reason
 
 
+def test_dispatch_chain_ping_failure_skips_model_without_real_attempt(monkeypatch, tmp_path):
+    _init_git_repo(tmp_path)
+    pinged_models = []
+    real_attempt_models = []
+
+    def fake_ping_model(model, timeout):
+        pinged_models.append(model)
+        if model == "bad/model":
+            return dispatch.DispatchOutcome(classification="FAILED", reason="unknown model")
+        return dispatch.DispatchOutcome(
+            classification="DONE",
+            events=[{"type": "step_finish", "part": {"reason": "stop"}}],
+        )
+
+    def fake_build_command(task, repo, model, session_id):
+        real_attempt_models.append(model)
+        return ["opencode", "run", task]
+
+    def fake_run_opencode(cmd, timeout):
+        return dispatch.DispatchOutcome(
+            classification="DONE",
+            events=[{"type": "step_finish", "part": {"reason": "stop"}}],
+        )
+
+    monkeypatch.setattr(dispatch, "ping_model", fake_ping_model)
+    monkeypatch.setattr(dispatch, "build_command", fake_build_command)
+    monkeypatch.setattr(dispatch, "run_opencode", fake_run_opencode)
+    result = dispatch.dispatch_with_retry(
+        task="x", repo=str(tmp_path), topic="t",
+        models=["bad/model", "good/model"], per_attempt_timeout=5, chain_timeout=30,
+    )
+    assert result.classification == "DONE"
+    assert pinged_models == ["bad/model", "good/model"]
+    # the failed ping must have prevented any real dispatch attempt against bad/model
+    assert real_attempt_models == ["good/model"]
+
+
+def test_dispatch_chain_all_pings_fail_returns_failed(monkeypatch, tmp_path):
+    _init_git_repo(tmp_path)
+    monkeypatch.setattr(
+        dispatch, "ping_model",
+        lambda model, timeout: dispatch.DispatchOutcome(classification="FAILED", reason="auth error"),
+    )
+    result = dispatch.dispatch_with_retry(
+        task="x", repo=str(tmp_path), topic="t",
+        models=["m1", "m2"], per_attempt_timeout=5, chain_timeout=30,
+    )
+    assert result.classification == "FAILED"
+    assert "m1" in result.reason and "m2" in result.reason
+
+
 def test_dispatch_chain_does_not_fabricate_session_id(monkeypatch, tmp_path):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
     monkeypatch.setattr(dispatch, "SESSIONS_PATH", tmp_path / "sessions.json")
     monkeypatch.setattr(
         dispatch, "run_opencode",
@@ -473,6 +584,7 @@ def test_dispatch_fails_deterministically_when_config_missing(tmp_path, monkeypa
 
 def test_dispatch_uses_config_models(tmp_path, monkeypatch):
     _init_git_repo(tmp_path)
+    _stub_ping_ok(monkeypatch)
     config_path = tmp_path / "config.json"
     dispatch.save_json_file(config_path, {"default_model": "m1", "fallback_models": ["m2"]})
     monkeypatch.setattr(dispatch, "CONFIG_PATH", config_path)
@@ -489,6 +601,7 @@ def test_dispatch_uses_config_models(tmp_path, monkeypatch):
 
 
 def test_dispatch_handles_bad_repo_path_gracefully(tmp_path, monkeypatch):
+    _stub_ping_ok(monkeypatch)
     config_path = tmp_path / "config.json"
     dispatch.save_json_file(config_path, {"default_model": "m1", "fallback_models": []})
     monkeypatch.setattr(dispatch, "CONFIG_PATH", config_path)

@@ -106,6 +106,25 @@ def build_command(task: str, repo: str, model: str, session_id: str | None) -> l
     return cmd
 
 
+def build_ping_command(model: str, scratch_dir: str) -> list[str]:
+    return [
+        "opencode", "run",
+        "Reply with exactly the word OK. Do not read or write any files.",
+        "--format", "json", "-m", model, "--dir", scratch_dir,
+    ]
+
+
+def ping_model(model: str, timeout: float) -> "DispatchOutcome":
+    """Cheap reachability/auth check for a model, run before committing to a
+    full dispatch attempt -- catches a dead/misconfigured model without
+    burning the (much longer) per-attempt timeout on it. Runs in a throwaway
+    directory, never the target repo, so a misbehaving model has nothing to
+    touch."""
+    with tempfile.TemporaryDirectory(prefix="opencode-bridge-ping-") as scratch_dir:
+        cmd = build_ping_command(model, scratch_dir)
+        return run_opencode(cmd, timeout=timeout)
+
+
 def git_status_snapshot(repo: str) -> set[str]:
     """Snapshot of `git status --porcelain --untracked-files=all` lines,
     run with cwd=repo (must match the --dir passed to opencode)."""
@@ -280,12 +299,23 @@ def _extract_session_id(events: list[dict]) -> str | None:
     return None
 
 
-def dispatch_with_retry(task, repo, topic, models, per_attempt_timeout, chain_timeout):
+def dispatch_with_retry(task, repo, topic, models, per_attempt_timeout, chain_timeout, ping_timeout=30):
     start = time.monotonic()
     failure_reasons = []
     mapping_session_id = resolve_session(repo, topic)
 
     for model_index, model in enumerate(models):
+        if time.monotonic() - start > chain_timeout:
+            return DispatchOutcome(
+                classification="FAILED",
+                reason=f"chain-level timeout exceeded; failures so far: {failure_reasons}",
+            )
+
+        ping_outcome = ping_model(model, timeout=ping_timeout)
+        if ping_outcome.classification != "DONE":
+            failure_reasons.append(f"{model}: ping failed -- {ping_outcome.reason}")
+            continue  # dead/misconfigured model -- skip straight to the next fallback
+
         session_id = mapping_session_id if model_index == 0 else None
         for attempt in range(2):  # original attempt + one retry, per model
             if time.monotonic() - start > chain_timeout:
@@ -366,11 +396,13 @@ def dispatch(task: str, repo: str, topic: str) -> dict:
     models = [config["default_model"]] + config.get("fallback_models", [])
     per_attempt_timeout = config.get("per_attempt_timeout_seconds", 300)
     chain_timeout = config.get("chain_timeout_seconds", 600)
+    ping_timeout = config.get("ping_timeout_seconds", 30)
 
     try:
         outcome = dispatch_with_retry(
             task=task, repo=repo, topic=topic, models=models,
             per_attempt_timeout=per_attempt_timeout, chain_timeout=chain_timeout,
+            ping_timeout=ping_timeout,
         )
     except (subprocess.CalledProcessError, OSError) as exc:
         outcome = DispatchOutcome(

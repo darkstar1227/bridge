@@ -40,6 +40,7 @@ If `MISSING`, or if the file exists but fails to parse as JSON: ask the user via
 - Fallback model list (ordered, can be empty)
 - Per-attempt timeout in seconds (default suggestion: 300)
 - Chain-level timeout in seconds (default suggestion: 600 — must be greater than per-attempt timeout)
+- Ping timeout in seconds (default suggestion: 30 — how long to wait for the pre-dispatch reachability check per model, see Step 2)
 
 Write the answers to `~/.opencode-bridge/config.json`:
 ```json
@@ -47,7 +48,8 @@ Write the answers to `~/.opencode-bridge/config.json`:
   "default_model": "<answer>",
   "fallback_models": ["<answer>", "..."],
   "per_attempt_timeout_seconds": <answer>,
-  "chain_timeout_seconds": <answer>
+  "chain_timeout_seconds": <answer>,
+  "ping_timeout_seconds": <answer>
 }
 ```
 
@@ -85,6 +87,8 @@ Before running Step 2, check: will this be the only dispatch running against thi
   - **Subagent dispatch**: have Claude Code launch one Agent (subagent) per concurrent task, each running its own Step 2 `uv run dispatch.py` call scoped to its own worktree/repo path — do not fan out raw parallel Bash calls against one shared repo path from the main loop.
 
 ## Step 2: Dispatch
+
+Before running the real task against a model, `dispatch.py` pings it first: a cheap throwaway-directory call (`ping_timeout_seconds`, default 30s) asking it to reply "OK" with no file access. This catches a dead/misconfigured/unauthenticated model up front, instead of discovering it only after burning the full `per_attempt_timeout_seconds` on the real task. If the ping fails, that model is skipped (no real attempt, no git-status snapshot) and the chain advances straight to the next fallback model. This happens automatically inside `dispatch_with_retry` — no separate command to run.
 
 Run (substituting the actual task description, target repo absolute path, and a short topic string identifying this line of work — e.g. the feature/branch name):
 
