@@ -39,6 +39,8 @@ uv run script.py
 - Skills must **not** implement code themselves — they instruct Claude how to act.
 - Every skill that produces files must specify the output path (e.g. `docs/superpowers/input/`).
 - Explicit `[ASSUMPTION: ...]` markers are preferred over silent gap-filling.
+- When a skill's own steps involve parsing, filtering, or summarizing a log file or other large text output (e.g. `review-pipeline-logs` isolating a run's log block), the step should say to use context-mode (`ctx_batch_execute`/`ctx_execute_file`) for that pass instead of raw `Read`/`Bash`/`Grep` — only the derived findings should enter the conversation, not the raw bytes. Still use `Read` when the exact text is needed afterward (e.g. quoting a line verbatim in a report).
+- When those findings point at source code (file paths, function names, stack traces) in a *target* repo the skill is operating on, and that repo has a `.codegraph/` directory, the step should say to use codegraph (`codegraph_explore`/`codegraph_node`, or the `codegraph explore`/`codegraph node` CLI) to locate the referenced code instead of `grep`/whole-file `Read`. If the target repo has no `.codegraph/`, skip it — indexing is the user's decision, not something a skill should assume or trigger.
 
 ## Known output paths and shared config
 
