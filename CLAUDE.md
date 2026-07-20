@@ -51,3 +51,13 @@ uv run script.py
 - `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
 - `.bridge/email-config.json` (per target repo) — recipients, last-sent tracking, and Resend MCP connection; shared by `setup-email-updates`, `send-update-email`, and `send-update-email-batch`
 - `docs/env-setup/claude-plugins-manifest.json` — user-scope Claude Code plugins/marketplaces + gstack snapshot, written/read by `setup-env`
+
+<!-- OPENWIKI:START -->
+
+## OpenWiki
+
+This repository uses OpenWiki for recurring code documentation. Start with `openwiki/quickstart.md`, then follow its links to architecture, workflows, domain concepts, operations, integrations, testing guidance, and source maps.
+
+The scheduled OpenWiki GitHub Actions workflow refreshes the repository wiki. Do not hand-edit generated OpenWiki pages unless explicitly asked; prefer updating source code/docs and letting OpenWiki regenerate.
+
+<!-- OPENWIKI:END -->

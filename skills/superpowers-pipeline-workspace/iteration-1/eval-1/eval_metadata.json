@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "spec-with-db-schema",
+  "prompt": "docs/spec.md 已經寫好了（裡面提到要加一個 audit_logs 表跟對應的 RLS policy），直接跑 superpowers-pipeline 幫我做完。",
+  "assertions": []
+}

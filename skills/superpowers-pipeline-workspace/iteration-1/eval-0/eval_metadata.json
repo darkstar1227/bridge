@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "no-existing-spec",
+  "prompt": "幫我跑 superpowers 的流程，把這個 repo 裡的 XX 功能做完，不用經過 gstack 那些審查。",
+  "assertions": []
+}

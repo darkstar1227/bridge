@@ -1,0 +1,2143 @@
+{
+  "openrouter/cohere/north-mini-code:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/nvidia/nemotron-3-nano-30b-a3b:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/google/gemma-4-26b-a4b-it:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/nvidia/nemotron-3-super-120b-a12b:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/nvidia/nemotron-nano-12b-v2-vl:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/nvidia/nemotron-nano-9b-v2:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/poolside/laguna-m.1:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/poolside/laguna-xs-2.1:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "openrouter/openai/gpt-oss-20b:free": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "litellm/subscription-gpt-oss-120b": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 9.2,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 68.8,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 1,
+        "completeness": 1,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 11.1,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "average([1,2,3]) == 2.0": false,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 8.2,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "average([1,2,3]) == 2.0": false,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 3,
+        "completeness": 3,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 69.7,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_leap_year(2000) is True": false,
+        "is_leap_year(1900) is False": false,
+        "is_leap_year(2024) is True": false,
+        "is_leap_year(2023) is False": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 3,
+        "discipline": 5,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      },
+      "tdd_calls": []
+    }
+  },
+  "openrouter/tencent/hy3:free": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 22.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 30.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 17.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 20.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 30.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode/deepseek-v4-flash-free": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 20.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 16.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 15.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 26.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 16.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode/hy3-free": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 41.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 23.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 18.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 21.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 27.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode/mimo-v2.5-free": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 17.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 33.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "FAILED",
+      "elapsed": 11.0,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "process exited zero but no terminal step_finish/stop event found",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 27.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 40.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode/north-mini-code-free": {
+    "feature_short": {
+      "terminal_state": "FAILED",
+      "elapsed": 7.6,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "process exited zero but no terminal step_finish/stop event found",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 56.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 41.7,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "FAILED",
+      "elapsed": 12.0,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "process exited zero but no terminal step_finish/stop event found",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 27.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode/nemotron-3-ultra-free": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 19.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 56.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 15.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 60.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 31.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 4
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "echo 'def is_leap_year(year: int) -> bool:\n    if year % 400 == 0:\n        return True\n    if year % 100 == 0:\n        return False\n    if year % 4 == 0:\n        return True\n    return False' > calc.py",
+          "exit_code": 0
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "litellm/nvidia/nemotron-3-ultra-550b-a55b": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 18.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 42.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "litellm/subscription-codex": {
+    "feature_short": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.0,
+      "changed_files": [
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 3
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 122.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 51.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "litellm/subscription-gemini-pro": {
+    "feature_short": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 3
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 240.1,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 219.5,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 100.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 108.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 2
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "rm -rf __pycache__ && python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  }
+}

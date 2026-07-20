@@ -1,0 +1,1782 @@
+{
+  "opencode-go/deepseek-v4-pro": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 96.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 67.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 31.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 33.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 28.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/deepseek-v4-flash": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 117.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 60.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 30.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 27.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 27.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/minimax-m2.7": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 132.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 48.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 25.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 36.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 31.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/grok-4.5": {
+    "feature_short": {
+      "terminal_state": "FAILED",
+      "elapsed": 185.1,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {},
+      "issues": "process exited zero but no terminal step_finish/stop event found",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 3
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 28.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 34.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 28.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 27.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/minimax-m3": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 24.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 25.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 33.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 32.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 29.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\" 2>&1",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\" 2>&1",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/kimi-k2.6": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 22.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 24.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 32.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 22.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 34.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/qwen3.6-plus": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 27.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 39.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 55.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 37.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 40.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/kimi-k2.7-code": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 78.3,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 21.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 52.4,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 43.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 33.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/mimo-v2.5": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 19.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 28.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 24.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 35.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 32.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/glm-5.2": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 34.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 20.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 44.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 50.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 49.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/glm-5.1": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 27.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 49.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 21.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 20.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 47.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/qwen3.7-max": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 32.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 36.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 37.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 30.8,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 42.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/mimo-v2.5-pro": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 58.5,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 69.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 40.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 40.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 50.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "opencode-go/qwen3.7-plus": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 32.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 35.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 49.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 28.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 39.4,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  }
+}

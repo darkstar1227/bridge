@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "single-approach-with-db",
+  "prompt": "plan 已經定案了，就只有一種做法沒有替代方案可比較，這個功能要新增一張 subscriptions 表跟一個 migration。跑一下完整 pipeline。",
+  "assertions": []
+}

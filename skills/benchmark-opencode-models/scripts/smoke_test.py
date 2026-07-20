@@ -36,11 +36,13 @@ score_tdd_test().
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import os
 import re
 import shutil
 import subprocess
+import threading
 import sys
 import time
 
@@ -271,10 +273,10 @@ def _changed_paths(changed_lines):
     return paths
 
 
-def run_single_attempt(model, task, repo_dir, timeout):
+def run_single_attempt(model, task, repo_dir, timeout, env=None):
     cmd = dispatch.build_command(task=task, repo=repo_dir, model=model, session_id=None)
     before = dispatch.git_status_snapshot(repo_dir)
-    outcome = dispatch.run_opencode(cmd, timeout=timeout)
+    outcome = dispatch.run_opencode(cmd, timeout=timeout, env=env)
     after = dispatch.git_status_snapshot(repo_dir)
     changed = sorted(dispatch.diff_snapshots(before, after))
     return outcome, changed
@@ -460,8 +462,43 @@ def _skipped_result(spec, reason):
     }
 
 
+_AUTH_FILES = ["auth.json", "account.json", "mcp-auth.json"]
+
+
+def _isolated_env(repo_root, model):
+    """opencode writes every session to one shared sqlite db (~/.local/share/
+    opencode/opencode.db by default). Concurrent `opencode run` processes
+    against that one db hit "database is locked" or hang under contention --
+    give each concurrently-running model its own XDG_DATA_HOME so its opencode
+    db is a separate file, making concurrency safe.
+
+    That same directory is also where opencode keeps provider credentials
+    (auth.json/account.json/mcp-auth.json) -- a bare empty XDG_DATA_HOME has
+    no credentials at all and every model fails with a generic "Unexpected
+    server error" that looks like a real auth failure but isn't. Copy those
+    files into each isolated dir so credentials still resolve while the
+    session db itself stays separate per model."""
+    slug = model.replace("/", "_").replace(":", "_")
+    data_home = os.path.join(repo_root, ".opencode-data", slug)
+    isolated_opencode_dir = os.path.join(data_home, "opencode")
+    os.makedirs(isolated_opencode_dir, exist_ok=True)
+
+    source_data_home = os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
+    source_opencode_dir = os.path.join(source_data_home, "opencode")
+    for fname in _AUTH_FILES:
+        src = os.path.join(source_opencode_dir, fname)
+        dst = os.path.join(isolated_opencode_dir, fname)
+        if os.path.exists(src) and not os.path.exists(dst):
+            shutil.copy2(src, dst)
+
+    env = dict(os.environ)
+    env["XDG_DATA_HOME"] = data_home
+    return env
+
+
 def test_model(model, repo_root, per_attempt_timeout, ping_timeout, on_result=None):
-    ping_outcome = dispatch.ping_model(model, timeout=ping_timeout)
+    env = _isolated_env(repo_root, model)
+    ping_outcome = dispatch.ping_model(model, timeout=ping_timeout, env=env)
     if ping_outcome.classification != "DONE":
         results = {key: _skipped_result(spec, ping_outcome.reason) for key, spec in TESTS.items()}
         if on_result:
@@ -477,7 +514,7 @@ def test_model(model, repo_root, per_attempt_timeout, ping_timeout, on_result=No
         spec = dict(spec)
         spec["_repo_dir"] = repo_dir
         start = time.monotonic()
-        outcome, changed = run_single_attempt(model, spec["task"], repo_dir, per_attempt_timeout)
+        outcome, changed = run_single_attempt(model, spec["task"], repo_dir, per_attempt_timeout, env=env)
         elapsed = round(time.monotonic() - start, 1)
         scorer = score_tdd_test if spec.get("kind") == "tdd" else score_test
         result = scorer(spec, outcome, changed, elapsed)
@@ -493,6 +530,7 @@ def main():
     parser.add_argument("--repo-root", required=True, help="scratch dir to create throwaway repos in")
     parser.add_argument("--per-attempt-timeout", type=float, default=240)
     parser.add_argument("--ping-timeout", type=float, default=30)
+    parser.add_argument("--concurrency", type=int, default=6, help="models run in parallel; each model's own 5 tests stay sequential")
     parser.add_argument("--out", required=True, help="path to write the JSON report")
     args = parser.parse_args()
 
@@ -500,14 +538,24 @@ def main():
     os.makedirs(args.repo_root, exist_ok=True)
 
     report = {}
-    for model in models:
-        print(f"=== {model} ===", flush=True)
-        report[model] = test_model(
-            model, args.repo_root, args.per_attempt_timeout, args.ping_timeout,
-            on_result=_print_result,
-        )
-        with open(args.out, "w") as f:
-            json.dump(report, f, indent=2)
+    lock = threading.Lock()
+
+    def run_one(model):
+        print(f"=== {model} start ===", flush=True)
+
+        def on_result(key, r):
+            with lock:
+                _print_result(f"{model} {key}", r)
+
+        results = test_model(model, args.repo_root, args.per_attempt_timeout, args.ping_timeout, on_result=on_result)
+        with lock:
+            report[model] = results
+            with open(args.out, "w") as f:
+                json.dump(report, f, indent=2)
+        print(f"=== {model} done ===", flush=True)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as ex:
+        list(ex.map(run_one, models))
 
     print(f"\nWrote {args.out}")
 

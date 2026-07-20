@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "alt-approaches-no-db",
+  "prompt": "我剛用 /autoplan 把一個『訂單匯出功能』的 plan 定案了，plan 裡面比較了 sync 匯出 vs 背景 job 匯出兩種做法還沒決定選哪個。幫我把整個 pipeline 跑完，這個功能不會動到資料庫 schema。",
+  "assertions": []
+}

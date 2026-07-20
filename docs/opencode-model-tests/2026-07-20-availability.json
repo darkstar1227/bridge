@@ -1,0 +1,271 @@
+[
+  {
+    "model": "opencode-go/deepseek-v4-flash",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 31.4,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/deepseek-v4-pro",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 32.3,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/grok-4.5",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 31.5,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/minimax-m2.7",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 26.2,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/minimax-m3",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 36.7,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/qwen3.6-plus",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 35.3,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "openrouter/cohere/north-mini-code:free",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 37.8,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "openrouter/nvidia/nemotron-3-nano-30b-a3b:free",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 41.9,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "openrouter/poolside/laguna-m.1:free",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 22.8,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "openrouter/tencent/hy3:free",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 24.8,
+    "correct": true,
+    "slow": false,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/glm-5.1",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 88.9,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/glm-5.2",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 59.5,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/kimi-k2.6",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 53.0,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/kimi-k2.7-code",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 67.1,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/mimo-v2.5",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 53.0,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/mimo-v2.5-pro",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 45.6,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/qwen3.7-max",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 54.0,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "opencode-go/qwen3.7-plus",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "DONE",
+    "prompt_elapsed": 61.2,
+    "correct": true,
+    "slow": true,
+    "issues": null
+  },
+  {
+    "model": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+    "available": true,
+    "classification": "DONE",
+    "reason": "",
+    "prompt_state": "FAILED",
+    "prompt_elapsed": 7.9,
+    "correct": false,
+    "slow": true,
+    "issues": "{\"code\":502,\"message\":\"Upstream error from Nvidia: ResourceExhausted: Worker local total request limit reached (32/32)\",\"metadata\":{\"error_type\":\"provider_unavailable\"}}"
+  },
+  {
+    "model": "opencode-go/kimi-k3",
+    "available": false,
+    "classification": "TIMED_OUT",
+    "reason": "timeout elapsed, process group killed",
+    "prompt_state": null,
+    "prompt_elapsed": null,
+    "correct": null,
+    "slow": null
+  },
+  {
+    "model": "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+    "available": false,
+    "classification": "FAILED",
+    "reason": "This model is unavailable for free. The paid version is available now - use this slug instead: meta-llama/llama-3.3-70b-instruct",
+    "prompt_state": null,
+    "prompt_elapsed": null,
+    "correct": null,
+    "slow": null
+  },
+  {
+    "model": "openrouter/nousresearch/hermes-3-llama-3.1-405b:free",
+    "available": false,
+    "classification": "FAILED",
+    "reason": "This model is unavailable for free. The paid version is available now - use this slug instead: nousresearch/hermes-3-llama-3.1-405b",
+    "prompt_state": null,
+    "prompt_elapsed": null,
+    "correct": null,
+    "slow": null
+  },
+  {
+    "model": "openrouter/openai/gpt-oss-20b:free",
+    "available": false,
+    "classification": "TIMED_OUT",
+    "reason": "timeout elapsed, process group killed",
+    "prompt_state": null,
+    "prompt_elapsed": null,
+    "correct": null,
+    "slow": null
+  },
+  {
+    "model": "openrouter/qwen/qwen3-coder:free",
+    "available": false,
+    "classification": "FAILED",
+    "reason": "This model is unavailable for free. The paid version is available now - use this slug instead: qwen/qwen3-coder",
+    "prompt_state": null,
+    "prompt_elapsed": null,
+    "correct": null,
+    "slow": null
+  },
+  {
+    "model": "openrouter/qwen/qwen3-next-80b-a3b-instruct:free",
+    "available": false,
+    "classification": "FAILED",
+    "reason": "This model is unavailable for free. The paid version is available now - use this slug instead: qwen/qwen3-next-80b-a3b-instruct",
+    "prompt_state": null,
+    "prompt_elapsed": null,
+    "correct": null,
+    "slow": null
+  }
+]

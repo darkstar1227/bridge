@@ -1,0 +1,903 @@
+{
+  "litellm/RedHatAI/Qwen3.6-35B-A3B-NVFP4": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.ContextWindowExceededError: litellm.BadRequestError: ContextWindowExceededError: OpenAIException - This model's maximum context length is 32768 tokens. However, you requested 32000 output tokens and your prompt contains at least 769 input tokens, for a total of at least 32769 tokens. Please reduce the length of the input prompt or the number of requested output tokens. (parameter=input_tokens, value=769)\nmodel=RedHatAI/Qwen3.6-35B-A3B-NVFP4. context_window_fallbacks=None. fallbacks=None.\n\nSet 'context_window_fallback' - https://docs.litellm.ai/docs/routing#fallbacks. Received Model Group=RedHatAI/Qwen3.6-35B-A3B-NVFP4\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.ContextWindowExceededError: litellm.BadRequestError: ContextWindowExceededError: OpenAIException - This model's maximum context length is 32768 tokens. However, you requested 32000 output tokens and your prompt contains at least 769 input tokens, for a total of at least 32769 tokens. Please reduce the length of the input prompt or the number of requested output tokens. (parameter=input_tokens, value=769)\nmodel=RedHatAI/Qwen3.6-35B-A3B-NVFP4. context_window_fallbacks=None. fallbacks=None.\n\nSet 'context_window_fallback' - https://docs.litellm.ai/docs/routing#fallbacks. Received Model Group=RedHatAI/Qwen3.6-35B-A3B-NVFP4\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.ContextWindowExceededError: litellm.BadRequestError: ContextWindowExceededError: OpenAIException - This model's maximum context length is 32768 tokens. However, you requested 32000 output tokens and your prompt contains at least 769 input tokens, for a total of at least 32769 tokens. Please reduce the length of the input prompt or the number of requested output tokens. (parameter=input_tokens, value=769)\nmodel=RedHatAI/Qwen3.6-35B-A3B-NVFP4. context_window_fallbacks=None. fallbacks=None.\n\nSet 'context_window_fallback' - https://docs.litellm.ai/docs/routing#fallbacks. Received Model Group=RedHatAI/Qwen3.6-35B-A3B-NVFP4\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.ContextWindowExceededError: litellm.BadRequestError: ContextWindowExceededError: OpenAIException - This model's maximum context length is 32768 tokens. However, you requested 32000 output tokens and your prompt contains at least 769 input tokens, for a total of at least 32769 tokens. Please reduce the length of the input prompt or the number of requested output tokens. (parameter=input_tokens, value=769)\nmodel=RedHatAI/Qwen3.6-35B-A3B-NVFP4. context_window_fallbacks=None. fallbacks=None.\n\nSet 'context_window_fallback' - https://docs.litellm.ai/docs/routing#fallbacks. Received Model Group=RedHatAI/Qwen3.6-35B-A3B-NVFP4\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.ContextWindowExceededError: litellm.BadRequestError: ContextWindowExceededError: OpenAIException - This model's maximum context length is 32768 tokens. However, you requested 32000 output tokens and your prompt contains at least 769 input tokens, for a total of at least 32769 tokens. Please reduce the length of the input prompt or the number of requested output tokens. (parameter=input_tokens, value=769)\nmodel=RedHatAI/Qwen3.6-35B-A3B-NVFP4. context_window_fallbacks=None. fallbacks=None.\n\nSet 'context_window_fallback' - https://docs.litellm.ai/docs/routing#fallbacks. Received Model Group=RedHatAI/Qwen3.6-35B-A3B-NVFP4\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "litellm/subscription-claude": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Ask your workspace admin to add more so you can keep going.\"}}'. Received Model Group=subscription-claude\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Ask your workspace admin to add more so you can keep going.\"}}'. Received Model Group=subscription-claude\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Ask your workspace admin to add more so you can keep going.\"}}'. Received Model Group=subscription-claude\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Ask your workspace admin to add more so you can keep going.\"}}'. Received Model Group=subscription-claude\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Ask your workspace admin to add more so you can keep going.\"}}'. Received Model Group=subscription-claude\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "litellm/subscription-claude-sonnet-5": {
+    "feature_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Add more at claude.ai/admin-settings/usage and keep going.\"}}'. Received Model Group=subscription-claude-sonnet-5\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Add more at claude.ai/admin-settings/usage and keep going.\"}}'. Received Model Group=subscription-claude-sonnet-5\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Add more at claude.ai/admin-settings/usage and keep going.\"}}'. Received Model Group=subscription-claude-sonnet-5\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Add more at claude.ai/admin-settings/usage and keep going.\"}}'. Received Model Group=subscription-claude-sonnet-5\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0
+      }
+    },
+    "tdd": {
+      "terminal_state": "PING_FAILED",
+      "elapsed": null,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "litellm.BadRequestError: AnthropicException - b'{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You\\'re out of extra usage. Add more at claude.ai/admin-settings/usage and keep going.\"}}'. Received Model Group=subscription-claude-sonnet-5\nAvailable Model Group Fallbacks=None",
+      "scores": {
+        "time": 0,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 0,
+        "discipline": 0,
+        "red_green_accuracy": 0,
+        "test_call_discipline": 0
+      }
+    }
+  },
+  "litellm/subscription-codex": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 110.4,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 580.7,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 1,
+        "completeness": 1,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 124.7,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 581.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 104.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "litellm/subscription-gemini-pro": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 102.9,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 565.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 101.7,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 83.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 730.5,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 1
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"import sys; import importlib.util; spec = importlib.util.spec_from_file_location('calc', '/private/tmp/opencode-benchmark-repos-litellm/litellm_subscription-gemini-pro__tdd/calc.py'); foo = importlib.util.module_from_spec(spec); spec.loader.exec_module(foo); print(foo.is_leap_year(2000))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"exec(open('calc.py').read()); print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"import importlib.util; import sys; spec = importlib.util.spec_from_file_location('calc', 'calc.py'); module = importlib.util.module_from_spec(spec); sys.modules['calc'] = module; spec.loader.exec_module(module); from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "cat << 'EOF' > calc.py\ndef is_leap_year(year: int) -> bool:\n    if year % 400 == 0:\n        return True\n    if year % 100 == 0:\n        return False\n    return year % 4 == 0\nEOF",
+          "exit_code": 0
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "litellm/subscription-gpt-oss-120b": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 9.5,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 10.2,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_prime(2) is True": false,
+        "is_prime(1) is False": false,
+        "is_prime(97) is True": false,
+        "is_prime(100) is False": false,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 1,
+        "completeness": 1,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 8.6,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "average([1,2,3]) == 2.0": false,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 2,
+        "completeness": 2,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 492.0,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "average([1,2,3]) == 2.0": false,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 3,
+        "completeness": 3,
+        "autonomy": 3,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 23.0,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": true,
+      "checks": {
+        "is_leap_year(2000) is True": false,
+        "is_leap_year(1900) is False": false,
+        "is_leap_year(2024) is True": false,
+        "is_leap_year(2023) is False": false
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 1,
+        "discipline": 5,
+        "red_green_accuracy": 1,
+        "test_call_discipline": 0
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        }
+      ]
+    }
+  },
+  "litellm/nvidia/nemotron-3-ultra-550b-a55b": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 86.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 26.6,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "DONE",
+      "elapsed": 13.7,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 5,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 1800.1,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 157.3,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 2,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "litellm/glm-5.2": {
+    "feature_short": {
+      "terminal_state": "DONE",
+      "elapsed": 1388.9,
+      "changed_files": [
+        "calc.py",
+        "test_calc.py"
+      ],
+      "unexpected_files": [
+        "test_calc.py"
+      ],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 3
+      }
+    },
+    "feature_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 663.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_prime(2) is True": true,
+        "is_prime(1) is False": true,
+        "is_prime(97) is True": true,
+        "is_prime(100) is False": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 1,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "bugfix_short": {
+      "terminal_state": "TIMED_OUT",
+      "elapsed": 1800.1,
+      "changed_files": [],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {},
+      "issues": "timeout elapsed, process group killed",
+      "scores": {
+        "time": 1,
+        "quality": 0,
+        "completeness": 0,
+        "autonomy": 4,
+        "discipline": 5
+      }
+    },
+    "bugfix_detailed": {
+      "terminal_state": "DONE",
+      "elapsed": 34.0,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "average([1,2,3]) == 2.0": true,
+        "average([]) == 0": true,
+        "double(21) == 42": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 4,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5
+      }
+    },
+    "tdd": {
+      "terminal_state": "DONE",
+      "elapsed": 79.2,
+      "changed_files": [
+        "calc.py"
+      ],
+      "unexpected_files": [],
+      "no_op": false,
+      "checks": {
+        "is_leap_year(2000) is True": true,
+        "is_leap_year(1900) is False": true,
+        "is_leap_year(2024) is True": true,
+        "is_leap_year(2023) is False": true
+      },
+      "issues": null,
+      "scores": {
+        "time": 3,
+        "quality": 5,
+        "completeness": 5,
+        "autonomy": 5,
+        "discipline": 5,
+        "red_green_accuracy": 5,
+        "test_call_discipline": 5
+      },
+      "tdd_calls": [
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 1
+        },
+        {
+          "command": "python3 -c \"from calc import is_leap_year; print(is_leap_year(2000), is_leap_year(1900), is_leap_year(2024), is_leap_year(2023))\"",
+          "exit_code": 0
+        }
+      ]
+    }
+  }
+}

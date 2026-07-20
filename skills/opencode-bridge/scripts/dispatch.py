@@ -33,16 +33,30 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import signal
 import subprocess
 import tempfile
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from filelock import FileLock
+
+logger = logging.getLogger("opencode_bridge.dispatch")
+if not logger.handlers:
+    # dispatch.py is used both as an importable module (smoke_test.py) and as
+    # a standalone `uv run dispatch.py` CLI -- attach a default stderr handler
+    # here so progress messages are visible either way, since callers that
+    # only import this module have no reason to configure logging themselves.
+    _handler = logging.StreamHandler()  # defaults to sys.stderr
+    _handler.setFormatter(logging.Formatter("%(asctime)s [dispatch] %(message)s"))
+    logger.addHandler(_handler)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
 
 STATE_DIR = Path.home() / ".opencode-bridge"
 CONFIG_PATH = STATE_DIR / "config.json"
@@ -99,6 +113,228 @@ def update_session_mapping(repo: str, topic: str, session_id: str) -> None:
         save_json_file(SESSIONS_PATH, mapping)
 
 
+ROTATION_PATH = STATE_DIR / "state" / "provider_rotation.json"
+
+
+def _provider_of(model: str) -> str:
+    """First path segment of a model slug is its provider, e.g.
+    "opencode-go/kimi-k2.6" -> "opencode-go", "openrouter/tencent/hy3:free"
+    -> "openrouter"."""
+    return model.split("/", 1)[0]
+
+
+def _group_by_provider(models: list[str]) -> dict[str, list[str]]:
+    groups: dict[str, list[str]] = {}
+    for m in models:
+        groups.setdefault(_provider_of(m), []).append(m)
+    return groups
+
+
+def _next_rotation_start(providers: list[str]) -> int:
+    """Persisted round-robin pointer so consecutive dispatch() calls don't
+    all start on the same provider -- spreads load across providers over
+    time instead of every call hammering the same one first."""
+    lock = FileLock(str(ROTATION_PATH) + ".lock")
+    with lock:
+        state = load_json_file(ROTATION_PATH, default={"last_index": -1})
+        start = (state.get("last_index", -1) + 1) % len(providers)
+        save_json_file(ROTATION_PATH, {"last_index": start})
+        return start
+
+
+def rotate_models_by_provider(models: list[str]) -> list[str]:
+    """Reorders the model chain to spread load across providers instead of
+    exhausting one provider's rate limit before ever trying another:
+
+    1. Round-robins which provider leads *this* call, persisted across
+       calls via ROTATION_PATH -- repeated dispatch() calls cycle through
+       providers rather than always starting on the same one.
+    2. Within the resulting chain, interleaves providers round-robin (one
+       model per provider per round) so a rate-limited provider's fallback
+       models aren't retried back-to-back -- same-provider repeats only
+       cluster once every other provider's models are exhausted.
+
+    Relative order within each provider (i.e. score ranking from config)
+    is preserved; only the interleaving across providers changes."""
+    groups = _group_by_provider(models)
+    providers = list(groups.keys())
+    if len(providers) <= 1:
+        return models
+    start = _next_rotation_start(providers)
+    rotated_providers = providers[start:] + providers[:start]
+    chain = []
+    round_idx = 0
+    while len(chain) < len(models):
+        for p in rotated_providers:
+            bucket = groups[p]
+            if round_idx < len(bucket):
+                chain.append(bucket[round_idx])
+        round_idx += 1
+    return chain
+
+
+RUN_LOG_DIR = STATE_DIR / "state" / "runs"
+
+
+def _slugify(s: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", s)
+
+
+def run_log_path_for(repo: str, topic: str, model: str) -> Path:
+    """Deterministic-ish path so a caller can predict it and `tail -f` (or
+    hand it to the Monitor tool) before/while the attempt is running.
+    Timestamped so retries/re-runs against the same (repo, topic, model)
+    don't clobber each other's log."""
+    name = f"{_slugify(topic)}__{_slugify(model)}__{int(time.time())}.jsonl"
+    return RUN_LOG_DIR / _slugify(repo) / name
+
+
+HEALTH_PATH = STATE_DIR / "state" / "health.json"
+
+# Consecutive ambiguous (timeout/rate-limit/generic) failures before a single
+# model gets disabled on its own.
+MODEL_FAIL_THRESHOLD = 2
+# How many distinct models under the same provider have to be simultaneously
+# struggling (>= MODEL_FAIL_THRESHOLD each) before we stop disabling them one
+# by one and conclude it's an account-wide problem (quota/rate limit) --
+# disabling the whole provider instead.
+PROVIDER_ESCALATION_COUNT = 2
+MODEL_COOLDOWN_SECONDS = 2 * 3600
+PROVIDER_COOLDOWN_SECONDS = 6 * 3600
+
+# Explicit text markers that unambiguously identify *which* level broke,
+# independent of the retry-count heuristic above.
+_MODEL_LEVEL_MARKERS = [
+    "unknown model", "invalid model", "model not found",
+    "unavailable for free", "does not exist",
+]
+_PROVIDER_LEVEL_MARKERS = [
+    "unauthorized", "authentication", "auth failed",
+    "invalid api key", "invalid_api_key",
+]
+
+
+def _load_health() -> dict:
+    return load_json_file(HEALTH_PATH, default={"models": {}, "providers": {}})
+
+
+def _save_health(health: dict) -> None:
+    save_json_file(HEALTH_PATH, health)
+
+
+def _entry_is_active(entry: dict | None) -> bool:
+    if not entry or not entry.get("disabled"):
+        return False
+    until = entry.get("disabled_until")
+    return until is None or time.time() < until  # None == permanent
+
+
+def is_model_disabled(model: str) -> tuple[bool, str]:
+    """Checks both this model's own disable entry and its provider's --
+    a provider-level disable overrides every model under it, since the
+    provider itself (not any one model) is the thing that's broken."""
+    health = _load_health()
+    provider = _provider_of(model)
+    p_entry = health["providers"].get(provider)
+    if _entry_is_active(p_entry):
+        return True, f"provider '{provider}' disabled -- {p_entry.get('reason')}"
+    m_entry = health["models"].get(model)
+    if _entry_is_active(m_entry):
+        return True, f"model disabled -- {m_entry.get('reason')}"
+    return False, ""
+
+
+def record_health_success(model: str) -> None:
+    """Live proof the model (and by extension its provider's credentials)
+    work right now -- clears any disable on both, since real evidence beats
+    a stale disable flag."""
+    lock = FileLock(str(HEALTH_PATH) + ".lock")
+    with lock:
+        health = _load_health()
+        health["models"][model] = {"consecutive_failures": 0}
+        provider = _provider_of(model)
+        prov_entry = health["providers"].get(provider)
+        if prov_entry and prov_entry.get("disabled"):
+            prov_entry["disabled"] = False
+        _save_health(health)
+
+
+def record_health_failure(model: str, reason: str, sibling_models: list[str]) -> None:
+    """Decides whether to disable just this model or escalate to disabling
+    its whole provider:
+
+    - An explicit "unknown model"/"model not found"/etc marker means the
+      model slug itself is bad -> disable that model only, permanently (it
+      will never start working on its own).
+    - An explicit auth-failure marker means the provider's credentials are
+      broken -> disable the whole provider, permanently (needs a human to
+      fix credentials).
+    - Otherwise (timeout / rate-limit / generic failure) it's ambiguous on
+      its own -- track consecutive failures per model, and once a model
+      crosses MODEL_FAIL_THRESHOLD, check how many *other* models under the
+      same provider are also currently struggling. If enough are, this is
+      almost certainly one account-wide problem (quota exhaustion, rate
+      limit) rather than N independently-broken models -- escalate to a
+      temporary provider-level disable instead of disabling each one by one.
+    """
+    lock = FileLock(str(HEALTH_PATH) + ".lock")
+    with lock:
+        health = _load_health()
+        provider = _provider_of(model)
+        lowered = (reason or "").lower()
+        now = time.time()
+
+        if any(marker in lowered for marker in _MODEL_LEVEL_MARKERS):
+            health["models"][model] = {
+                "consecutive_failures": health["models"].get(model, {}).get("consecutive_failures", 0) + 1,
+                "disabled": True, "disabled_until": None, "disabled_at": now,
+                "scope": "model", "reason": reason,
+            }
+            _save_health(health)
+            return
+
+        if any(marker in lowered for marker in _PROVIDER_LEVEL_MARKERS):
+            health["providers"][provider] = {
+                "disabled": True, "disabled_until": None, "disabled_at": now,
+                "scope": "provider", "reason": reason,
+            }
+            _save_health(health)
+            return
+
+        entry = health["models"].get(model, {"consecutive_failures": 0})
+        entry["consecutive_failures"] = entry.get("consecutive_failures", 0) + 1
+        entry["last_reason"] = reason
+        entry["last_ts"] = now
+        health["models"][model] = entry
+
+        if entry["consecutive_failures"] < MODEL_FAIL_THRESHOLD:
+            _save_health(health)
+            return
+
+        struggling_siblings = sum(
+            1 for m in sibling_models
+            if m != model and health["models"].get(m, {}).get("consecutive_failures", 0) >= MODEL_FAIL_THRESHOLD
+        )
+        if struggling_siblings + 1 >= PROVIDER_ESCALATION_COUNT:
+            health["providers"][provider] = {
+                "disabled": True, "disabled_until": now + PROVIDER_COOLDOWN_SECONDS,
+                "disabled_at": now, "scope": "provider",
+                "reason": (
+                    f"{struggling_siblings + 1} models under provider '{provider}' are all "
+                    f"failing at once (latest: {reason}) -- looks account-wide (quota/rate "
+                    f"limit), not per-model"
+                ),
+            }
+        else:
+            entry["disabled"] = True
+            entry["disabled_until"] = now + MODEL_COOLDOWN_SECONDS
+            entry["disabled_at"] = now
+            entry["scope"] = "model"
+            entry["reason"] = reason
+            health["models"][model] = entry
+        _save_health(health)
+
+
 def build_command(task: str, repo: str, model: str, session_id: str | None) -> list[str]:
     cmd = ["opencode", "run", task, "--format", "json", "-m", model, "--dir", repo]
     if session_id:
@@ -114,7 +350,7 @@ def build_ping_command(model: str, scratch_dir: str) -> list[str]:
     ]
 
 
-def ping_model(model: str, timeout: float) -> "DispatchOutcome":
+def ping_model(model: str, timeout: float, env: dict | None = None) -> "DispatchOutcome":
     """Cheap reachability/auth check for a model, run before committing to a
     full dispatch attempt -- catches a dead/misconfigured model without
     burning the (much longer) per-attempt timeout on it. Runs in a throwaway
@@ -122,7 +358,7 @@ def ping_model(model: str, timeout: float) -> "DispatchOutcome":
     touch."""
     with tempfile.TemporaryDirectory(prefix="opencode-bridge-ping-") as scratch_dir:
         cmd = build_ping_command(model, scratch_dir)
-        return run_opencode(cmd, timeout=timeout)
+        return run_opencode(cmd, timeout=timeout, env=env)
 
 
 def git_status_snapshot(repo: str) -> set[str]:
@@ -222,30 +458,86 @@ class DispatchOutcome:
     retryable: bool = False
     events: list = field(default_factory=list)
     files_changed: list = field(default_factory=list)
+    run_log_path: str | None = None  # jsonl file this attempt streamed to, if any
 
 
-def run_opencode(cmd: list[str], timeout: float) -> DispatchOutcome:
+def _stream_reader(pipe, sink: list[str], log_file, log_lock: threading.Lock) -> None:
+    """Reads `pipe` line-by-line as it arrives and appends each line to
+    `sink` (for the caller's final stdout string) and, if given, tees it
+    live to `log_file` -- so a long-running attempt's progress is visible
+    (e.g. via `tail -f`/the Monitor tool) instead of only appearing after
+    the whole process exits."""
+    for line in iter(pipe.readline, ""):
+        sink.append(line)
+        if log_file is not None:
+            with log_lock:
+                log_file.write(line if line.endswith("\n") else line + "\n")
+                log_file.flush()
+    pipe.close()
+
+
+def run_opencode(
+    cmd: list[str], timeout: float, env: dict | None = None,
+    jsonl_log_path: "Path | str | None" = None,
+) -> DispatchOutcome:
     # Popen (not subprocess.run) so we retain the pid for a process-group kill
     # on timeout -- subprocess.run's own TimeoutExpired never carries .pid,
     # which would make the kill unreachable (verified empirically: a real
     # TimeoutExpired instance has no `pid` attribute at all).
+    #
+    # opencode writes every session to one global sqlite db (~/.local/share/
+    # opencode/opencode.db, or $XDG_DATA_HOME/opencode/opencode.db). Running
+    # several `opencode run` processes concurrently against that shared db
+    # causes "database is locked" (immediate failure) or, once contention
+    # backs up, silent hangs to the timeout. Callers dispatching multiple
+    # models in parallel must pass a distinct env with its own XDG_DATA_HOME
+    # per concurrent worker to keep each one on an isolated db file.
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-        start_new_session=True,
+        start_new_session=True, env=env,
     )
+
+    log_file = None
+    if jsonl_log_path is not None:
+        jsonl_log_path = Path(jsonl_log_path)
+        jsonl_log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_file = open(jsonl_log_path, "a")
+
+    # `--format json` already emits one JSON event per line -- read it
+    # incrementally (own thread, since proc.stdout.readline() blocks) instead
+    # of buffering the whole thing in communicate(), so each event lands in
+    # jsonl_log_path the moment opencode writes it, not only at process exit.
+    stdout_lines: list[str] = []
+    log_lock = threading.Lock()
+    reader = threading.Thread(
+        target=_stream_reader, args=(proc.stdout, stdout_lines, log_file, log_lock),
+        daemon=True,
+    )
+    reader.start()
+
     try:
-        stdout, stderr = proc.communicate(timeout=timeout)
+        proc.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
         try:
             pgid = os.getpgid(proc.pid)
             os.killpg(pgid, signal.SIGKILL)
         except ProcessLookupError:
             pass
-        proc.communicate()  # reap the now-killed process
+        proc.wait()  # reap the now-killed process
+        reader.join(timeout=5)
+        if log_file is not None:
+            log_file.close()
         return DispatchOutcome(
             classification="TIMED_OUT", reason="timeout elapsed, process group killed",
             retryable=True,
         )
+
+    reader.join(timeout=5)
+    stderr = proc.stderr.read()
+    proc.stderr.close()
+    if log_file is not None:
+        log_file.close()
+    stdout = "".join(stdout_lines)
 
     returncode = proc.returncode
 
@@ -311,10 +603,17 @@ def dispatch_with_retry(task, repo, topic, models, per_attempt_timeout, chain_ti
                 reason=f"chain-level timeout exceeded; failures so far: {failure_reasons}",
             )
 
+        disabled, disabled_reason = is_model_disabled(model)
+        if disabled:
+            failure_reasons.append(f"{model}: skipped -- {disabled_reason}")
+            continue  # known-bad model/provider -- don't waste a ping on it
+
         ping_outcome = ping_model(model, timeout=ping_timeout)
         if ping_outcome.classification != "DONE":
             failure_reasons.append(f"{model}: ping failed -- {ping_outcome.reason}")
+            record_health_failure(model, ping_outcome.reason, sibling_models=models)
             continue  # dead/misconfigured model -- skip straight to the next fallback
+        record_health_success(model)
 
         session_id = mapping_session_id if model_index == 0 else None
         for attempt in range(2):  # original attempt + one retry, per model
@@ -325,9 +624,13 @@ def dispatch_with_retry(task, repo, topic, models, per_attempt_timeout, chain_ti
                 )
             before = git_status_snapshot(repo)
             cmd = build_command(task=task, repo=repo, model=model, session_id=session_id)
-            outcome = run_opencode(cmd, timeout=per_attempt_timeout)
+            log_path = run_log_path_for(repo, topic, model)
+            logger.info(f"streaming {model} output -> {log_path}")
+            outcome = run_opencode(cmd, timeout=per_attempt_timeout, jsonl_log_path=log_path)
+            outcome.run_log_path = str(log_path)
 
             if outcome.classification == "DONE":
+                record_health_success(model)
                 new_session_id = _extract_session_id(outcome.events) or session_id
                 if new_session_id:
                     update_session_mapping(repo, topic, new_session_id)
@@ -345,9 +648,14 @@ def dispatch_with_retry(task, repo, topic, models, per_attempt_timeout, chain_ti
                 outcome.files_changed = sorted(changed)
                 return outcome
             if not outcome.retryable:
+                record_health_failure(model, outcome.reason, sibling_models=models)
                 break  # non-retryable: stop retrying this model, advance to the next
             # retryable + clean tree: retry same model once with a fresh session
             session_id = None  # fresh temp session for the retry attempt
+        else:
+            # both attempts were retryable and still failed -- exhausted, not
+            # just skipped, so it counts toward this model's health too
+            record_health_failure(model, outcome.reason, sibling_models=models)
 
     return DispatchOutcome(
         classification="FAILED",
@@ -362,6 +670,7 @@ def build_handoff_report(outcome: DispatchOutcome, session_id: str | None) -> di
             "issues": outcome.reason,
             "files_changed": getattr(outcome, "files_changed", []),
             "session_id": session_id,
+            "run_log_path": getattr(outcome, "run_log_path", None),
         }
 
     final_text = ""
@@ -379,6 +688,7 @@ def build_handoff_report(outcome: DispatchOutcome, session_id: str | None) -> di
         "test_results": test_results,
         "self_review_notes": "not reported by OpenCode",
         "session_id": session_id,
+        "run_log_path": getattr(outcome, "run_log_path", None),
     }
 
 
@@ -394,6 +704,8 @@ def dispatch(task: str, repo: str, topic: str) -> dict:
             "re-run the SKILL.md first-run setup flow"
         )
     models = [config["default_model"]] + config.get("fallback_models", [])
+    if config.get("rotate_providers", True):
+        models = rotate_models_by_provider(models)
     per_attempt_timeout = config.get("per_attempt_timeout_seconds", 300)
     chain_timeout = config.get("chain_timeout_seconds", 600)
     ping_timeout = config.get("ping_timeout_seconds", 30)

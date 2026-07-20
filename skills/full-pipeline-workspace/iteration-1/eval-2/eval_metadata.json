@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "mid-pipeline-implementer-swap",
+  "prompt": "跑到一半，implementation 那步我想用 opencode 來做而不是 claude subagent，不要跟我原本問的方式一樣（superpowers 預設用 claude subagent），你自己判斷一下就好，不用再問我。",
+  "assertions": []
+}
