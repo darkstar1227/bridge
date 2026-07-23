@@ -79,15 +79,27 @@ For each repo name printed in Step 2, `cd` into it and run the following per-rep
    ```
    Empty → record `Skipped (no new commits): <repo>`, continue.
 
-4. **Gather commit detail and filter.** Read every commit's message, body, and changed files (`git show --stat <sha>`) in the range, oldest first. Discard any commit that only touches `.bridge/email-config.json` (this skill's own bookkeeping). Also discard commits that are purely deployment/infrastructure/CI changes with no user-facing effect, or routine documentation/informational edits (wording tweaks, typos, comment-only changes, changelog housekeeping) — **except** a genuinely significant documentation update (a new architecture/design doc, a substantial rewrite of a core doc), which still gets included as its own bullet or block. If every commit in range ends up excluded, treat it exactly like "no new commits" (step 3 above): record `Skipped (no new commits): <repo>`, continue — do not advance `lastSentSha`.
-
-   Then, if `package.json` exists, walk every commit individually to get the ordered version sequence (a single `git diff` across the range only shows start/end, not intermediates):
+4. **Gather commit detail and filter (via context-mode sandbox).** A busy range's per-commit `git show --stat` output (and the per-commit `package.json` version walk) can be large, and none of those raw lines need to survive into the conversation. Do this whole gather-and-mechanically-filter pass with `ctx_execute` (language: `"shell"`) instead of raw `Bash`:
    ```bash
-   for sha in $(git log "$LAST_SHA"..HEAD --reverse --format='%H'); do
-     git show "$sha:package.json" 2>/dev/null | jq -r '.version // empty'
-   done
+   git log "$LAST_SHA"..HEAD --reverse --format='%H' | while read -r sha; do
+     subject=$(git show -s --format='%s' "$sha")
+     body=$(git show -s --format='%b' "$sha")
+     files=$(git show --stat --format='' "$sha" | sed '$d' | awk '{print $1}' | grep -v '^$')
+     ver=$(git show "$sha:package.json" 2>/dev/null | jq -r '.version // empty')
+     jq -n --arg sha "$sha" --arg subject "$subject" --arg body "$body" \
+           --argjson files "$(printf '%s\n' "$files" | jq -R . | jq -s .)" \
+           --arg ver "$ver" \
+           '{sha:$sha, subject:$subject, body:$body, files:$files, version:$ver}'
+   done | jq -s '{
+     commits: [.[] | select(.files != [".bridge/email-config.json"])],
+     versions: [.[].version | select(. != "")]
+   }'
    ```
-   No `package.json` in range → use the commit date range as the block boundary instead (see step 5).
+   This mechanically drops commits whose changed files are *only* `.bridge/email-config.json` (this skill's own bookkeeping) and collects the ordered version sequence — only the resulting `{commits, versions}` JSON enters the conversation, never the raw diffstat/version-walk output.
+
+   Reading each surviving commit's `subject`/`body`/`files` from that JSON, apply judgment to also discard commits that are purely deployment/infrastructure/CI changes with no user-facing effect, or routine documentation/informational edits (wording tweaks, typos, comment-only changes, changelog housekeeping) — **except** a genuinely significant documentation update (a new architecture/design doc, a substantial rewrite of a core doc), which still gets included as its own bullet or block. If every commit in range ends up excluded (mechanically or by judgment), treat it exactly like "no new commits" (step 3 above): record `Skipped (no new commits): <repo>`, continue — do not advance `lastSentSha`.
+
+   `versions` empty → no `package.json` in range, use the commit date range as the block boundary instead (see step 5).
 
 5. **Group into feature/fix blocks and bullets — organized around what changed, never by version.** Version numbers never appear on block headings; they only show up once, in the opening paragraph (step 6).
    - **Level 1:** cluster commits by real-world topic ("AI Providers self-service key," "database health monitoring") regardless of which version(s) touched it — never title a block with a version number or range. Small unrelated fixes that don't cluster into a named theme go in a catch-all block titled `修正` (all bug fixes) or `其他` (genuine mix), instead of forcing an artificial theme name.

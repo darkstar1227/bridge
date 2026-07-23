@@ -81,35 +81,41 @@ If this prints nothing: no new commits since the last send. Stop — no email, `
 
 **Important:** this raw count can include commits that only touch `.bridge/email-config.json` — this skill's and `setup-email-updates`'s own bookkeeping (e.g. the `chore: init bridge email config` commit made when the repo was first set up) — as well as routine deployment/infra/doc commits that Step 5 also discards (see below). Neither ever counts as real content. If, after Step 5's gathering and Step 6's grouping, every commit in range turns out to be excluded and there is nothing left to report, treat it exactly like this step's "no new commits" case: stop, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
 
-## Step 5 — Gather Commit Detail
+## Step 5 — Gather Commit Detail (via context-mode sandbox)
+
+A busy range's per-commit `git show --stat` output (and the per-commit `package.json` version walk) can be large, and none of those raw lines need to survive into the conversation — only the reduced, per-commit facts do. Do this whole gather-and-mechanically-filter pass with `ctx_execute` (language: `"shell"`) instead of raw `Bash`, so only the derived JSON below enters context:
 
 ```bash
-git log "$LAST_SHA"..HEAD --reverse --format='%H%n%s%n%b%n---COMMIT-END---'
+git log "$LAST_SHA"..HEAD --reverse --format='%H' | while read -r sha; do
+  subject=$(git show -s --format='%s' "$sha")
+  body=$(git show -s --format='%b' "$sha")
+  files=$(git show --stat --format='' "$sha" | sed '$d' | awk '{print $1}' | grep -v '^$')
+  ver=$(git show "$sha:package.json" 2>/dev/null | jq -r '.version // empty')
+  jq -n --arg sha "$sha" --arg subject "$subject" --arg body "$body" \
+        --argjson files "$(printf '%s\n' "$files" | jq -R . | jq -s .)" \
+        --arg ver "$ver" \
+        '{sha:$sha, subject:$subject, body:$body, files:$files, version:$ver}'
+done | jq -s '{
+  commits: [.[] | select(.files != [".bridge/email-config.json"])],
+  versions: [.[].version | select(. != "")]
+}'
 ```
 
-Read the message and body of every commit in the range, oldest first, and check which files each one touched:
+This mechanically drops commits whose changed files are *only* `.bridge/email-config.json` — that is this skill's own bookkeeping, never user-facing content, and must never be turned into a bullet (see Step 4's note above for what to do if this empties the whole range) — and collects the ordered `package.json` version sequence (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones). Only the resulting `{commits: [{sha, subject, body, files}], versions: [...]}` JSON enters the conversation; the raw diffstat/version-walk output never does.
 
-```bash
-git show --stat <commit-sha>
-```
+If `commits` comes back empty after this mechanical drop: same as Step 4's "no new commits" case — stop, no email, `lastSentSha` unchanged.
 
-Discard any commit whose changed files are *only* `.bridge/email-config.json` — that is this skill's own bookkeeping, never user-facing content, and must never be turned into a bullet (see Step 4's note above for what to do if this empties the whole range).
+If `versions` is empty: no `package.json` was found in any commit in range — skip version extraction entirely and use the no-`package.json` fallback described in Step 6.
 
-**The email is themed around features — routine housekeeping doesn't belong in it.** Also discard commits that are purely:
+**What the sandbox can't judge for you:** deciding which of the surviving `commits` are routine noise is a semantic call, not a mechanical filter — read each one's `subject`/`body`/`files` from the JSON above yourself and apply the exclusion rules below.
+
+**The email is themed around features — routine housekeeping doesn't belong in it.** Discard commits that are purely:
 - deployment/infrastructure/CI changes with no user-facing effect (deploy scripts, pipeline config, environment/env-var wiring, build tooling)
 - routine informational or documentation edits unrelated to functionality (wording tweaks, typo fixes, comment-only changes, changelog housekeeping)
 
 **Exception:** a genuinely significant documentation update — e.g. a new architecture/design doc, or a substantial rewrite of an existing core doc (a README overhaul, a major spec revision) — is still worth telling colleagues about even though it isn't a code feature. Include it as its own bullet (or its own version block, if nothing else in the range shares its theme) rather than silently dropping it. Use judgment on "significant": a one-line doc fix is routine and excluded; a doc a reader would actually want to know exists is included.
 
-Then check whether `package.json` exists and, if so, walk every commit individually to get the ordered sequence of version values (a single `git diff` across the whole range only shows the start and end value, not the intermediate ones):
-
-```bash
-for sha in $(git log "$LAST_SHA"..HEAD --reverse --format='%H'); do
-  git show "$sha:package.json" 2>/dev/null | jq -r '.version // empty'
-done
-```
-
-If this prints nothing at all (no `package.json` in any commit in range), skip version extraction entirely — this repo uses the no-`package.json` fallback described in Step 6.
+If applying these judgment-based exclusions empties the range entirely: same as above — stop, no email, `lastSentSha` unchanged (do not advance it — the next run will re-check from the same point once a real content commit lands).
 
 ## Step 6 — Group Into Feature/Fix Blocks and Bullets
 
