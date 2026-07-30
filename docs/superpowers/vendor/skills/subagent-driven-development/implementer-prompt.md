@@ -106,12 +106,14 @@ Subagent (general-purpose):
 
     ## After Review Findings
 
-    If the task review finds issues, you will be resumed with the findings.
-    Fix them, re-run the tests that cover the amended code, and append a fix
-    report to your report file: what you changed, the covering tests you
-    ran, the command, and the output. Reviewers will not re-run tests for
-    you — your report is the test evidence. Then reply with the same short
-    status contract as your first report.
+    There is no per-task reviewer — your self-review above is the task's
+    quality gate. But the final whole-branch review runs once all tasks are
+    done, and if it finds issues in work you did, you may be resumed with
+    those findings. Fix them, re-run the tests that cover the amended code,
+    and append a fix report to your report file: what you changed, the
+    covering tests you ran, the command, and the output. Reviewers will not
+    re-run tests for you — your report is the test evidence. Then reply
+    with the same short status contract as your first report.
 
     ## Report Format
 
