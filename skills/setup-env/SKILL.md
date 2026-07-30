@@ -36,6 +36,7 @@ If the user's request doesn't already make it obvious, ask (via `AskUserQuestion
 1. Read `~/.claude/plugins/installed_plugins.json`. Filter to entries where at least one install record has `"scope": "user"`.
 2. Read `~/.claude/plugins/known_marketplaces.json` to resolve each plugin's marketplace alias (the part after `@` in its key, e.g. `context-mode@context-mode` → marketplace `context-mode`) to its actual source (`{"source": "github", "repo": "org/repo"}`).
 3. Check whether `~/.claude/skills/gstack` exists and looks like a real install (has `setup` script, `package.json`). If so, capture it as a separate block — it is **not** part of the plugin-marketplace system, it's a standalone git-cloned tool.
+3a. Check whether `oh-my-posh` is installed (`which oh-my-posh`). If so, capture it as a separate block too — same reasoning as gstack, standalone tool outside plugin system.
 4. Write the manifest to `docs/env-setup/claude-plugins-manifest.json` in this repo (create the directory if missing), using this shape:
 
 ```json
@@ -52,6 +53,11 @@ If the user's request doesn't already make it obvious, ask (via `AskUserQuestion
     "cloneUrl": "https://github.com/garrytan/gstack.git",
     "installPath": "~/.claude/skills/gstack",
     "setupCommand": "git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup"
+  },
+  "ohmyposh": {
+    "installed": true,
+    "setupCommand": "curl -s https://ohmyposh.dev/install.sh | bash -s",
+    "fontCommand": "oh-my-posh font install meslo"
   }
 }
 ```
@@ -67,7 +73,8 @@ If the user's request doesn't already make it obvious, ask (via `AskUserQuestion
 4. For each plugin in the manifest not already installed, run `claude plugin install <name>@<marketplace>`.
 5. If the manifest has a `gstack` block and `~/.claude/skills/gstack` doesn't already exist, **stop and ask the user before running `setupCommand`** — it clones a third-party repo and executes its own `./setup` script, which is a different trust boundary than installing a Claude Code plugin through the marketplace system. Only run it after explicit confirmation.
 6. After a confirmed gstack install, ask the user whether to also add the gstack CLAUDE.md section (the block describing `/browse` and the other gstack skills) — don't add it unprompted, since it changes how every future session on this machine behaves.
-7. Report what was added vs. already-present vs. skipped (e.g. gstack declined). Don't claim the environment is "fully replicated" if anything was skipped — list it explicitly.
+6a. If the manifest has an `ohmyposh` block and `oh-my-posh` isn't already installed (`which oh-my-posh`), same rule as gstack — stop and ask before running `setupCommand` (`curl | bash`, third-party trust boundary). After confirmed install, run `fontCommand` (`oh-my-posh font install meslo`) to install the Meslo Nerd Font it needs for glyphs.
+7. Report what was added vs. already-present vs. skipped (e.g. gstack or oh-my-posh declined). Don't claim the environment is "fully replicated" if anything was skipped — list it explicitly.
 
 ## Notes
 
