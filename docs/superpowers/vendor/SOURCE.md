@@ -73,3 +73,16 @@ the specific assertion that now holds) before logging the task complete —
 a bare "DONE" or "tests pass" with nothing to back it gets sent back, same
 treatment as DONE_WITH_CONCERNS. Tightened implementer-prompt.md's report
 format so this evidence is always present, not just for TDD tasks.
+
+## subagent-driven-development: moved the evidence check into the final review (2026-07-30)
+
+Follow-up: rather than having the controller check verification evidence
+per task (previous pass), moved that check into the single final
+whole-branch review instead — consistent with "no check of any kind at task
+level; every check happens once, at the end." The final review now audits
+three things in one dispatch: spec compliance, code quality, and (new) a
+verification-evidence audit across every task's report file, checking each
+claimed DONE has a real command and real output behind it. Reverted the
+per-task DONE handling in SKILL.md and the implementer-prompt.md report
+format back to "nothing checks this at task level" language, pointing at
+the final review instead.

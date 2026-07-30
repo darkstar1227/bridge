@@ -94,8 +94,9 @@ Subagent (general-purpose):
     - What you implemented (or what you attempted, if blocked)
     - The verification command(s) you ran and their actual output (pass
       count, "0 failures", or the specific assertion that now holds) — not
-      "tests pass," the real output. The controller checks for this before
-      logging your task complete.
+      "tests pass," the real output. Nothing checks this at task level, but
+      the final whole-branch review audits every task's report for it, so
+      it needs to be here and be real.
     - **TDD Evidence** (if TDD was required for this task):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation

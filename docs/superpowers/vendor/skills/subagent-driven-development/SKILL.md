@@ -5,14 +5,13 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching a fresh implementer subagent per task. No
-reviewer subagent runs per task — implementers implement, test, commit, and
-report, and the controller confirms each report carries real verification
-evidence (command + output) before logging it complete, the same way
-superpowers:executing-plans runs each step's specified verification inline.
-The only judgment-based quality check in the whole flow is one whole-branch
-review, dispatched once after every task is done, with a short capped fix
-loop.
+Execute plan by dispatching a fresh implementer subagent per task. Nothing
+checks or reviews a task at task level — implementers implement, test,
+commit, and report, and the controller logs each report straight to the
+ledger. Every check in the whole flow — spec compliance, code quality, and
+whether each task's tests are real, not just claimed — happens exactly once,
+in a single whole-branch review dispatched after every task is done, with a
+short capped fix loop.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
@@ -46,16 +45,17 @@ interdependent, consider reviewing more often than this skill defaults to.
 
 Setup (worktree, ledger check, read plan, pre-flight review) → per task:
 dispatch implementer → answer its questions if any → it implements, tests,
-commits, and reports → report shows real verification evidence? no → send
-back for the command and output; yes → append completion to ledger, mark
-todo complete, next task. When no tasks remain: dispatch the final whole-branch
-review → clean? → delete this plan's workspace → use
-`superpowers:finishing-a-development-branch`. Findings? → fix round (cap 2):
-ONE fix dispatch covering every open finding → batch was Minor-only? skip
-re-review, just confirm the fix report's tests → otherwise scoped re-review
-→ all addressed? → clean, proceed to finish. Round cap hit with findings
-still open → adjudicate each: load-bearing → STOP, report BLOCKED;
-not load-bearing → park in ledger with ruling, then proceed to finish.
+commits, and reports → append completion to ledger, mark todo complete, next
+task. When no tasks remain: dispatch the final whole-branch review — spec
+compliance, code quality, and a verification-evidence audit across every
+task's reports, all in one pass — → clean? → delete this plan's workspace →
+use `superpowers:finishing-a-development-branch`. Findings? → fix round
+(cap 2): ONE fix dispatch covering every open finding → batch was
+Minor-only? skip re-review, just confirm the fix report's tests →
+otherwise scoped re-review → all addressed? → clean, proceed to finish.
+Round cap hit with findings still open → adjudicate each: load-bearing →
+STOP, report BLOCKED; not load-bearing → park in ledger with ruling, then
+proceed to finish.
 
 ## Setup
 
@@ -182,19 +182,9 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** no reviewer subagent runs at task level, but don't log completion
-on a bare status word either. Check the report (the short status message,
-and the report file if the status message doesn't already show it) names
-the actual verification command(s) it ran and the actual output — a pass
-count, "0 failures", or the specific assertion that now holds — not just
-"tests pass" or "implemented and verified" with nothing to back it. This
-is the same evidence standard superpowers:verification-before-completion
-requires of yourself, applied to what a subagent hands you: a status
-report is a claim, and a claim needs the command and its output, not trust.
-If the evidence is there, append the completion line to the ledger and move
-on. If it's missing or vague, treat it like DONE_WITH_CONCERNS below —
-send it back asking for the command and output before you log the task
-complete.
+**DONE:** nothing checks the report at task level. Append the completion
+line to the ledger and move on — the final whole-branch review is where
+this task's tests, and every other task's, get checked for real.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before marking complete — resume the implementer or fix inline yourself if trivial. If they're observations (e.g., "this file is getting large"), note them in the ledger and proceed.
 
@@ -214,9 +204,8 @@ rush it into implementation.
 
 ### 3. Complete the task
 
-Once the report is DONE with verification evidence checked (or
-DONE_WITH_CONCERNS resolved), append the completion line to the ledger in
-the same message as your other bookkeeping:
+Once the report is DONE (or DONE_WITH_CONCERNS resolved), append the
+completion line to the ledger in the same message as your other bookkeeping:
 
 `Task <N>: complete (commits <base7>..<head7>)`
 
@@ -232,8 +221,20 @@ one file instead of re-deriving the branch diff with git commands. Dispatch
 on the most capable available model (see Model Selection), using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md). This is the
-only review dispatch in the whole flow, so give it the full diff and let it
-check spec compliance across every task, not just code quality.
+only review dispatch in the whole flow, so it carries everything that would
+otherwise have been checked task-by-task: spec compliance and code quality
+across the full diff, same as before, plus one thing that used to be a
+per-task gate and is now folded in here instead —
+
+**Verification-evidence audit.** Point the reviewer at the ledger and the
+directory of task report files (`<workspace>/task-*-report.md`) alongside
+the diff. For each task, it should be able to find a real command and real
+output backing the claim — a pass count, "0 failures," or the specific
+assertion that now holds — not just "tests pass" with nothing behind it.
+A task whose report claims success without evidence is a finding, at the
+same severity as a task whose tests don't actually cover the change: this
+is the one place in the whole flow that catches an implementer who claimed
+DONE without really verifying, so it isn't optional scope.
 
 **If clean:** proceed to Finish.
 
@@ -277,9 +278,10 @@ session (pollutes context, skips review) — dispatch the fix subagent.
 Skipping re-review is only for Minor-only batches — a round that includes
 any Critical/Important finding always gets a scoped re-review, even if the
 fix looked small. Adjudicate residual findings only after the round cap, and
-every ruling is a ledger entry — silent discards are forbidden. A bare
-"DONE" or "tests pass" with no command or output is not evidence — logging
-a task complete on that alone is the same mistake as skipping verification
-yourself; send it back for the real command and output instead. The ledger
-is what survives compaction — controllers without one have re-dispatched
-entire completed task sequences.
+every ruling is a ledger entry — silent discards are forbidden. "The
+implementer already said DONE, the evidence check is redundant" is the
+rationalization that makes the whole flow trust unverified claims — the
+verification-evidence audit is scoped into the final review precisely
+because nothing checks it before then; don't hand-wave it as covered by the
+implementer's own report. The ledger is what survives compaction —
+controllers without one have re-dispatched entire completed task sequences.
