@@ -6,8 +6,11 @@ description: Use when executing implementation plans with independent tasks in t
 # Subagent-Driven Development
 
 Execute plan by dispatching a fresh implementer subagent per task. No
-review of any kind happens per task — implementers implement, test, commit,
-and report. The only quality check in the whole flow is one whole-branch
+reviewer subagent runs per task — implementers implement, test, commit, and
+report, and the controller confirms each report carries real verification
+evidence (command + output) before logging it complete, the same way
+superpowers:executing-plans runs each step's specified verification inline.
+The only judgment-based quality check in the whole flow is one whole-branch
 review, dispatched once after every task is done, with a short capped fix
 loop.
 
@@ -43,8 +46,9 @@ interdependent, consider reviewing more often than this skill defaults to.
 
 Setup (worktree, ledger check, read plan, pre-flight review) → per task:
 dispatch implementer → answer its questions if any → it implements, tests,
-commits, and reports → append completion to ledger, mark todo complete, next
-task. When no tasks remain: dispatch the final whole-branch
+commits, and reports → report shows real verification evidence? no → send
+back for the command and output; yes → append completion to ledger, mark
+todo complete, next task. When no tasks remain: dispatch the final whole-branch
 review → clean? → delete this plan's workspace → use
 `superpowers:finishing-a-development-branch`. Findings? → fix round (cap 2):
 ONE fix dispatch covering every open finding → batch was Minor-only? skip
@@ -178,8 +182,19 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** no review of any kind runs at task level. Append the completion
-line to the ledger and move on.
+**DONE:** no reviewer subagent runs at task level, but don't log completion
+on a bare status word either. Check the report (the short status message,
+and the report file if the status message doesn't already show it) names
+the actual verification command(s) it ran and the actual output — a pass
+count, "0 failures", or the specific assertion that now holds — not just
+"tests pass" or "implemented and verified" with nothing to back it. This
+is the same evidence standard superpowers:verification-before-completion
+requires of yourself, applied to what a subagent hands you: a status
+report is a claim, and a claim needs the command and its output, not trust.
+If the evidence is there, append the completion line to the ledger and move
+on. If it's missing or vague, treat it like DONE_WITH_CONCERNS below —
+send it back asking for the command and output before you log the task
+complete.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before marking complete — resume the implementer or fix inline yourself if trivial. If they're observations (e.g., "this file is getting large"), note them in the ledger and proceed.
 
@@ -199,8 +214,9 @@ rush it into implementation.
 
 ### 3. Complete the task
 
-Once the report is DONE (or DONE_WITH_CONCERNS resolved), append the
-completion line to the ledger in the same message as your other bookkeeping:
+Once the report is DONE with verification evidence checked (or
+DONE_WITH_CONCERNS resolved), append the completion line to the ledger in
+the same message as your other bookkeeping:
 
 `Task <N>: complete (commits <base7>..<head7>)`
 
@@ -261,6 +277,9 @@ session (pollutes context, skips review) — dispatch the fix subagent.
 Skipping re-review is only for Minor-only batches — a round that includes
 any Critical/Important finding always gets a scoped re-review, even if the
 fix looked small. Adjudicate residual findings only after the round cap, and
-every ruling is a ledger entry — silent discards are forbidden. The ledger is
-what survives compaction — controllers without one have re-dispatched entire
-completed task sequences.
+every ruling is a ledger entry — silent discards are forbidden. A bare
+"DONE" or "tests pass" with no command or output is not evidence — logging
+a task complete on that alone is the same mistake as skipping verification
+yourself; send it back for the real command and output instead. The ledger
+is what survives compaction — controllers without one have re-dispatched
+entire completed task sequences.

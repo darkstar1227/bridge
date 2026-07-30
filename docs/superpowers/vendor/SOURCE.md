@@ -60,3 +60,16 @@ commit, and report; no review of any kind, self or otherwise, happens at
 task level. The single final whole-branch review is the only quality check
 in the whole plan. Updated all "self-review" references in SKILL.md
 (Overview, When to Use, Process, Setup, Task Loop) to match.
+
+## subagent-driven-development: controller confirms verification evidence (2026-07-30)
+
+Follow-up: user felt zero per-task checking (previous pass) was too little,
+compared against executing-plans — which has no reviewer subagent either,
+but does run each step's plan-specified verification inline and see the
+real output itself. Brought that back without adding a subagent dispatch:
+the controller now checks that an implementer's DONE report names the
+actual verification command(s) and real output (pass count / "0 failures" /
+the specific assertion that now holds) before logging the task complete —
+a bare "DONE" or "tests pass" with nothing to back it gets sent back, same
+treatment as DONE_WITH_CONCERNS. Tightened implementer-prompt.md's report
+format so this evidence is always present, not just for TDD tasks.

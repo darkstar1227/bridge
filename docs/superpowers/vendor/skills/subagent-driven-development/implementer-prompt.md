@@ -92,7 +92,10 @@ Subagent (general-purpose):
 
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
+    - The verification command(s) you ran and their actual output (pass
+      count, "0 failures", or the specific assertion that now holds) — not
+      "tests pass," the real output. The controller checks for this before
+      logging your task complete.
     - **TDD Evidence** (if TDD was required for this task):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation
