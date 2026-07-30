@@ -5,16 +5,17 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching a fresh implementer subagent per task. Each
-implementer self-reviews before reporting — there is no separate reviewer
-dispatch per task. One whole-branch review runs once, after all tasks are
-done, with a short capped fix loop.
+Execute plan by dispatching a fresh implementer subagent per task. No
+review of any kind happens per task — implementers implement, test, commit,
+and report. The only quality check in the whole flow is one whole-branch
+review, dispatched once after every task is done, with a short capped fix
+loop.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task, implementer self-review as the
-per-task gate, one broad review at the end = high quality with a fraction of
-the review dispatches.
+**Core principle:** Fresh subagent per task, zero review overhead until
+every task is done, one broad review at the end = minimum review dispatches
+for the whole plan.
 
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
@@ -28,22 +29,22 @@ Tasks tightly coupled or no plan yet → brainstorm/plan first. Independent task
 but need a parallel session instead → use `executing-plans`.
 
 **vs. Executing Plans (parallel session):** same session (no context switch),
-fresh subagent per task (no context pollution), implementer self-review per
-task plus one broad review at the end, faster iteration (no human-in-loop
+fresh subagent per task (no context pollution), zero review overhead per
+task and one broad review at the end, faster iteration (no human-in-loop
 between tasks).
 
-**Trade-off of skipping per-task review:** a spec gap in an early task isn't
-caught until the final whole-branch review, after every later task may have
-built on it. This skill accepts that trade-off for speed and lower review
-overhead — if a plan's tasks are unusually risky or tightly interdependent,
-consider reviewing more often than this skill defaults to.
+**Trade-off of skipping all per-task review:** a spec gap in an early task
+isn't caught until the final whole-branch review, after every later task may
+have built on it. This skill accepts that trade-off for speed and the lowest
+possible review overhead — if a plan's tasks are unusually risky or tightly
+interdependent, consider reviewing more often than this skill defaults to.
 
 ## The Process
 
 Setup (worktree, ledger check, read plan, pre-flight review) → per task:
 dispatch implementer → answer its questions if any → it implements, tests,
-commits, self-reviews, and reports → append completion to ledger, mark todo
-complete, next task. When no tasks remain: dispatch the final whole-branch
+commits, and reports → append completion to ledger, mark todo complete, next
+task. When no tasks remain: dispatch the final whole-branch
 review → clean? → delete this plan's workspace → use
 `superpowers:finishing-a-development-branch`. Findings? → fix round (cap 2):
 ONE fix dispatch covering every open finding → batch was Minor-only? skip
@@ -96,9 +97,9 @@ Before dispatching Task 1, scan the plan once for conflicts:
 Present everything you find to your human partner as one batched question —
 each finding beside the plan text that mandates it, asking which governs —
 before execution begins, not one interrupt per discovery mid-plan. If the
-scan is clean, proceed without comment. Since there's no per-task review
-net anymore, this pre-flight scan and the implementer's own self-review are
-what catch conflicts before the final review.
+scan is clean, proceed without comment. Since there's no review of any kind
+until every task is done, this pre-flight scan is the only thing catching
+plan-level conflicts before the final review.
 
 ## Model Selection
 
@@ -177,9 +178,8 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** the implementer's own self-review (completeness, quality,
-discipline, testing) is the task's quality gate — there is no separate
-reviewer dispatch. Append the completion line to the ledger and move on.
+**DONE:** no review of any kind runs at task level. Append the completion
+line to the ledger and move on.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before marking complete — resume the implementer or fix inline yourself if trivial. If they're observations (e.g., "this file is getting large"), note them in the ledger and proceed.
 
@@ -202,7 +202,7 @@ rush it into implementation.
 Once the report is DONE (or DONE_WITH_CONCERNS resolved), append the
 completion line to the ledger in the same message as your other bookkeeping:
 
-`Task <N>: complete (commits <base7>..<head7>, self-reviewed)`
+`Task <N>: complete (commits <base7>..<head7>)`
 
 Then mark the todo complete and move on to the next task.
 

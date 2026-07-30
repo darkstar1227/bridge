@@ -36,8 +36,7 @@ Subagent (general-purpose):
     2. Write tests (following TDD if task says to)
     3. Verify implementation works
     4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    5. Report back
 
     Work from: [directory]
 
@@ -77,43 +76,17 @@ Subagent (general-purpose):
     The controller can provide more context, re-dispatch with a more capable model,
     or break the task into smaller pieces.
 
-    ## Before Reporting Back: Self-Review
-
-    Review your work with fresh eyes. Ask yourself:
-
-    **Completeness:**
-    - Did I fully implement everything in the spec?
-    - Did I miss any requirements?
-    - Are there edge cases I didn't handle?
-
-    **Quality:**
-    - Is this my best work?
-    - Are names clear and accurate (match what things do, not how they work)?
-    - Is the code clean and maintainable?
-
-    **Discipline:**
-    - Did I avoid overbuilding (YAGNI)?
-    - Did I only build what was requested?
-    - Did I follow existing patterns in the codebase?
-
-    **Testing:**
-    - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
-    - Are tests comprehensive?
-    - Is the test output pristine (no stray warnings or noise)?
-
-    If you find issues during self-review, fix them now before reporting.
-
     ## After Review Findings
 
-    There is no per-task reviewer — your self-review above is the task's
-    quality gate. But the final whole-branch review runs once all tasks are
-    done, and if it finds issues in work you did, you may be resumed with
-    those findings. Fix them, re-run the tests that cover the amended code,
-    and append a fix report to your report file: what you changed, the
-    covering tests you ran, the command, and the output. Reviewers will not
-    re-run tests for you — your report is the test evidence. Then reply
-    with the same short status contract as your first report.
+    Nothing reviews your work at task level — implement, test, commit, and
+    report; move on. The only quality check in the whole plan is one
+    whole-branch review after every task is done, and if it finds issues in
+    work you did, you may be resumed with those findings. Fix them, re-run
+    the tests that cover the amended code, and append a fix report to your
+    report file: what you changed, the covering tests you ran, the command,
+    and the output. Reviewers will not re-run tests for you — your report is
+    the test evidence. Then reply with the same short status contract as
+    your first report.
 
     ## Report Format
 
@@ -124,7 +97,6 @@ Subagent (general-purpose):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation
     - Files changed
-    - Self-review findings (if any)
     - Any issues or concerns
 
     Then report back with ONLY (under 15 lines — the detail lives in the

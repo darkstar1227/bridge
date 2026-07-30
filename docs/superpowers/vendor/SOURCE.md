@@ -49,3 +49,14 @@ an early task is no longer caught until the final review, after later tasks
 may have built on it. Accepted deliberately for lower review overhead;
 plans with unusually risky or interdependent tasks should review more often
 than this skill now defaults to.
+
+## subagent-driven-development: dropped the implementer self-review too (2026-07-30)
+
+Follow-up per user feedback that per-task review was still too heavy even
+after the previous pass. Removed the implementer's formal self-review
+checklist (completeness/quality/discipline/testing) from
+`implementer-prompt.md` entirely — implementers now just implement, test,
+commit, and report; no review of any kind, self or otherwise, happens at
+task level. The single final whole-branch review is the only quality check
+in the whole plan. Updated all "self-review" references in SKILL.md
+(Overview, When to Use, Process, Setup, Task Loop) to match.
