@@ -15,23 +15,10 @@ When you have multiple unrelated failures (different test files, different subsy
 
 ## When to Use
 
-```dot
-digraph when_to_use {
-    "Multiple failures?" [shape=diamond];
-    "Are they independent?" [shape=diamond];
-    "Single agent investigates all" [shape=box];
-    "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
-    "Sequential agents" [shape=box];
-    "Parallel dispatch" [shape=box];
-
-    "Multiple failures?" -> "Are they independent?" [label="yes"];
-    "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
-}
-```
+Multiple failures, independent of each other, no shared state between them →
+parallel dispatch. Independent but would interfere with each other (shared
+state) → sequential agents. Related (fixing one might fix others), or not yet
+independent → investigate together with a single agent first.
 
 **Use when:**
 - 3+ test files failing with different root causes
@@ -114,49 +101,18 @@ Return: Summary of what you found and what you fixed.
 
 ## Common Mistakes
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
-
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
-
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
-
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+Too broad ("fix all the tests") loses the agent — scope to one file/subsystem.
+No context ("fix the race condition") leaves the agent guessing — paste the
+error messages and test names. No constraints risks the agent refactoring
+everything — state what not to touch ("fix tests only"). Vague output ("fix
+it") leaves you unable to verify — ask for a summary of root cause and changes.
 
 ## When NOT to Use
 
-**Related failures:** Fixing one might fix others - investigate together first
-**Need full context:** Understanding requires seeing entire system
-**Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
-
-## Real Example from Session
-
-**Scenario:** 6 test failures across 3 files after major refactoring
-
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
-
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
-
-**Dispatch:**
-```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
-```
-
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
-
-**Integration:** All fixes independent, no conflicts, full suite green
+Related failures where fixing one might fix others — investigate together
+first. Understanding requires seeing the entire system. Exploratory debugging
+where you don't yet know what's broken. Shared state where agents would
+interfere (same files, same resources).
 
 ## Verification
 

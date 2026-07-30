@@ -32,22 +32,11 @@ When multiple skills apply, process skills come first — they set the approach,
 
 ## Red Flags
 
-These thoughts mean STOP—you're rationalizing:
-
-| Thought | Reality |
-|---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. |
-| "This doesn't need a formal skill" | If a skill exists, use it. |
-| "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
-| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
-| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+Any of these thoughts mean STOP — you're rationalizing around the rule instead
+of checking for a skill: treating a question, a "quick" file/git check, or
+context-gathering as exempt from the check; deciding a skill is unneeded,
+overkill, or already known well enough to skip re-reading; wanting to do "one
+thing first" before checking. The check always comes first.
 
 ## Platform Adaptation
 

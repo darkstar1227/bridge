@@ -168,31 +168,15 @@ should fail for each realistic mutation:
 A mutation nothing catches marks the behavior as unprotected — or the
 test as tautological.
 
-## Quick Reference
-
-| When you... | Do |
-|-------------|-----|
-| Write any test | Name the break it catches — a bug, not a decision |
-| Build an expected value | Derive it by hand; never with the code under test |
-| Test a script or document | Run it / pressure-test its consumer; never grep its text |
-| Reach for a dependency test | Test your boundary contract, not their documented mechanics |
-| Want to assert on a mocked element | Test the real component, or unmock it |
-| Are about to mock a method | Learn its side effects; mock the slow/external level |
-| Build a mock response | Mirror the real structure completely |
-| Need cleanup only tests use | Put it in test utilities |
-| Watch mock setup balloon | Switch to an integration test with real components |
-| Finish a test file | Run the mutation check |
-
 ## Warning Signs
 
-- Setup and assertion share the same object, guaranteeing equality
-- The test can fail only through a panic, crash, or missing selector
-- The test fails on every intentional change, never on accidental breakage
-- Expected values are hidden behind loops, builders, or helpers
-- The test greps source text, or asserts a removed symbol stays removed
-- The test would still matter if only the framework remained
-- The test exists for coverage, checking no side effect or outcome
-- An assertion checks a `*-mock` test ID, or fails if you remove the mock
-- A method is called only from test files
-- Mock setup is more than half the test, or you can't explain why the mock is needed
-- Mocking "just to be safe"
+Setup and assertion sharing the same object (guarantees equality); a test
+that can only fail via panic/crash/missing selector; a test that fires on
+every intentional change but never on accidental breakage; expected values
+hidden behind loops, builders, or helpers; grepping source text or asserting
+a removed symbol stays removed; a test that would still matter if only the
+framework remained; a test that exists for coverage with no side effect or
+outcome checked; an assertion on a `*-mock` test ID or one that fails if you
+remove the mock; a method called only from test files; mock setup that's more
+than half the test or that you can't explain the need for; mocking "just to
+be safe."
