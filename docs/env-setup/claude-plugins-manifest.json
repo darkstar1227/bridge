@@ -51,6 +51,11 @@
   "ohmyposh": {
     "installed": true,
     "setupCommand": "curl -s https://ohmyposh.dev/install.sh | bash -s",
-    "fontCommand": "oh-my-posh font install meslo"
+    "fontCommand": "oh-my-posh font install meslo",
+    "statusLine": {
+      "type": "command",
+      "command": "oh-my-posh claude",
+      "padding": 0
+    }
   }
 }

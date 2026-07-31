@@ -36,7 +36,7 @@ If the user's request doesn't already make it obvious, ask (via `AskUserQuestion
 1. Read `~/.claude/plugins/installed_plugins.json`. Filter to entries where at least one install record has `"scope": "user"`.
 2. Read `~/.claude/plugins/known_marketplaces.json` to resolve each plugin's marketplace alias (the part after `@` in its key, e.g. `context-mode@context-mode` → marketplace `context-mode`) to its actual source (`{"source": "github", "repo": "org/repo"}`).
 3. Check whether `~/.claude/skills/gstack` exists and looks like a real install (has `setup` script, `package.json`). If so, capture it as a separate block — it is **not** part of the plugin-marketplace system, it's a standalone git-cloned tool.
-3a. Check whether `oh-my-posh` is installed (`which oh-my-posh`). If so, capture it as a separate block too — same reasoning as gstack, standalone tool outside plugin system.
+3a. Check whether `oh-my-posh` is installed (`which oh-my-posh`). If so, capture it as a separate block too — same reasoning as gstack, standalone tool outside plugin system. Also read `~/.claude/settings.json`'s `statusLine` key — if it's set to an oh-my-posh command (e.g. `oh-my-posh claude`), capture that exact object so install can reproduce the statusline, not just the binary.
 4. Write the manifest to `docs/env-setup/claude-plugins-manifest.json` in this repo (create the directory if missing), using this shape:
 
 ```json
@@ -57,7 +57,12 @@ If the user's request doesn't already make it obvious, ask (via `AskUserQuestion
   "ohmyposh": {
     "installed": true,
     "setupCommand": "curl -s https://ohmyposh.dev/install.sh | bash -s",
-    "fontCommand": "oh-my-posh font install meslo"
+    "fontCommand": "oh-my-posh font install meslo",
+    "statusLine": {
+      "type": "command",
+      "command": "oh-my-posh claude",
+      "padding": 0
+    }
   }
 }
 ```
@@ -74,6 +79,7 @@ If the user's request doesn't already make it obvious, ask (via `AskUserQuestion
 5. If the manifest has a `gstack` block and `~/.claude/skills/gstack` doesn't already exist, **stop and ask the user before running `setupCommand`** — it clones a third-party repo and executes its own `./setup` script, which is a different trust boundary than installing a Claude Code plugin through the marketplace system. Only run it after explicit confirmation.
 6. After a confirmed gstack install, ask the user whether to also add the gstack CLAUDE.md section (the block describing `/browse` and the other gstack skills) — don't add it unprompted, since it changes how every future session on this machine behaves.
 6a. If the manifest has an `ohmyposh` block and `oh-my-posh` isn't already installed (`which oh-my-posh`), same rule as gstack — stop and ask before running `setupCommand` (`curl | bash`, third-party trust boundary). After confirmed install, run `fontCommand` (`oh-my-posh font install meslo`) to install the Meslo Nerd Font it needs for glyphs.
+6a-i. After oh-my-posh is installed (fresh or already present) and the manifest carries a `statusLine` object, write it into `~/.claude/settings.json`'s top-level `statusLine` key — merge into the existing JSON (read, patch, write back), don't overwrite the whole file. Skip silently if `~/.claude/settings.json` already has a non-empty `statusLine` key set to something else — don't clobber a user's existing custom statusline without asking.
 6b. If `context-mode` is among the plugins just installed (fresh install, not already-present), run its doctor check afterward — call the `ctx_doctor` MCP tool if available in this session, else `npx context-mode doctor` — and run whatever fix command it returns. context-mode needs this extra step because it's an MCP server, not just a skill: plugin install alone doesn't guarantee the MCP server registered/started correctly.
 7. Report what was added vs. already-present vs. skipped (e.g. gstack or oh-my-posh declined). Don't claim the environment is "fully replicated" if anything was skipped — list it explicitly.
 
