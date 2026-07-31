@@ -20,7 +20,7 @@ gstack produces strategic plans reviewed by CEO / design / eng / DX lenses. Supe
 ### Via Claude marketplace (GitHub URL)
 
 ```
-/plugin install https://github.com/ds-anxing/bridge
+/plugin install https://github.com/darkstar1227/bridge
 ```
 
 ### Manual
