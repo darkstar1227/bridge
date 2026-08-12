@@ -92,12 +92,23 @@ Delegates a coding task to [OpenCode](https://opencode.ai) and gets back a struc
 - "use opencode for this task"
 - "opencode bridge"
 
+### `/bridge:setup-relay-provider-template`
+
+Wires [cancerfreebiotech/claude-profile-kit](https://github.com/cancerfreebiotech/claude-profile-kit)'s `claude-project-template` (orchestrator + 7 specialized subagents + native advisor) into the current project, driven entirely by an already-configured [`relay`](https://github.com/darkstar1227/relay) LiteLLM provider — queries the provider's gateway for its real model list, assigns a model per role by tier (heavy/mid/light), and writes every file (`CLAUDE.md`, `.claude/agents/*.md`, `.claude/settings.json`) without hand-editing anything. Refuses to proceed if the provider has `--subagent-model` set, since that would clobber every subagent's per-role model. Shows the full role → model mapping before writing and gives you a chance to redirect it.
+
+**Triggers:**
+- `/bridge:setup-relay-provider-template`
+- "setup relay provider template"
+- "apply claude-project-template with relay"
+- "relay provider template"
+
 ## Requirements
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`
 - [superpowers](https://github.com/obra/superpowers) — for `writing-plans`
 - [Resend](https://resend.com) account and API key, plus [`resend-mcp`](https://github.com/resend/resend-mcp) available via `npx` — for `/bridge:setup-email-updates`, which registers one dedicated MCP connection per repo (neither `send-update-email` nor `send-update-email-batch` needs an API key itself)
 - [`opencode`](https://opencode.ai) CLI on `PATH`, plus [`uv`](https://docs.astral.sh/uv/) — for `/bridge:opencode-bridge`
+- [`relay`](https://github.com/darkstar1227/relay) CLI with a configured LiteLLM provider (no `--subagent-model` set) — for `/bridge:setup-relay-provider-template`
 
 ## License
 
