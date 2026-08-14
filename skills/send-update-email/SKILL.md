@@ -1,6 +1,6 @@
 ---
 name: send-update-email
-description: Send a readable, version-grouped update email via Resend for a single repo's accumulated commits since the last send — shows the rendered content and waits for confirmation before actually sending.
+description: Send a readable, version-grouped update email for a single repo's accumulated commits since the last send, via Resend or a direct HTTP relay depending on the repo's configured provider — shows the rendered content and waits for confirmation before actually sending.
 triggers:
   - send update email
   - email changelog
@@ -20,21 +20,25 @@ allowed-tools:
 
 ## Purpose
 
-Sends colleagues a readable, bullet-point update email summarizing everything that changed in this repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via the Resend MCP server. Always shows you the rendered subject/recipients/body and waits for explicit confirmation before sending anything.
+Sends colleagues a readable, bullet-point update email summarizing everything that changed in this repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via whichever provider `.bridge/email-config.json` names — the Resend MCP server, or a direct HTTP POST to an internal relay endpoint. Always shows you the rendered subject/recipients/body and waits for explicit confirmation before sending anything.
 
 This skill only works inside a single repo. For unattended sending across a parent folder of repos (e.g. scheduled via `/loop`), use `/bridge:send-update-email-batch` instead — it shares this skill's core logic (Steps 2-7, 9, 10 below) but skips the confirmation step, since there's no one to ask when it's running unattended. **When editing the core logic here (commit gathering, content filtering, grouping, the email template, or the send/state-update mechanics), make the same edit in `skills/send-update-email-batch/SKILL.md`** — the two are meant to stay behaviorally identical apart from the confirmation gate and the parent-folder loop.
 
 ## Requirements
 
-- **A dedicated Resend MCP connection for this repo.** This skill never holds a Resend API key or a sender address itself — both live inside a per-repo MCP server (named `resend-<repo-slug>`) that `/bridge:setup-email-updates` registers once, with a fixed `SENDER_EMAIL_ADDRESS` for that repo. `.bridge/email-config.json`'s `mcpServerName` field (read in Step 3) names the exact connection to use. If it's missing on the current machine, that's a setup problem, not something this skill can fix — see Step 3 and Step 9.
+`.bridge/email-config.json`'s `provider` field (read in Step 3) picks which of two send mechanisms this skill uses. Missing `provider` means an older config — treat it as `"resend"`.
 
-At the start of Step 9 (not before — no need to check this until you're actually about to send), locate the tool on the connection named by `mcpServerName`:
+- **`provider: "resend"` (default/legacy) — Resend MCP connection.** This skill never holds a Resend API key or a sender address itself — both live inside a per-repo MCP server (named `resend-<repo-slug>`) that `/bridge:setup-email-updates` registers once, with a fixed `SENDER_EMAIL_ADDRESS` for that repo. `.bridge/email-config.json`'s `mcpServerName` field names the exact connection to use. If it's missing on the current machine, that's a setup problem, not something this skill can fix — see Step 3 and Step 9.
 
-```
-ToolSearch query: "<mcpServerName> send email"
-```
+  At the start of Step 9 (not before), locate the tool on the connection named by `mcpServerName`:
 
-If nothing matches: stop and tell the user that the `<mcpServerName>` MCP connection isn't registered on this machine, and that re-running `/bridge:setup-email-updates` will register it.
+  ```
+  ToolSearch query: "<mcpServerName> send email"
+  ```
+
+  If nothing matches: stop and tell the user that the `<mcpServerName>` MCP connection isn't registered on this machine, and that re-running `/bridge:setup-email-updates` will register it.
+
+- **`provider: "drava"` — direct HTTP relay.** No MCP connection involved. The config carries everything needed directly: `endpoint` (the POST URL), `system` (the relay's system id), `token` (bearer auth — a secret, see the handling note in Step 9), `fromName`, and `replyTo`. Step 9 calls the endpoint with `curl` directly instead of going through ToolSearch/MCP.
 
 ## Step 1 — Require Single-Repo Context
 
@@ -63,13 +67,32 @@ test -f .bridge/email-config.json && cat .bridge/email-config.json || echo "NO_C
 - Otherwise, extract the fields you need:
 
 ```bash
+PROVIDER=$(jq -r '.provider // "resend"' .bridge/email-config.json)
 RECIPIENTS=$(jq -c '.recipients' .bridge/email-config.json)
 LAST_SHA=$(jq -r '.lastSentSha' .bridge/email-config.json)
+```
+
+Then, depending on `PROVIDER`:
+
+```bash
+# provider == "resend"
 MCP_SERVER_NAME=$(jq -r '.mcpServerName' .bridge/email-config.json)
 SENDER_NAME=$(jq -r '.senderName // empty' .bridge/email-config.json)
 ```
 
-`SENDER_NAME` can come back empty for a config created before this field existed. If so, skip the sender-name sign-off line entirely in Step 7 (just the "Bridge 自動通知" line) rather than printing a blank or literal "null".
+```bash
+# provider == "drava"
+ENDPOINT=$(jq -r '.endpoint' .bridge/email-config.json)
+SYSTEM=$(jq -r '.system' .bridge/email-config.json)
+TOKEN=$(jq -r '.token' .bridge/email-config.json)
+FROM_NAME=$(jq -r '.fromName' .bridge/email-config.json)
+REPLY_TO=$(jq -r '.replyTo // empty' .bridge/email-config.json)
+SENDER_NAME="$FROM_NAME"
+```
+
+Treat `TOKEN` as a secret from this point on: never print it, never put it in a commit message, never let it appear in a rendered email preview shown to the user in Step 8.
+
+`SENDER_NAME` can come back empty for a `resend` config created before that field existed. If so, skip the sender-name sign-off line entirely in Step 7 (just the "Bridge 自動通知" line) rather than printing a blank or literal "null".
 
 ## Step 4 — Check for New Commits
 
@@ -234,9 +257,11 @@ If they cancel: stop. No email, `lastSentSha` unchanged, nothing else touched.
 
 Do not proceed to Step 9 without an explicit approval.
 
-## Step 9 — Send via Resend
+## Step 9 — Send
 
-Locate the tool on this repo's own connection (see "Requirements" above):
+Branch on `PROVIDER` from Step 3.
+
+**`PROVIDER == "resend"`:** locate the tool on this repo's own connection (see "Requirements" above):
 
 ```
 ToolSearch query: "<MCP_SERVER_NAME> send email"
@@ -252,7 +277,32 @@ Call the resolved tool directly with:
 
 Do not pass a `from` argument — the connection's fixed sender applies automatically, and the tool's own schema will refuse or ignore an override attempt depending on how the server was configured. Do not build a raw HTTP payload or call `curl` — the MCP tool call *is* the send. Check its result: a successful send returns the sent email's id with no error. Anything else (an `error` field, a thrown tool error, etc.) means failure: do not update state, do not commit (Step 10). Report the error to the user.
 
+**`PROVIDER == "drava"`:** POST directly to the relay endpoint. Write the JSON body to a temp file first (avoids shell-escaping issues with HTML content) and never echo `$TOKEN` to the conversation:
+
+```bash
+PAYLOAD_FILE=$(mktemp)
+jq -n --arg system "$SYSTEM" --argjson to "$RECIPIENTS" --arg subject "<subject from Step 7>" \
+      --arg html "<rendered HTML body from Step 7>" --arg fromName "$FROM_NAME" --arg replyTo "$REPLY_TO" \
+      '{system:$system, to:$to, subject:$subject, html:$html, fromName:$fromName, replyTo:$replyTo}' \
+      > "$PAYLOAD_FILE"
+
+RESPONSE=$(curl -s -w '\n%{http_code}' -X POST "$ENDPOINT" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  --data @"$PAYLOAD_FILE")
+rm -f "$PAYLOAD_FILE"
+
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
+```
+
+`HTTP_CODE` in the 200-299 range means success. Anything else means failure: do not update state, report `HTTP_CODE` and `RESPONSE_BODY` to the user (the response body from this endpoint never echoes the token back, so it's safe to show as-is).
+
+The `drava` API only accepts `html` — there is no separate `text` field, unlike Resend. The plain-text render from Step 7 is still shown to the user in Step 8 for readability; only the HTML goes out.
+
 ## Step 10 — Update State on Success
+
+`.bridge/email-config.json` is gitignored (see `setup-email-updates`'s Step 3b) because it can hold a plaintext secret (`token` for `drava`). State updates here are **local-only** — no commit, no push:
 
 ```bash
 HEAD_SHA=$(git rev-parse HEAD)
@@ -261,13 +311,11 @@ jq --arg sha "$HEAD_SHA" --arg now "$NOW" \
   '.lastSentSha = $sha | .lastSentAt = $now' \
   .bridge/email-config.json > .bridge/email-config.json.tmp
 mv .bridge/email-config.json.tmp .bridge/email-config.json
-
-git add .bridge/email-config.json
-git commit -m "chore: update bridge email state"
-git push
 ```
 
-If this `commit`/`push` fails after the email already sent successfully: explicitly warn the user that the email went out but the state file wasn't persisted, and that the next run may re-send this same commit range. Do not silently swallow this — it's the one case where the email and the repo's tracked state can disagree.
+Because this is local-only, `lastSentSha` tracking does not travel with `git clone`/`git pull` to other machines — each machine running this skill against the same repo tracks its own send history independently. This is expected: a gitignored file with a bearer token in it must never leave the local machine via git.
+
+If this file write fails after the email already sent successfully (disk full, permissions): explicitly warn the user that the email went out but the state file wasn't updated, and that the next run may re-send this same commit range. Do not silently swallow this — it's the one case where the email and the repo's tracked state can disagree.
 
 ## Error Handling Reference
 
@@ -276,8 +324,9 @@ If this `commit`/`push` fails after the email already sent successfully: explici
 | `git pull` fails | Stop — no email, no state change. |
 | `.bridge/email-config.json` missing | Stop, tell the user to run `/bridge:setup-email-updates`. |
 | No new commits since `lastSentSha` (including ranges that are bookkeeping/routine-only, see Step 4) | Stop — no email, state unchanged. |
-| This repo's `resend-<repo-slug>` MCP tool not found | Stop, tell the user to re-run `/bridge:setup-email-updates` to register it on this machine. |
+| This repo's `resend-<repo-slug>` MCP tool not found (`provider: "resend"`) | Stop, tell the user to re-run `/bridge:setup-email-updates` to register it on this machine. |
 | User declines to send at the Step 8 confirmation | Stop — no email, state unchanged. |
-| Resend MCP tool call returns an error | Do not update state, do not commit. Report the error to the user. |
+| Resend MCP tool call returns an error (`provider: "resend"`) | Do not update state. Report the error to the user. |
+| Relay POST returns non-2xx (`provider: "drava"`) | Do not update state. Report `HTTP_CODE`/`RESPONSE_BODY` to the user. |
 | `package.json` absent | Use commit-date-range block titles; keep root-cause bullet merging. |
-| State commit/push fails after a successful send | Warn the user explicitly: email sent, state not persisted. |
+| Local state file write fails after a successful send | Warn the user explicitly: email sent, state not persisted. |
