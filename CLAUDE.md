@@ -51,6 +51,8 @@ uv run script.py
 - `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
 - `.bridge/email-config.json` (per target repo, gitignored — may hold a plaintext token) — recipients, last-sent tracking, and a `provider`-selected send mechanism (Resend MCP connection, or direct HTTP relay credentials); shared by `setup-email-updates`, `send-update-email`, and `send-update-email-batch`
 - `docs/env-setup/claude-plugins-manifest.json` — user-scope Claude Code plugins/marketplaces + gstack snapshot, written/read by `setup-env`
+- `docs/finance/{reports,valuations,backtests}/` — handoff docs and reports from the financial series (`market-account-report`, `valuation-model`, `strategy-backtest`), bridging into the `anthropics/financial-services` marketplace's `client-report`/`dcf-model` skills where applicable
+- `.bridge/finance-config.json` (per target repo, gitignored — an `http` source may hold a plaintext token) — configured market/account data sources (MCP connections, direct HTTP APIs, or local Python packages), base currency, and watchlist; shared by `setup-finance-sources`, `market-account-report`, `valuation-model`, `strategy-backtest`, and `finnhub-query`. `finnhub-query` is the only skill that calls Finnhub's REST API directly — the other three invoke it rather than duplicating endpoint/auth/error-handling logic
 
 <!-- OPENWIKI:START -->
 
