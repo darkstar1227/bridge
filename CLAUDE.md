@@ -30,6 +30,10 @@ Claude Code reads `plugins/<plugin-name>/skills/*/SKILL.md` for each installed p
 2. Add an entry to the `plugins` array in the root `.claude-plugin/marketplace.json`: `{"name": "<new-plugin-name>", "source": "./plugins/<new-plugin-name>", "description": "..."}`.
 3. Document it in README.md under its own `## Skills (\`<new-plugin-name>\` series)` section.
 
+## Versioning
+
+Each plugin's `version` in its `plugin.json` follows semver. Bump the minor or patch component freely as part of normal work (new skill, fix, small change). **Never bump the major (leftmost) component without the user's explicit go-ahead first** — ask before bumping it, even when the change looks breaking (removed skill, renamed provider, changed config schema).
+
 ## Python scripts
 
 If any helper scripts are added, use `uv` for package management and `uv run` to execute them. Never use `pip install` or bare `python`.
@@ -56,7 +60,7 @@ uv run script.py
 - `docs/autoresearch/plan/` — autoresearch-plan comparison logs (candidate approaches, metric, winner)
 - `docs/autoresearch/impl/` — autoresearch-impl iteration logs (round-by-round variant/metric/keep-or-discard)
 - `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
-- `.bridge/email-config.json` (per target repo, gitignored — may hold a plaintext token) — recipients, last-sent tracking, and a `provider`-selected send mechanism (Resend MCP connection, or direct HTTP relay credentials); shared by `setup-email-updates` and `send-update-email`
+- `.bridge/email-config.json` (per target repo, gitignored — may hold plaintext secrets) — recipients, last-sent tracking, and a `provider`-selected send mechanism (Resend MCP connection, or a fully custom HTTP POST: endpoint/headers/body template); shared by `setup-email-updates` and `send-update-email`
 - `docs/env-setup/claude-plugins-manifest.json` — user-scope Claude Code plugins/marketplaces + gstack snapshot, written/read by `setup-env`
 
 <!-- OPENWIKI:START -->
