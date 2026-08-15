@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A Claude Code **marketplace** (not a single plugin). It currently hosts one installable plugin, `bridge-dev`, bundling several skill families under the `bridge-dev` namespace: gstack-plan → Superpowers `writing-plans` bridging, pipeline orchestration, autoresearch loops, OpenCode model benchmarking, Resend-based repo update-email digests, and pipeline log review against a design doc. Additional skill series get their own sibling plugin directory and their own namespace, selectable independently at install time — don't add unrelated new skill groups into `bridge-dev`. No build step, no runtime — pure skill definitions and plugin metadata.
+A Claude Code **marketplace** (not a single plugin). It currently hosts two installable plugins:
+- `bridge-dev`, bundling several skill families under the `bridge-dev` namespace: gstack-plan → Superpowers `writing-plans` bridging, pipeline orchestration, autoresearch loops, OpenCode model benchmarking, Resend-based repo update-email digests, and pipeline log review against a design doc.
+- `bridge-fin`, bundling financial-workflow skills under the `bridge-fin` namespace: configurable market/account data sources, portfolio/account reporting and DCF valuation bridged into `anthropics/financial-services`, standalone strategy backtesting, and a shared Finnhub REST query skill.
+
+Each series gets its own sibling plugin directory and its own namespace, selectable independently at install time — don't add unrelated new skill groups into an existing plugin; give them a new one instead. No build step, no runtime — pure skill definitions and plugin metadata.
 
 ## Plugin structure
 
@@ -62,6 +66,8 @@ uv run script.py
 - `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
 - `.bridge/email-config.json` (per target repo, gitignored — may hold plaintext secrets) — recipients, last-sent tracking, and a `provider`-selected send mechanism (Resend MCP connection, or a fully custom HTTP POST: endpoint/headers/body template); shared by `setup-email-updates` and `send-update-email`
 - `docs/env-setup/claude-plugins-manifest.json` — user-scope Claude Code plugins/marketplaces + gstack snapshot, written/read by `setup-env`
+- `docs/finance/{reports,valuations,backtests}/` — handoff docs and reports from the financial series (`market-account-report`, `valuation-model`, `strategy-backtest`), bridging into the `anthropics/financial-services` marketplace's `client-report`/`dcf-model` skills where applicable
+- `.bridge/finance-config.json` (per target repo, gitignored — an `http` source may hold a plaintext token) — configured market/account data sources (MCP connections, direct HTTP APIs, or local Python packages), base currency, and watchlist; shared by `setup-finance-sources`, `market-account-report`, `valuation-model`, `strategy-backtest`, and `finnhub-query`. `finnhub-query` is the only skill that calls Finnhub's REST API directly — the other three invoke it rather than duplicating endpoint/auth/error-handling logic
 
 <!-- OPENWIKI:START -->
 

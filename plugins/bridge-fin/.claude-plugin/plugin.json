@@ -1,0 +1,16 @@
+{
+  "name": "bridge-fin",
+  "version": "1.0.0",
+  "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, and a shared Finnhub REST query skill.",
+  "author": {
+    "name": "ds-anxing"
+  },
+  "license": "MIT",
+  "keywords": [
+    "finance",
+    "portfolio",
+    "valuation",
+    "backtest",
+    "bridge"
+  ]
+}
