@@ -1,6 +1,6 @@
 ---
 name: send-update-email
-description: Send a readable, version-grouped update email for a single repo's accumulated commits since the last send, via Resend or a direct HTTP relay depending on the repo's configured provider — shows the rendered content and waits for confirmation before actually sending.
+description: Send a readable, version-grouped update email for a single repo's accumulated commits since the last send, via Resend or a fully custom HTTP POST depending on the repo's configured provider — shows the rendered content and waits for confirmation before actually sending.
 triggers:
   - send update email
   - email changelog
@@ -20,7 +20,7 @@ allowed-tools:
 
 ## Purpose
 
-Sends colleagues a readable, bullet-point update email summarizing everything that changed in this repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via whichever provider `.bridge/email-config.json` names — the Resend MCP server, or a direct HTTP POST to an internal relay endpoint. Always shows you the rendered subject/recipients/body and waits for explicit confirmation before sending anything.
+Sends colleagues a readable, bullet-point update email summarizing everything that changed in this repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via whichever provider `.bridge/email-config.json` names — the Resend MCP server, or a direct HTTP POST built from the repo's own custom endpoint/headers/body template. Always shows you the rendered subject/recipients/body and waits for explicit confirmation before sending anything.
 
 This skill only works inside a single repo.
 
@@ -38,7 +38,7 @@ This skill only works inside a single repo.
 
   If nothing matches: stop and tell the user that the `<mcpServerName>` MCP connection isn't registered on this machine, and that re-running `/bridge-dev:setup-email-updates` will register it.
 
-- **`provider: "drava"` — direct HTTP relay.** No MCP connection involved. The config carries everything needed directly: `endpoint` (the POST URL), `system` (the relay's system id), `token` (bearer auth — a secret, see the handling note in Step 9), `fromName`, and `replyTo`. Step 9 calls the endpoint with `curl` directly instead of going through ToolSearch/MCP.
+- **`provider: "custom"` — direct HTTP POST, fully user-defined.** No MCP connection involved. The config carries everything needed directly: `endpoint` (the POST URL), `headers` (the complete headers object, verbatim — may contain secret auth values, see the handling note in Step 9), `bodyTemplate` (the JSON body shape, with `{{TO}}`/`{{TO_CSV}}`/`{{SUBJECT}}`/`{{HTML}}`/`{{TEXT}}`/`{{FROM_NAME}}`/`{{REPLY_TO}}` placeholder tokens marking where per-send values go), `senderName`, and `replyTo`. Step 9 substitutes the placeholders and calls the endpoint with `curl` directly instead of going through ToolSearch/MCP. This skill never assumes anything about the target API's shape beyond those placeholder tokens — everything else in `bodyTemplate` is sent exactly as `setup-email-updates` wrote it.
 
 ## Step 1 — Require Single-Repo Context
 
@@ -81,16 +81,15 @@ SENDER_NAME=$(jq -r '.senderName // empty' .bridge/email-config.json)
 ```
 
 ```bash
-# provider == "drava"
+# provider == "custom"
 ENDPOINT=$(jq -r '.endpoint' .bridge/email-config.json)
-SYSTEM=$(jq -r '.system' .bridge/email-config.json)
-TOKEN=$(jq -r '.token' .bridge/email-config.json)
-FROM_NAME=$(jq -r '.fromName' .bridge/email-config.json)
+HEADERS_JSON=$(jq -c '.headers // {}' .bridge/email-config.json)
+BODY_TEMPLATE_JSON=$(jq -c '.bodyTemplate' .bridge/email-config.json)
+SENDER_NAME=$(jq -r '.senderName // empty' .bridge/email-config.json)
 REPLY_TO=$(jq -r '.replyTo // empty' .bridge/email-config.json)
-SENDER_NAME="$FROM_NAME"
 ```
 
-Treat `TOKEN` as a secret from this point on: never print it, never put it in a commit message, never let it appear in a rendered email preview shown to the user in Step 8.
+Treat `HEADERS_JSON` as a secret from this point on — it may carry a bearer token, an API key, or any other credential the user configured: never print its values, never put them in a commit message, never let them appear in a rendered email preview shown to the user in Step 8.
 
 `SENDER_NAME` can come back empty for a `resend` config created before that field existed. If so, skip the sender-name sign-off line entirely in Step 7 (just the "Bridge 自動通知" line) rather than printing a blank or literal "null".
 
@@ -277,32 +276,50 @@ Call the resolved tool directly with:
 
 Do not pass a `from` argument — the connection's fixed sender applies automatically, and the tool's own schema will refuse or ignore an override attempt depending on how the server was configured. Do not build a raw HTTP payload or call `curl` — the MCP tool call *is* the send. Check its result: a successful send returns the sent email's id with no error. Anything else (an `error` field, a thrown tool error, etc.) means failure: do not update state, do not commit (Step 10). Report the error to the user.
 
-**`PROVIDER == "drava"`:** POST directly to the relay endpoint. Write the JSON body to a temp file first (avoids shell-escaping issues with HTML content) and never echo `$TOKEN` to the conversation:
+**`PROVIDER == "custom"`:** substitute the placeholder tokens into `bodyTemplate`, then POST to `ENDPOINT` with `HEADERS_JSON` merged over a default `Content-Type: application/json`. Write the JSON body to a temp file first (avoids shell-escaping issues with HTML content) and never echo any header value to the conversation:
 
 ```bash
 PAYLOAD_FILE=$(mktemp)
-jq -n --arg system "$SYSTEM" --argjson to "$RECIPIENTS" --arg subject "<subject from Step 7>" \
-      --arg html "<rendered HTML body from Step 7>" --arg fromName "$FROM_NAME" --arg replyTo "$REPLY_TO" \
-      '{system:$system, to:$to, subject:$subject, html:$html, fromName:$fromName, replyTo:$replyTo}' \
-      > "$PAYLOAD_FILE"
+jq -n --argjson tmpl "$BODY_TEMPLATE_JSON" --argjson to "$RECIPIENTS" \
+      --arg toCsv "$(jq -r 'join(", ")' <<<"$RECIPIENTS")" \
+      --arg subject "<subject from Step 7>" --arg html "<rendered HTML body from Step 7>" \
+      --arg text "<rendered plain-text body from Step 7>" \
+      --arg fromName "$SENDER_NAME" --arg replyTo "$REPLY_TO" '
+  def substitute:
+    if type == "string" then
+      if .   == "{{TO}}"        then $to
+      elif . == "{{TO_CSV}}"    then $toCsv
+      elif . == "{{SUBJECT}}"   then $subject
+      elif . == "{{HTML}}"      then $html
+      elif . == "{{TEXT}}"      then $text
+      elif . == "{{FROM_NAME}}" then $fromName
+      elif . == "{{REPLY_TO}}"  then $replyTo
+      else . end
+    else . end;
+  $tmpl | walk(substitute)
+' > "$PAYLOAD_FILE"
 
-RESPONSE=$(curl -s -w '\n%{http_code}' -X POST "$ENDPOINT" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  --data @"$PAYLOAD_FILE")
+FINAL_HEADERS=$(jq -n --argjson defaults '{"Content-Type": "application/json"}' --argjson user "$HEADERS_JSON" '$defaults * $user')
+
+CURL_HEADER_ARGS=()
+while IFS=$'\t' read -r key value; do
+  CURL_HEADER_ARGS+=(-H "$key: $value")
+done < <(jq -r 'to_entries[] | [.key, .value] | @tsv' <<<"$FINAL_HEADERS")
+
+RESPONSE=$(curl -s -w '\n%{http_code}' -X POST "$ENDPOINT" "${CURL_HEADER_ARGS[@]}" --data @"$PAYLOAD_FILE")
 rm -f "$PAYLOAD_FILE"
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
 ```
 
-`HTTP_CODE` in the 200-299 range means success. Anything else means failure: do not update state, report `HTTP_CODE` and `RESPONSE_BODY` to the user (the response body from this endpoint never echoes the token back, so it's safe to show as-is).
+`HTTP_CODE` in the 200-299 range means success. Anything else means failure: do not update state, report `HTTP_CODE` and `RESPONSE_BODY` to the user — check `RESPONSE_BODY` for anything that looks like it echoes back a header value (some APIs do this in error responses) before showing it, since headers can carry secrets this skill doesn't otherwise know about.
 
-The `drava` API only accepts `html` — there is no separate `text` field, unlike Resend. The plain-text render from Step 7 is still shown to the user in Step 8 for readability; only the HTML goes out.
+Whether the rendered body includes `text` at all depends entirely on whether the user's `bodyTemplate` uses the `{{TEXT}}` placeholder — this skill doesn't assume one exists. The plain-text render from Step 7 is always shown to the user in Step 8 for readability regardless.
 
 ## Step 10 — Update State on Success
 
-`.bridge/email-config.json` is gitignored (see `setup-email-updates`'s Step 3b) because it can hold a plaintext secret (`token` for `drava`). State updates here are **local-only** — no commit, no push:
+`.bridge/email-config.json` is gitignored (see `setup-email-updates`'s Step 3b) because it can hold plaintext secrets (inside `headers`, for `custom`). State updates here are **local-only** — no commit, no push:
 
 ```bash
 HEAD_SHA=$(git rev-parse HEAD)
@@ -327,6 +344,6 @@ If this file write fails after the email already sent successfully (disk full, p
 | This repo's `resend-<repo-slug>` MCP tool not found (`provider: "resend"`) | Stop, tell the user to re-run `/bridge-dev:setup-email-updates` to register it on this machine. |
 | User declines to send at the Step 8 confirmation | Stop — no email, state unchanged. |
 | Resend MCP tool call returns an error (`provider: "resend"`) | Do not update state. Report the error to the user. |
-| Relay POST returns non-2xx (`provider: "drava"`) | Do not update state. Report `HTTP_CODE`/`RESPONSE_BODY` to the user. |
+| Custom POST returns non-2xx (`provider: "custom"`) | Do not update state. Report `HTTP_CODE`/`RESPONSE_BODY` to the user. |
 | `package.json` absent | Use commit-date-range block titles; keep root-cause bullet merging. |
 | Local state file write fails after a successful send | Warn the user explicitly: email sent, state not persisted. |

@@ -1,6 +1,6 @@
 ---
 name: setup-email-updates
-description: Create or edit the .bridge/email-config.json that send-update-email needs — recipients, last-sent tracking, and either a per-repo Resend MCP connection or direct HTTP relay credentials, chosen per repo — for a single repo or in bulk across a parent folder. Always gitignores the config since it can hold a plaintext token.
+description: Create or edit the .bridge/email-config.json that send-update-email needs — recipients, last-sent tracking, and either a per-repo Resend MCP connection or a fully custom HTTP POST structure (endpoint, headers, body template), chosen per repo — for a single repo or in bulk across a parent folder. Always gitignores the config since it can hold plaintext secrets.
 triggers:
   - setup email updates
   - configure update email recipients
@@ -24,8 +24,8 @@ allowed-tools:
 ## Requirements
 
 - For `resend` provider setups: `RESEND_API_KEY` environment variable, set wherever *this skill* runs (only needed at setup time — see Step 3). `send-update-email` itself never needs this variable; by the time it runs, the key already lives inside the per-repo MCP server this skill registers.
-- For `drava` provider setups: the relay endpoint URL, system id, and bearer token, given to you by the user (see Step 3).
-- `.bridge/email-config.json` must never be committed to git — it can hold a plaintext secret (`token` for `drava`). This skill gitignores it as part of Step 3/Step 3b, regardless of which provider is chosen.
+- For `custom` provider setups: the user must supply the complete HTTP POST structure their endpoint expects — the URL, every header (including whatever auth scheme it uses), and the exact JSON body shape, given to you by the user (see Step 3b). This skill does not assume any particular vendor's API shape.
+- `.bridge/email-config.json` must never be committed to git — it can hold plaintext secrets (any value inside `headers` for `custom`). This skill gitignores it as part of Step 3/Step 3b, regardless of which provider is chosen.
 
 ## Step 1 — Detect Mode
 
@@ -49,7 +49,7 @@ test -f .bridge/email-config.json && cat .bridge/email-config.json || echo "NO_C
 
 Ask the user which provider this repo should send through:
 - **`resend`** — Resend via a dedicated per-repo MCP connection. Go to Step 3a.
-- **`drava`** — direct HTTP POST to an internal relay endpoint (`https://drava.cancerfree.io/api/systems/send-email`), for repos under the newer internal email policy. Go to Step 3b.
+- **`custom`** — direct HTTP POST to any endpoint the user provides, using a POST structure they fully specify themselves. Go to Step 3b.
 
 Either way, finish with Step 3c (gitignore) before committing.
 
@@ -96,36 +96,66 @@ Replace the `--argjson recipients` value with the actual addresses the user gave
 
 Continue to Step 3c.
 
-### Step 3b — `drava` provider
+### Step 3b — `custom` provider
 
-Ask the user for:
-1. The relay endpoint URL — default to `https://drava.cancerfree.io/api/systems/send-email` unless they give a different one.
-2. The `system` id (e.g. `relay-c3a238f1bd21`) — this identifies which registered system is sending, on the relay's side.
-3. The bearer `token` for that system. Treat this as a secret: never echo it back, never put it in a commit message, never print it in a way that ends up in shell history logs you show the user.
-4. The `fromName` to send under (e.g. `Justin(Shopify)`).
-5. An optional `replyTo` address.
-6. The recipient email addresses.
+This provider makes no assumption about the target API's shape — the user supplies the complete POST structure themselves. Ask for, in order:
 
-Write the config:
+1. **The endpoint URL** — the full URL this skill will POST to.
+2. **The complete `headers` object**, as JSON — every header the endpoint needs, including whichever auth scheme it uses (`Authorization: Bearer ...`, an API-key header, whatever their vendor requires). There is no assumed auth shape; the user's JSON is sent verbatim. If they don't include `Content-Type`, this skill adds `Content-Type: application/json` automatically at send time — mention this so they only need to specify it if they want something else.
+3. **The complete request body**, as a JSON template, exactly matching what their endpoint's documentation expects — every field they'd normally hardcode (vendor ids, system names, flags, nested objects, whatever their API needs) written out literally. Wherever a value must vary per send, they mark the spot with one of these exact placeholder tokens (as a bare JSON string value, not concatenated into a larger string):
+   - `"{{TO}}"` → the recipient list, substituted as a JSON array of email strings
+   - `"{{TO_CSV}}"` → the recipient list, substituted as a single comma-separated string (use this instead of `{{TO}}` if their API wants one string, not an array)
+   - `"{{SUBJECT}}"` → the rendered subject line
+   - `"{{HTML}}"` → the rendered HTML email body
+   - `"{{TEXT}}"` → the rendered plain-text email body (only needed if their API takes a separate text field)
+   - `"{{FROM_NAME}}"` → the sign-off name given in step 5 below
+   - `"{{REPLY_TO}}"` → the reply-to address given in step 6 below (substituted as an empty string if they skip it)
+
+   Show them a concrete example if it helps, e.g.:
+   ```json
+   {"system": "relay-c3a238f1bd21", "to": "{{TO}}", "subject": "{{SUBJECT}}", "html": "{{HTML}}", "fromName": "{{FROM_NAME}}", "replyTo": "{{REPLY_TO}}"}
+   ```
+4. **Any secret values** embedded in the headers or body (bearer tokens, API keys). Treat these as secrets from the moment they're given: never echo them back, never put them in a commit message, never print them in a way that ends up in shell history logs you show the user.
+5. **The sign-off name** to send under (e.g. `Justin(Shopify)`) — this is `senderName`, shown in the email body's sign-off line (see `send-update-email`'s Step 7) and available to the body template as `{{FROM_NAME}}`.
+6. An optional `replyTo` address.
+7. The recipient email addresses.
+
+Write the user's `headers` and body template to temp files first and validate each is well-formed JSON before using it — this catches a malformed paste before it lands in the config:
 
 ```bash
 mkdir -p .bridge
 HEAD_SHA=$(git rev-parse HEAD)
+
+HEADERS_FILE=$(mktemp)
+cat > "$HEADERS_FILE" <<'EOF'
+{"Authorization": "Bearer ..."}
+EOF
+jq empty "$HEADERS_FILE" || { echo "Invalid headers JSON — ask the user to fix it and retry."; exit 1; }
+
+BODY_TEMPLATE_FILE=$(mktemp)
+cat > "$BODY_TEMPLATE_FILE" <<'EOF'
+{"system": "relay-c3a238f1bd21", "to": "{{TO}}", "subject": "{{SUBJECT}}", "html": "{{HTML}}", "fromName": "{{FROM_NAME}}", "replyTo": "{{REPLY_TO}}"}
+EOF
+jq empty "$BODY_TEMPLATE_FILE" || { echo "Invalid body template JSON — ask the user to fix it and retry."; exit 1; }
+
 jq -n --argjson recipients '["alice@example.com", "bob@example.com"]' --arg sha "$HEAD_SHA" \
-      --arg endpoint "https://drava.cancerfree.io/api/systems/send-email" --arg system "relay-c3a238f1bd21" \
-      --arg token "..." --arg fromName "Justin(Shopify)" --arg replyTo "justin.lee@cancerfree.io" \
-  '{provider: "drava", endpoint: $endpoint, system: $system, token: $token, fromName: $fromName, replyTo: $replyTo,
+      --arg endpoint "https://example.com/api/send" \
+      --slurpfile headers "$HEADERS_FILE" --slurpfile bodyTemplate "$BODY_TEMPLATE_FILE" \
+      --arg senderName "Justin(Shopify)" --arg replyTo "justin.lee@example.com" \
+  '{provider: "custom", endpoint: $endpoint, headers: $headers[0], bodyTemplate: $bodyTemplate[0],
+    senderName: $senderName, replyTo: $replyTo,
     recipients: $recipients, lastSentSha: $sha, lastSentAt: null}' \
   > .bridge/email-config.json
+rm -f "$HEADERS_FILE" "$BODY_TEMPLATE_FILE"
 ```
 
-Replace every placeholder value with what the user gave you. Leave `lastSentAt` as `null`. There is no MCP registration step for this provider — `send-update-email` calls the endpoint directly using the config's own `endpoint`/`system`/`token`.
+Replace every placeholder value (the heredoc contents, `--arg endpoint`, `--arg senderName`, `--arg replyTo`, `--argjson recipients`) with what the user actually gave you. Leave `lastSentAt` as `null`. There is no MCP registration step for this provider — `send-update-email` calls the endpoint directly using the config's own `endpoint`/`headers`/`bodyTemplate`.
 
 Continue to Step 3c.
 
 ### Step 3c — Gitignore the config (both providers)
 
-`.bridge/email-config.json` can hold a plaintext secret (`token`, for `drava`) and must never be committed. Ensure it's gitignored before touching git at all:
+`.bridge/email-config.json` can hold plaintext secrets (any value inside `headers`, for `custom`) and must never be committed. Ensure it's gitignored before touching git at all:
 
 ```bash
 grep -qxF '.bridge/email-config.json' .gitignore 2>/dev/null || echo '.bridge/email-config.json' >> .gitignore
@@ -143,7 +173,7 @@ If `git status` shows `.bridge/email-config.json` as already tracked (from a con
 
 ## Step 4 — Single-repo: Edit Existing Config
 
-Show the user the `provider`, `recipients` array, and sign-off field (`senderName` for `resend`, `fromName` for `drava`) from the `cat` output in Step 2. Ask whether to add/remove/replace any recipients, and whether to change the sign-off name — this skill does not support switching a repo's `provider` after creation (delete `.bridge/email-config.json` and re-run Step 3 for that). Rewrite only `recipients` and the sign-off field — every other field (`lastSentSha`, `lastSentAt`, `mcpServerName`, `endpoint`, `system`, `token`, `replyTo`) must be preserved exactly as it was, so a re-run of this skill can never cause a duplicate send, a gap, or an orphaned connection.
+Show the user the `provider`, `recipients` array, and sign-off field (`senderName`, for both providers) from the `cat` output in Step 2. Ask whether to add/remove/replace any recipients, and whether to change the sign-off name — this skill does not support switching a repo's `provider` after creation (delete `.bridge/email-config.json` and re-run Step 3 for that). Rewrite only `recipients` and `senderName` — every other field (`lastSentSha`, `lastSentAt`, `mcpServerName`, `endpoint`, `headers`, `bodyTemplate`, `replyTo`) must be preserved exactly as it was, so a re-run of this skill can never cause a duplicate send, a gap, or an orphaned connection.
 
 For `resend`:
 
@@ -154,11 +184,11 @@ jq --argjson recipients '["alice@example.com", "carol@example.com"]' --arg sende
 mv .bridge/email-config.json.tmp .bridge/email-config.json
 ```
 
-For `drava`:
+For `custom`:
 
 ```bash
-jq --argjson recipients '["alice@example.com", "carol@example.com"]' --arg fromName "Justin(Shopify)" \
-  '.recipients = $recipients | .fromName = $fromName' \
+jq --argjson recipients '["alice@example.com", "carol@example.com"]' --arg sender "Justin(Shopify)" \
+  '.recipients = $recipients | .senderName = $sender' \
   .bridge/email-config.json > .bridge/email-config.json.tmp
 mv .bridge/email-config.json.tmp .bridge/email-config.json
 ```
@@ -183,5 +213,5 @@ For each repo name printed, `cd` into it and run Steps 2-4 for that repo only, o
 - This skill never sets `lastSentSha` to anything other than the current `HEAD` at creation time — it never touches `lastSentSha` on an edit.
 - This skill is interactive by design. Do not schedule it under `/loop`.
 - `resend` provider: each repo gets its own dedicated Resend MCP connection (named `resend-<repo-slug>`) so it can send under its own sender name — this is why `send-update-email` never needs `RESEND_API_KEY` itself. Changing an existing repo's sender name isn't handled by this skill; to do that, run `claude mcp remove resend-<repo-slug>` first, then re-run this skill's create flow (Step 3a) to register it fresh with the new sender. Every machine that will run `send-update-email` for a given repo needs that repo's `resend-<repo-slug>` MCP connection registered on it — this lives in the local Claude Code config, not in git, so it does not travel with `git clone`. Re-run this skill on any new machine before expecting `resend` sends to work there.
-- `drava` provider: no MCP connection or per-machine registration involved — the config itself carries the `endpoint`/`system`/`token` needed to send. This is exactly why the config must stay gitignored (Step 3c): unlike `resend` (where the secret lives in local MCP config, never in the repo), `drava`'s secret lives in the config file itself.
+- `custom` provider: no MCP connection or per-machine registration involved — the config itself carries the `endpoint`/`headers`/`bodyTemplate` needed to send. This is exactly why the config must stay gitignored (Step 3c): unlike `resend` (where the secret lives in local MCP config, never in the repo), `custom`'s secrets live in the config file itself (inside `headers`).
 - `.bridge/email-config.json` is gitignored for both providers (Step 3c) and is never committed by this skill or by `send-update-email`. It's a local, per-machine file — copy it manually (out-of-band, not via git) to any other machine that needs to run sends for this repo.
