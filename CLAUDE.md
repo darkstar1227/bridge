@@ -56,7 +56,7 @@ uv run script.py
 - `docs/autoresearch/plan/` — autoresearch-plan comparison logs (candidate approaches, metric, winner)
 - `docs/autoresearch/impl/` — autoresearch-impl iteration logs (round-by-round variant/metric/keep-or-discard)
 - `docs/opencode-model-tests/` — reports shared by `benchmark-opencode-models` (deep per-prompt time/quality/completeness/autonomy/discipline/TDD-discipline scores) and `check-opencode-models` (fast ping-only availability reports)
-- `.bridge/email-config.json` (per target repo, gitignored — may hold a plaintext token) — recipients, last-sent tracking, and a `provider`-selected send mechanism (Resend MCP connection, or direct HTTP relay credentials); shared by `setup-email-updates`, `send-update-email`, and `send-update-email-batch`
+- `.bridge/email-config.json` (per target repo, gitignored — may hold a plaintext token) — recipients, last-sent tracking, and a `provider`-selected send mechanism (Resend MCP connection, or direct HTTP relay credentials); shared by `setup-email-updates` and `send-update-email`
 - `docs/env-setup/claude-plugins-manifest.json` — user-scope Claude Code plugins/marketplaces + gstack snapshot, written/read by `setup-env`
 
 <!-- OPENWIKI:START -->

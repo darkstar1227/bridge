@@ -22,7 +22,7 @@ allowed-tools:
 
 Sends colleagues a readable, bullet-point update email summarizing everything that changed in this repo since the last successful send, grouped by version and by root cause rather than listed commit-by-commit. Delivered via whichever provider `.bridge/email-config.json` names — the Resend MCP server, or a direct HTTP POST to an internal relay endpoint. Always shows you the rendered subject/recipients/body and waits for explicit confirmation before sending anything.
 
-This skill only works inside a single repo. For unattended sending across a parent folder of repos (e.g. scheduled via `/loop`), use `/bridge-dev:send-update-email-batch` instead — it shares this skill's core logic (Steps 2-7, 9, 10 below) but skips the confirmation step, since there's no one to ask when it's running unattended. **When editing the core logic here (commit gathering, content filtering, grouping, the email template, or the send/state-update mechanics), make the same edit in `skills/send-update-email-batch/SKILL.md`** — the two are meant to stay behaviorally identical apart from the confirmation gate and the parent-folder loop.
+This skill only works inside a single repo.
 
 ## Requirements
 
@@ -47,7 +47,7 @@ git rev-parse --is-inside-work-tree 2>/dev/null
 ```
 
 - Prints `true` → continue to Step 2.
-- Errors (not a git repo): stop. This skill only works `cd`'d into a single repo — tell the user to run it from inside the target repo, or to use `/bridge-dev:send-update-email-batch` if they want to process a whole parent folder of repos.
+- Errors (not a git repo): stop. This skill only works `cd`'d into a single repo — tell the user to run it from inside the target repo.
 
 ## Step 2 — Pull Latest
 

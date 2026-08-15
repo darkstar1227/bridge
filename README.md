@@ -54,7 +54,7 @@ Detects a project's stack (Python/uv, Docker, Supabase, Git) and initializes or 
 
 ### `/bridge-dev:setup-email-updates`
 
-Creates or edits the `.bridge/email-config.json` a repo needs before `/bridge-dev:send-update-email` or `/bridge-dev:send-update-email-batch` will work — who gets notified, and (on first setup) registers a dedicated `resend-<repo-slug>` MCP connection with its own sender name, so each repo sends under its own identity. Works on a single repo, or in bulk when run from a parent folder containing multiple repos (asks one repo at a time). Interactive by design — not meant to run under `/loop`; that's `/bridge-dev:send-update-email-batch`'s job. Requires `RESEND_API_KEY` in your environment at setup time only.
+Creates or edits the `.bridge/email-config.json` a repo needs before `/bridge-dev:send-update-email` will work — who gets notified, and (on first setup) registers a dedicated `resend-<repo-slug>` MCP connection with its own sender name, so each repo sends under its own identity. Works on a single repo, or in bulk when run from a parent folder containing multiple repos (asks one repo at a time). Interactive by design — not meant to run under `/loop`. Requires `RESEND_API_KEY` in your environment at setup time only.
 
 **Triggers:**
 - `/bridge-dev:setup-email-updates`
@@ -71,16 +71,6 @@ Sends a readable, bullet-point update email via [Resend](https://resend.com) for
 - "send update email"
 - "email changelog"
 - "notify team of updates"
-
-### `/bridge-dev:send-update-email-batch`
-
-The unattended counterpart to `/bridge-dev:send-update-email` — run from a parent folder containing multiple repos (e.g. on a schedule via `/loop`), it scans for configured repos and sends each one's update email with no confirmation step, since there's no one to ask. Shares the same commit-gathering, content-filtering, grouping, and template logic; skips repos with no config or no new commits, and one repo's failure doesn't stop the others.
-
-**Triggers:**
-- `/bridge-dev:send-update-email-batch`
-- "send update email batch"
-- "loop send update emails"
-- "batch email changelog"
 
 ### `/bridge-dev:opencode-bridge`
 
@@ -106,7 +96,7 @@ Wires [cancerfreebiotech/claude-profile-kit](https://github.com/cancerfreebiotec
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`
 - [superpowers](https://github.com/obra/superpowers) — for `writing-plans`
-- [Resend](https://resend.com) account and API key, plus [`resend-mcp`](https://github.com/resend/resend-mcp) available via `npx` — for `/bridge-dev:setup-email-updates`, which registers one dedicated MCP connection per repo (neither `send-update-email` nor `send-update-email-batch` needs an API key itself)
+- [Resend](https://resend.com) account and API key, plus [`resend-mcp`](https://github.com/resend/resend-mcp) available via `npx` — for `/bridge-dev:setup-email-updates`, which registers one dedicated MCP connection per repo (`send-update-email` doesn't need an API key itself)
 - [`opencode`](https://opencode.ai) CLI on `PATH`, plus [`uv`](https://docs.astral.sh/uv/) — for `/bridge-dev:opencode-bridge`
 - [`relay`](https://github.com/darkstar1227/relay) CLI with a configured LiteLLM provider (no `--subagent-model` set) — for `/bridge-dev:setup-relay-provider-template`
 

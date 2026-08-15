@@ -1,6 +1,6 @@
 ---
 name: setup-email-updates
-description: Create or edit the .bridge/email-config.json that send-update-email and send-update-email-batch need — recipients, last-sent tracking, and either a per-repo Resend MCP connection or direct HTTP relay credentials, chosen per repo — for a single repo or in bulk across a parent folder. Always gitignores the config since it can hold a plaintext token.
+description: Create or edit the .bridge/email-config.json that send-update-email needs — recipients, last-sent tracking, and either a per-repo Resend MCP connection or direct HTTP relay credentials, chosen per repo — for a single repo or in bulk across a parent folder. Always gitignores the config since it can hold a plaintext token.
 triggers:
   - setup email updates
   - configure update email recipients
@@ -19,7 +19,7 @@ allowed-tools:
 
 ## Purpose
 
-Both `send-update-email` and `send-update-email-batch` refuse to run against a repo that has no `.bridge/email-config.json`. This skill is the only thing that creates or edits that file — recipients, the `lastSentSha` tracking marker, and (on first setup) a dedicated per-repo Resend MCP connection so each repo can send under its own sender name.
+`send-update-email` refuses to run against a repo that has no `.bridge/email-config.json`. This skill is the only thing that creates or edits that file — recipients, the `lastSentSha` tracking marker, and (on first setup) a dedicated per-repo Resend MCP connection so each repo can send under its own sender name.
 
 ## Requirements
 
@@ -181,7 +181,7 @@ For each repo name printed, `cd` into it and run Steps 2-4 for that repo only, o
 ## Notes
 
 - This skill never sets `lastSentSha` to anything other than the current `HEAD` at creation time — it never touches `lastSentSha` on an edit.
-- This skill is interactive by design. Do not schedule it under `/loop`; that's `/bridge-dev:send-update-email-batch`'s job — it processes a parent folder of already-configured repos unattended, using each repo's config.
-- `resend` provider: each repo gets its own dedicated Resend MCP connection (named `resend-<repo-slug>`) so it can send under its own sender name — this is why neither `send-update-email` nor `send-update-email-batch` ever needs `RESEND_API_KEY` itself. Changing an existing repo's sender name isn't handled by this skill; to do that, run `claude mcp remove resend-<repo-slug>` first, then re-run this skill's create flow (Step 3a) to register it fresh with the new sender. Every machine that will run `send-update-email`/`send-update-email-batch` for a given repo needs that repo's `resend-<repo-slug>` MCP connection registered on it — this lives in the local Claude Code config, not in git, so it does not travel with `git clone`. Re-run this skill on any new machine before expecting `resend` sends to work there.
+- This skill is interactive by design. Do not schedule it under `/loop`.
+- `resend` provider: each repo gets its own dedicated Resend MCP connection (named `resend-<repo-slug>`) so it can send under its own sender name — this is why `send-update-email` never needs `RESEND_API_KEY` itself. Changing an existing repo's sender name isn't handled by this skill; to do that, run `claude mcp remove resend-<repo-slug>` first, then re-run this skill's create flow (Step 3a) to register it fresh with the new sender. Every machine that will run `send-update-email` for a given repo needs that repo's `resend-<repo-slug>` MCP connection registered on it — this lives in the local Claude Code config, not in git, so it does not travel with `git clone`. Re-run this skill on any new machine before expecting `resend` sends to work there.
 - `drava` provider: no MCP connection or per-machine registration involved — the config itself carries the `endpoint`/`system`/`token` needed to send. This is exactly why the config must stay gitignored (Step 3c): unlike `resend` (where the secret lives in local MCP config, never in the repo), `drava`'s secret lives in the config file itself.
-- `.bridge/email-config.json` is gitignored for both providers (Step 3c) and is never committed by this skill or by `send-update-email`/`send-update-email-batch`. It's a local, per-machine file — copy it manually (out-of-band, not via git) to any other machine that needs to run sends for this repo.
+- `.bridge/email-config.json` is gitignored for both providers (Step 3c) and is never committed by this skill or by `send-update-email`. It's a local, per-machine file — copy it manually (out-of-band, not via git) to any other machine that needs to run sends for this repo.
