@@ -4,24 +4,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A Claude Code plugin that bundles three unrelated skill families under one `bridge` namespace: gstack-plan → Superpowers `writing-plans` bridging, Resend-based repo update-email digests, and pipeline log review against a design doc. No build step, no runtime — pure skill definitions and plugin metadata.
+A Claude Code **marketplace** (not a single plugin). It currently hosts one installable plugin, `bridge-dev`, bundling several skill families under the `bridge-dev` namespace: gstack-plan → Superpowers `writing-plans` bridging, pipeline orchestration, autoresearch loops, OpenCode model benchmarking, Resend-based repo update-email digests, and pipeline log review against a design doc. Additional skill series get their own sibling plugin directory and their own namespace, selectable independently at install time — don't add unrelated new skill groups into `bridge-dev`. No build step, no runtime — pure skill definitions and plugin metadata.
 
 ## Plugin structure
 
 ```
-.claude-plugin/plugin.json      — plugin manifest (name, version, description)
-.claude-plugin/marketplace.json — local marketplace descriptor, used to install/test this plugin from a GitHub URL or local path
-skills/<skill-name>/SKILL.md    — one skill per directory; SKILL.md is the full skill prompt
-README.md                       — user-facing install and usage docs
+.claude-plugin/marketplace.json                    — marketplace descriptor; lists every installable plugin and its source path
+plugins/<plugin-name>/.claude-plugin/plugin.json    — one manifest per plugin (name, version, description)
+plugins/<plugin-name>/skills/<skill-name>/SKILL.md  — one skill per directory; SKILL.md is the full skill prompt
+README.md                                           — user-facing install and usage docs
 ```
 
-Claude Code reads `skills/*/SKILL.md` automatically when the plugin is installed. The frontmatter (`---` block) controls `name`, `description`, `triggers`, and `allowed-tools`.
+Claude Code reads `plugins/<plugin-name>/skills/*/SKILL.md` for each installed plugin. The frontmatter (`---` block) controls `name`, `description`, `triggers`, and `allowed-tools`. A skill's slash-command and cross-skill-reference prefix is its plugin's `name` (e.g. `bridge-dev:init-project`), not the marketplace name.
 
 ## Adding a new skill
 
-1. Create `skills/<skill-name>/SKILL.md` with a YAML frontmatter block followed by the skill instructions.
-2. No registration needed — Claude Code discovers skills by directory structure.
-3. Bump `version` in `.claude-plugin/plugin.json` (semver).
+1. Pick the plugin it belongs to (usually `bridge-dev`, unless it starts a new series — see above).
+2. Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md` with a YAML frontmatter block followed by the skill instructions.
+3. No registration needed — Claude Code discovers skills by directory structure.
+4. Bump `version` in `plugins/<plugin-name>/.claude-plugin/plugin.json` (semver).
+
+## Adding a new skill series (plugin)
+
+1. Create `plugins/<new-plugin-name>/.claude-plugin/plugin.json` (name, version, description, author, license, keywords) and `plugins/<new-plugin-name>/skills/`.
+2. Add an entry to the `plugins` array in the root `.claude-plugin/marketplace.json`: `{"name": "<new-plugin-name>", "source": "./plugins/<new-plugin-name>", "description": "..."}`.
+3. Document it in README.md under its own `## Skills (\`<new-plugin-name>\` series)` section.
 
 ## Python scripts
 

@@ -1,0 +1,97 @@
+---
+name: setup-env
+description: Export the user-scope Claude Code plugins, marketplaces, and gstack installation on this machine into a portable manifest, or install from an existing manifest onto a new machine to reproduce the same Claude Code environment. Trigger when the user wants to back up their plugin setup, replicate their Claude Code environment on a new machine, or bootstrap a fresh machine with the same plugins/skills they already use elsewhere.
+triggers:
+  - export my plugins
+  - back up my claude code setup
+  - install my plugins on a new machine
+  - replicate my claude code environment
+  - bootstrap this machine's claude code setup
+  - sync plugins to new machine
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+
+# Setup Env
+
+**Announce at start:** "I'm using the bridge-dev:setup-env skill to [export/install] this Claude Code environment's plugins."
+
+## Purpose
+
+Claude Code plugins/marketplaces are installed per-machine in `~/.claude/plugins/`. There's no built-in way to carry "everything I have installed" from one machine to another. This skill closes that gap in two directions: **export** snapshots the current machine's user-scope plugins and marketplaces (plus the separately-installed `gstack` skill suite) into a manifest file; **install** reads that manifest on a different machine and reproduces the setup by driving the real `claude plugin` CLI.
+
+This only covers **user-scope** plugins (`scope: "user"` in `~/.claude/plugins/installed_plugins.json`) — plugins installed per-project (`scope: "project"`/`"local"`) belong to that project's own setup, not the user's personal environment, and are deliberately excluded.
+
+## Step 1 — Determine Mode
+
+If the user's request doesn't already make it obvious, ask (via `AskUserQuestion`) whether this is:
+- **Export** — snapshot this machine's current setup to a manifest file
+- **Install** — read an existing manifest and set this machine up to match
+
+## Step 2 — Export
+
+1. Read `~/.claude/plugins/installed_plugins.json`. Filter to entries where at least one install record has `"scope": "user"`.
+2. Read `~/.claude/plugins/known_marketplaces.json` to resolve each plugin's marketplace alias (the part after `@` in its key, e.g. `context-mode@context-mode` → marketplace `context-mode`) to its actual source (`{"source": "github", "repo": "org/repo"}`).
+3. Check whether `~/.claude/skills/gstack` exists and looks like a real install (has `setup` script, `package.json`). If so, capture it as a separate block — it is **not** part of the plugin-marketplace system, it's a standalone git-cloned tool.
+3a. Check whether `oh-my-posh` is installed (`which oh-my-posh`). If so, capture it as a separate block too — same reasoning as gstack, standalone tool outside plugin system. Also read `~/.claude/settings.json`'s `statusLine` key — if it's set to an oh-my-posh command (e.g. `oh-my-posh claude`), capture that exact object so install can reproduce the statusline, not just the binary. If the command references a `--config <path>` file, copy that file verbatim into `docs/env-setup/ohmyposh-claude.toml` in this repo (it may contain Nerd Font glyphs in private-use codepoints — copy the file directly, never retype or re-encode it by hand) and record a `configFile` block with `manifestPath`/`installPath` so install can restore it byte-for-byte.
+4. Write the manifest to `docs/env-setup/claude-plugins-manifest.json` in this repo (create the directory if missing), using this shape:
+
+```json
+{
+  "generatedAt": "<today's date, YYYY-MM-DD>",
+  "marketplaces": [
+    { "name": "claude-plugins-official", "repo": "anthropics/claude-plugins-official" }
+  ],
+  "plugins": [
+    { "name": "context-mode", "marketplace": "context-mode" }
+  ],
+  "gstack": {
+    "installed": true,
+    "cloneUrl": "https://github.com/garrytan/gstack.git",
+    "installPath": "~/.claude/skills/gstack",
+    "setupCommand": "git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup"
+  },
+  "ohmyposh": {
+    "installed": true,
+    "setupCommand": "curl -s https://ohmyposh.dev/install.sh | bash -s",
+    "fontCommand": "oh-my-posh font install meslo",
+    "configFile": {
+      "manifestPath": "docs/env-setup/ohmyposh-claude.toml",
+      "installPath": "~/.config/ohmyposh/claude.toml"
+    },
+    "statusLine": {
+      "type": "command",
+      "command": "oh-my-posh claude --config ~/.config/ohmyposh/claude.toml",
+      "padding": 0
+    }
+  }
+}
+```
+
+`configFile` is optional — only present when the captured `statusLine.command` points at a custom config via `--config`. Omit the whole key if the statusline uses oh-my-posh's built-in `claude` template with no custom file.
+
+5. If the same plugin name appears against two different marketplaces (e.g. installed once from `claude-plugins-official` and once from its original community marketplace), include both entries but call this out to the user directly in chat as a likely-redundant duplicate — don't silently dedupe, since the user may have a reason for both, but don't hide it either.
+6. Summarize in chat what was captured (counts of marketplaces/plugins, whether gstack was included) and the manifest's path. Recommend the user commit `docs/env-setup/claude-plugins-manifest.json` to git so it travels with the repo.
+
+## Step 3 — Install
+
+1. Locate the manifest — a path the user gave, or `docs/env-setup/claude-plugins-manifest.json` in this repo.
+2. Run `claude plugin marketplace list` and `claude plugin list` to see what's already present on this machine — never re-add or re-install something already there.
+3. For each marketplace in the manifest not already known, run `claude plugin marketplace add <repo>`.
+4. For each plugin in the manifest not already installed, run `claude plugin install <name>@<marketplace>`.
+5. If the manifest has a `gstack` block and `~/.claude/skills/gstack` doesn't already exist, **stop and ask the user before running `setupCommand`** — it clones a third-party repo and executes its own `./setup` script, which is a different trust boundary than installing a Claude Code plugin through the marketplace system. Only run it after explicit confirmation.
+6. After a confirmed gstack install, ask the user whether to also add the gstack CLAUDE.md section (the block describing `/browse` and the other gstack skills) — don't add it unprompted, since it changes how every future session on this machine behaves.
+6a. If the manifest has an `ohmyposh` block and `oh-my-posh` isn't already installed (`which oh-my-posh`), same rule as gstack — stop and ask before running `setupCommand` (`curl | bash`, third-party trust boundary). After confirmed install, run `fontCommand` (`oh-my-posh font install meslo`) to install the Meslo Nerd Font it needs for glyphs.
+6a-i. If the `ohmyposh` block has a `configFile` key, copy `configFile.manifestPath` (from this repo) to `configFile.installPath` (expand `~`) — create `~/.config/ohmyposh/` first if missing. Copy the file directly (e.g. `cp`), never retype its contents — it holds Nerd Font glyphs in private-use Unicode codepoints that silently corrupt to empty strings if hand-typed or regex-substituted. If `installPath` already exists, ask before overwriting.
+6a-ii. After oh-my-posh is installed (fresh or already present) and the manifest carries a `statusLine` object, write it into `~/.claude/settings.json`'s top-level `statusLine` key — merge into the existing JSON (read, patch, write back), don't overwrite the whole file. Skip silently if `~/.claude/settings.json` already has a non-empty `statusLine` key set to something else — don't clobber a user's existing custom statusline without asking.
+6b. If `context-mode` is among the plugins just installed (fresh install, not already-present), run its doctor check afterward — call the `ctx_doctor` MCP tool if available in this session, else `npx context-mode doctor` — and run whatever fix command it returns. context-mode needs this extra step because it's an MCP server, not just a skill: plugin install alone doesn't guarantee the MCP server registered/started correctly.
+7. Report what was added vs. already-present vs. skipped (e.g. gstack or oh-my-posh declined). Don't claim the environment is "fully replicated" if anything was skipped — list it explicitly.
+
+## Notes
+
+- This skill never modifies another repo's plugin scope (project/local installs) — it only touches user-scope state, which is what "this machine's personal environment" means here.
+- Re-running export is safe and idempotent — it always overwrites the manifest with the current state, it doesn't merge with a stale one.
+- Re-running install is safe — steps 3-4 already skip anything present; it will not duplicate-install a plugin.
