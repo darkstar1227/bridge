@@ -144,6 +144,17 @@ Pulls historical candles from a configured source and backtests a simple rule-ba
 - "backtest my strategy"
 - "trading strategy performance"
 
+### `/bridge:finnhub-query`
+
+Owns every direct call to [Finnhub](https://finnhub.io)'s REST API (quote, company profile, basic financials, historical candles, company news) in one place — endpoint shapes, auth, and error handling (including the free-tier `/stock/candle` restriction) — using the `finnhub` source in `.bridge/finance-config.json`. `market-account-report`, `valuation-model`, and `strategy-backtest` invoke this skill instead of each building their own curl calls, so a Finnhub API change only needs fixing here.
+
+**Triggers:**
+- `/bridge:finnhub-query`
+- "query finnhub"
+- "finnhub quote"
+- "finnhub api"
+- "finnhub candles"
+
 ## Requirements
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`

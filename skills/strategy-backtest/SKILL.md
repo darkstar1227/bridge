@@ -53,7 +53,7 @@ ToolSearch query: "<mcpServerName> candles"
 
 Call it for the requested asset/range/granularity (e.g. `market_get_candles` on an OKX-style connection, or FinMind-MCP's TW-equity candle tool).
 
-**`kind: "http"`, `provider: "finnhub"`** — `GET {endpoint}/stock/candle?symbol=<TICKER>&resolution=<D|60|...>&from=<unix>&to=<unix>&token=<token>`. Finnhub's free tier has repeatedly restricted this endpoint for US equities (returns 403/"no access" for some symbols) — if the call fails this way, tell the user plainly (don't retry-loop against it) and suggest either upgrading their Finnhub plan or switching to a `local`/`yfinance` source for this asset instead.
+**`kind: "http"`, `provider: "finnhub"`** — invoke `bridge:finnhub-query` with operation `candle` (don't call Finnhub directly). That skill's own Step 4 already handles the free-tier `/stock/candle` restriction (returns a clear "no access, try a `local`/`yfinance` source instead" rather than a raw HTTP error) — if it reports that, switch to a `local`/`yfinance` source for this asset rather than retrying.
 
 **`kind: "local"`, `provider: "yfinance"`** — no HTTP call; fetch inline via `uv run` with `yfinance` as an ad-hoc dependency (no separate script file needed for a fetch this small):
 
