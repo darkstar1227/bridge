@@ -43,13 +43,30 @@ Ask the user (or accept as arguments):
 
 ## Step 3 — Pull Candles
 
-Locate the source's market-data tool:
+Branch on the chosen source's `kind` (from `.bridge/finance-config.json`):
+
+**`kind: "mcp"`** — locate the tool, then call it:
 
 ```
 ToolSearch query: "<mcpServerName> candles"
 ```
 
-Call it for the requested asset/range/granularity (e.g. `market_get_candles` on an OKX-style connection). Normalize the result into `{t, o, h, l, c, v}` objects — the script only needs `c` (close) but pass the full OHLCV through for the report's own reference.
+Call it for the requested asset/range/granularity (e.g. `market_get_candles` on an OKX-style connection, or FinMind-MCP's TW-equity candle tool).
+
+**`kind: "http"`, `provider: "finnhub"`** — `GET {endpoint}/stock/candle?symbol=<TICKER>&resolution=<D|60|...>&from=<unix>&to=<unix>&token=<token>`. Finnhub's free tier has repeatedly restricted this endpoint for US equities (returns 403/"no access" for some symbols) — if the call fails this way, tell the user plainly (don't retry-loop against it) and suggest either upgrading their Finnhub plan or switching to a `local`/`yfinance` source for this asset instead.
+
+**`kind: "local"`, `provider: "yfinance"`** — no HTTP call; fetch inline via `uv run` with `yfinance` as an ad-hoc dependency (no separate script file needed for a fetch this small):
+
+```bash
+uv run --with yfinance python3 -c "
+import yfinance as yf, json, sys
+df = yf.download(sys.argv[1], start=sys.argv[2], end=sys.argv[3], interval=sys.argv[4])
+candles = [{'t': int(i.timestamp()), 'o': float(r.Open), 'h': float(r.High), 'l': float(r.Low), 'c': float(r.Close), 'v': float(r.Volume)} for i, r in df.iterrows()]
+print(json.dumps(candles))
+" "<TICKER>" "<start-date>" "<end-date>" "<interval, e.g. 1d>"
+```
+
+Normalize whichever source's result into `{t, o, h, l, c, v}` objects — the script only needs `c` (close) but pass the full OHLCV through for the report's own reference.
 
 If the pull returns fewer candles than the strategy needs to warm up (e.g. fewer than `slow` periods for an SMA crossover), tell the user and ask for a longer lookback rather than running a backtest that's mostly warm-up.
 

@@ -43,31 +43,46 @@ test -f .bridge/finance-config.json && cat .bridge/finance-config.json || echo "
 
 Ask the user which data sources they want to configure. They can add more than one; a repo commonly starts with just the crypto MCP and adds an equities source later.
 
-### Step 2a — `mcp` source (e.g. OKX)
+### Step 2a — `mcp` source
 
-Ask for the registered MCP connection name (default guess: `okx-agent-trade-kit`) and what market it covers (`crypto`, `tw-equity`, `us-equity`, ...). Verify it resolves before recording it:
+Ask for the registered MCP connection name and what market it covers (`crypto`, `tw-equity`, `us-equity`, ...). Verify it resolves before recording it:
 
 ```
 ToolSearch query: "<mcpServerName> account balance"
 ```
 
 - Matches → the connection is usable. Continue.
-- No match → tell the user this MCP connection isn't registered on this machine (via `claude mcp add` or `/mcp`), and ask if they want to record it anyway for later, or skip it.
+- No match → tell the user this MCP connection isn't registered on this machine, and ask if they want to record it anyway for later, or skip it.
 
-### Step 2b — `http` source (e.g. a TW/US equities API)
+Two concrete `mcp` sources this skill knows about by name:
 
-If the user doesn't already have one picked, offer this reference table (recommendations only — do not implement against any of these until the user actually has an account/key):
+- **`okx-agent-trade-kit`** (crypto) — spot/futures/account data, already covered by `market-account-report`/`strategy-backtest`'s Step 3 instructions.
+- **FinMind-MCP** (TW 台股) — [FinMind](https://finmind.github.io/)'s own **official** MCP server (`github.com/FinMind/FinMind-MCP`). Not installed by this skill — if the user wants it and it isn't registered yet, tell them:
+  1. Get a token at `https://finmindtrade.com/analysis/#/account/user`.
+  2. `export FINMIND_TOKEN=<token>` then register it as an MCP connection (`uvx finmind-mcp` or `pipx install finmind-mcp`, wired via `claude mcp add`/`/mcp` same as any other stdio MCP).
+  3. Re-run this skill once it resolves via `ToolSearch`.
+  Record it as `{"id": "finmind", "kind": "mcp", "mcpServerName": "finmind-mcp", "market": "tw-equity"}`.
+
+### Step 2b — `http` source
+
+Default recommendation for US equities: **Finnhub**, called directly over REST (no MCP — there is no single official Finnhub MCP, just several community-maintained ones of uneven quality, so a plain HTTP call is more reliable than trusting a third-party server). Record it with a `provider` field so the consuming skills know its exact request shape:
+
+```json
+{"id": "finnhub", "kind": "http", "provider": "finnhub", "endpoint": "https://finnhub.io/api/v1", "token": "<api key>", "market": "us-equity"}
+```
+
+Get the key from the [Finnhub dashboard](https://finnhub.io/dashboard) (free tier: 60 req/min, real-time quotes). **Caveat to tell the user up front:** Finnhub's free tier has repeatedly restricted `/stock/candle` (historical US-equity OHLC) — reliable for `market-account-report`'s current-price lookups, not reliably reliable for `strategy-backtest`'s historical candle needs. If they specifically want US-equity backtesting, recommend `yfinance` instead (no key, `kind: "http"` isn't even the right shape for it — it's a local Python library, so record it as `{"id": "yfinance", "kind": "local", "provider": "yfinance", "market": "us-equity"}` and note in `strategy-backtest` that a `local` source means "call the `yfinance` Python package directly in the sandboxed backtest script," not an HTTP request).
+
+Other options, for when the user already has an account with one (do not implement against any of these until they do):
 
 | Market | Option | Why |
 |---|---|---|
-| TW 台股 | [FinMind](https://finmind.github.io/) | Free tier, REST + Python SDK, documents its own LLM/Agent-Skill/MCP integration — easiest fit here |
 | TW 台股 | [Fugle 富果](https://www.fugle.tw/) | Real-time quotes, good for live market data |
 | TW 台股 | `shioaji` (永豐金) | Broker-linked, needed if the user wants actual account/order data, not just quotes |
-| US | Alpha Vantage / Finnhub | Free-tier REST, simple API-key auth |
-| US | `yfinance` | No key needed, quick historical pulls |
+| US | Alpha Vantage | Free tier is only 25 req/**day** and delayed — worse than Finnhub for most uses, but has technical indicators Finnhub's free tier lacks |
 | US | Polygon.io | Paid, tick-level/pro-grade data |
 
-For the chosen provider, ask for: endpoint base URL, auth token/key (if any), and what market it covers. Treat the token as a secret — never echo it back, never put it in a commit message.
+For any of these, ask for: endpoint base URL, auth token/key (if any), and what market it covers. Treat the token as a secret — never echo it back, never put it in a commit message.
 
 ### Step 2c — Base Currency and Watchlist
 
@@ -85,7 +100,7 @@ jq -n \
   > .bridge/finance-config.json
 ```
 
-Replace `--argjson sources` with the actual sources gathered above. Each `mcp` source object is `{id, kind: "mcp", mcpServerName, market}`; each `http` source object is `{id, kind: "http", endpoint, token, market}` (omit `token` entirely if the provider needs none — never write it as an empty string). Replace `--arg currency` and `--argjson watchlist` with the user's answers from Step 2c.
+Replace `--argjson sources` with the actual sources gathered above. Each `mcp` source object is `{id, kind: "mcp", mcpServerName, market}`; each `http` source object is `{id, kind: "http", provider, endpoint, token, market}` (`provider` names a request shape the consuming skills know, e.g. `"finnhub"` — omit it for a source with no documented shape, and treat the consuming skill's Step 3 as generic in that case; omit `token` entirely if the provider needs none — never write it as an empty string); a `local` source object (e.g. `yfinance`) is `{id, kind: "local", provider, market}` — no endpoint/token, it means a Python package called directly inside a sandboxed script rather than an HTTP request. Replace `--arg currency` and `--argjson watchlist` with the user's answers from Step 2c.
 
 Continue to Step 3.
 
@@ -127,3 +142,4 @@ mv .bridge/finance-config.json.tmp .bridge/finance-config.json
 - This skill never places live orders and never needs trade-execution scopes — it only records how to *read* market/account data.
 - `mcp` sources are resolved by name via `ToolSearch` at use-time by the skills that consume this config (never hardcoded), the same lazy-lookup pattern `send-update-email` uses for its Resend connection. Every machine that will run the finance report/model/backtest skills against a given repo needs that repo's `mcp` connections registered locally — this lives in Claude Code's local config, not in git, so it does not travel with `git clone`.
 - `http` sources carry their secret in the config file itself, which is exactly why `.bridge/finance-config.json` must stay gitignored (Step 3) — copy it manually (out-of-band, not via git) to any other machine that needs it.
+- `local` sources (e.g. `yfinance`) need whatever Python package they wrap available to `uv run` at use-time — this skill doesn't install it, it only records the intent to use it. Note this to the user when recording one.

@@ -36,13 +36,13 @@ DCF requires a business with projectable cash flows. Before gathering anything e
 
 ## Step 3 — Gather What's Locally Known
 
-Read `.bridge/finance-config.json` if it exists (optional for this skill — proceed without it if absent, since `/dcf` can source everything itself). For each configured source that's relevant to this asset:
+Read `.bridge/finance-config.json` if it exists (optional for this skill — proceed without it if absent, since `/dcf` can source everything itself). For each configured source that's relevant to this asset, branch on `kind`:
 
-```
-ToolSearch query: "<mcpServerName> ticker price"
-```
+- **`kind: "mcp"`** — locate the tool (`ToolSearch query: "<mcpServerName> ticker price"`) and call it. FinMind-MCP is the notable case here for TW-listed companies: unlike a pure market-data MCP, it also exposes fundamentals (revenue, EPS, financial statements) — when it's configured, pull those directly instead of leaving the whole income statement for `/dcf` to source itself, since `/dcf`'s documented data sources (Daloopa, SEC EDGAR) don't cover TWSE/TPEx filings.
+- **`kind: "http"`, `provider: "finnhub"`** — `GET {endpoint}/quote?symbol=<TICKER>&token=<token>` for current price; `GET {endpoint}/stock/profile2?symbol=<TICKER>&token=<token>` for shares outstanding/market cap.
+- **`kind: "local"`, `provider: "yfinance"`** — `uv run --with yfinance python3 -c "import yfinance as yf; t=yf.Ticker(sys.argv[1]); print(t.info)"` for the same fields.
 
-Pull whatever's directly available: current price, market cap, shares/units outstanding. This is a light touch — do not attempt to reconstruct a full income statement from a market-data MCP; that's `/dcf`'s own job via its documented data sources.
+Pull whatever's directly available: current price, market cap, shares/units outstanding (and, for FinMind, fundamentals). This is a light touch otherwise — do not attempt to reconstruct a full income statement from a plain market-data source; that's `/dcf`'s own job via its documented data sources when nothing locally configured covers it.
 
 Then ask the user for the inputs only they can supply:
 - Growth assumptions (specific rates for projection years, or "use consensus")

@@ -51,7 +51,7 @@ Then call the resolved tools to collect, per source:
 - Bills/fills covering the reporting period (for realized PnL, fees, deposits/withdrawals — this is the closest equivalent to `client-report`'s "trade execution records" and "contributions/withdrawals")
 - Current market prices for every held instrument (to value everything in `baseCurrency`)
 
-**`kind: "http"`**: call the configured `endpoint` with the stored `token` (never echo the token into the conversation) for the equivalent data. If the source hasn't actually been wired up yet (recorded during setup but no real integration written), skip it and note the gap — do not fabricate data for it.
+**`kind: "http"`/`"local"`** (e.g. Finnhub, `yfinance`): these have no account concept — an account/exchange MCP is what supplies balances/positions/bills. Use an `http`/`local` source only to fill the "current market prices" bullet above for a held instrument that an account source can't price itself: Finnhub via `GET {endpoint}/quote?symbol=<TICKER>&token=<token>`, `yfinance` via `uv run --with yfinance python3 -c "import yfinance as yf; print(yf.Ticker(sys.argv[1]).fast_info['last_price'])" "<TICKER>"`. Never echo an `http` source's token into the conversation. If a source (of any kind) hasn't actually been wired up yet (recorded during setup but no real integration written), skip it and note the gap — do not fabricate data for it.
 
 If a source's tools/endpoint fail or return nothing, note that specific source as unavailable in the report rather than silently omitting it.
 
