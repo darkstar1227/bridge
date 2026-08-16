@@ -13,6 +13,11 @@
       "name": "bridge-fin",
       "source": "./plugins/bridge-fin",
       "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, and a shared Finnhub REST query skill."
+    },
+    {
+      "name": "bridge-mind",
+      "source": "./plugins/bridge-mind",
+      "description": "ESTP-tuned decision-support skill series: rapid-prototype validation for technical evaluations, a mandatory risk/rollback checklist for irreversible or trading decisions, a compound-learning plateau tracker, and a system-design devil's-advocate pass — auto-triggering to reinforce long-horizon planning and risk assessment where Se/Ti-dominant thinking tends to under-weight them."
     }
   ]
 }

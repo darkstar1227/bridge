@@ -147,6 +147,34 @@ Owns every direct call to [Finnhub](https://finnhub.io)'s REST API (quote, compa
 - "finnhub api"
 - "finnhub candles"
 
+## Skills (`bridge-mind` series)
+
+ESTP-tuned decision-support skills — fully autonomous, no slash command needed to trigger. Each one leans into or braces against a specific part of the Se → Ti → Fe → Ni function stack: fast empirical validation where Se/Ti strengths shine, structured checklists where Ni (long-horizon planning) is naturally weak.
+
+### `bridge-mind:rapid-prototype-thinking`
+
+For technical evaluations (new APIs, frameworks, K8s configs, architecture options). Replaces theoretical "in theory this should work" answers with the smallest runnable experiment that produces observable proof, converging by elimination instead of expanding every branch at once.
+
+**Triggers:** "should I try this", "is this approach viable", "let's do a quick POC", "which option is better", "does this design look right"
+
+### `bridge-mind:risk-brake-thinking`
+
+Mandatory checklist before irreversible actions — production deploys, DB migrations, or taking a trading strategy live. Forces reversibility check, worst-case quantification, and a rollback plan before an execution plan, plus a delayed-gratification check when the user is in a hurry.
+
+**Triggers:** "about to deploy", "about to place the order", "about to delete", "about to migrate", "taking this strategy live"
+
+### `bridge-mind:compound-learning-tracker`
+
+For long-horizon skill learning (music theory, Rust, quant trading, an instrument) that hits a plateau. Diagnoses real vs. perceived stagnation against concrete output, redesigns the feedback loop to surface a visible result within days, and allows lateral pivots instead of full abandonment.
+
+**Triggers:** "I can't keep going with this", "feels like no progress", "should I switch methods", "is this exercise even useful"
+
+### `bridge-mind:system-design-devil-advocate`
+
+Plays skeptic on new system/architecture designs (K8s topology, microservice splits, agent architectures) instead of agreeing with the user's excitement — stress-tests the design from a "maintaining this in six months" vantage point, surfacing only the 1-2 most painful issues with a concrete minimal-change fix.
+
+**Triggers:** "I'm planning to design it this way", "here's the architecture diagram", "should I split this into multiple services"
+
 ## Requirements
 
 - [gstack](https://github.com/garrytan/gstack) — for `/autoplan`
