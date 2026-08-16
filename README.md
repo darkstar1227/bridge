@@ -27,6 +27,15 @@ gstack produces strategic plans reviewed by CEO / design / eng / DX lenses. Supe
 
 Add this repo as a marketplace in Claude Code settings, then install `bridge-dev`, `bridge-fin`, and/or `bridge-mind` independently — each is a separately installable plugin.
 
+### Via `npx skills` (single skill, no plugin install)
+
+Any skill in this repo can be pulled individually with [`skills`](https://github.com/vercel-labs/skills), without installing a plugin:
+
+```
+npx skills add ds-anxing/bridge --skill gstack-to-plan
+npx skills add ds-anxing/bridge --all   # every skill across all three series
+```
+
 ## Skills (`bridge-dev` series)
 
 ### `/bridge-dev:gstack-to-plan`
