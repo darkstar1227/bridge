@@ -4,3 +4,8 @@
 # (decisions.jsonl, focus-state.json, focus-log.jsonl, inbox.md) and any
 # bridge-dev/bridge-fin config that may hold a plaintext token.
 .bridge/
+
+# skill-creator eval run artifacts (transcripts, eval_metadata.json). These land
+# under plugins/*/skills/ where both Claude Code and Codex scan for skills, and
+# Codex's `skills: "./skills/"` would otherwise package them on install.
+plugins/*/skills/*-workspace/
