@@ -1,7 +1,7 @@
 {
   "name": "bridge-mind",
-  "version": "0.0.1",
-  "description": "ESTP-tuned decision-support skill series: rapid-prototype validation for technical evaluations, a mandatory risk/rollback checklist for irreversible or trading decisions, a compound-learning plateau tracker, and a system-design devil's-advocate pass — auto-triggering to reinforce long-horizon planning and risk assessment where Se/Ti-dominant thinking tends to under-weight them.",
+  "version": "0.0.2",
+  "description": "ESTP-tuned decision-support skill series: rapid-prototype validation for technical evaluations, a risk/rollback checklist for irreversible or trading decisions (backed by a non-blocking PreToolUse guard and a decision journal), a compound-learning plateau tracker, a system-design devil's-advocate pass, an unfinished-work audit countering Se novelty-chase, and an outward-facing tone check covering the tertiary-Fe blind spot. Triggers on English and Traditional Chinese phrasing, and its output is exempt from terseness/compression modes.",
   "author": {
     "name": "ds-anxing"
   },

@@ -1,1 +1,5 @@
 .DS_Store
+
+# bridge-mind: personal decision history written by risk-brake-thinking.
+# Per-user cognitive state, not shared repo state.
+.bridge/decisions.jsonl

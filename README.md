@@ -1,6 +1,6 @@
 # bridge
 
-A Claude Code marketplace. Its first plugin, **`bridge-dev`**, bridges [gstack](https://github.com/garrytan/gstack) reviewed plans into [Superpowers](https://github.com/obra/superpowers) `writing-plans` format, plus a set of related development-workflow skills. Future skill series live here as additional, separately installable plugins.
+A Claude Code marketplace hosting three independently installable plugins: **`bridge-dev`** (development-workflow skills, anchored by bridging [gstack](https://github.com/garrytan/gstack) reviewed plans into [Superpowers](https://github.com/obra/superpowers) `writing-plans` format), **`bridge-fin`** (financial-workflow skills), and **`bridge-mind`** (ESTP-tuned decision-support skills). Future skill series live here as additional plugins.
 
 ## What it does
 
@@ -25,7 +25,7 @@ gstack produces strategic plans reviewed by CEO / design / eng / DX lenses. Supe
 
 ### Manual
 
-Add this repo as a marketplace in Claude Code settings, then install the `bridge-dev` plugin — this marketplace can host other skill series alongside it later, each installable independently.
+Add this repo as a marketplace in Claude Code settings, then install `bridge-dev`, `bridge-fin`, and/or `bridge-mind` independently — each is a separately installable plugin.
 
 ## Skills (`bridge-dev` series)
 
@@ -92,6 +92,113 @@ Wires [cancerfreebiotech/claude-profile-kit](https://github.com/cancerfreebiotec
 - "apply claude-project-template with relay"
 - "relay provider template"
 
+### `/bridge-dev:agy-second-voice`
+
+Gets an independent, read-only second opinion from Antigravity CLI (`agy`, Google's coding agent) — review the current diff, adversarially challenge it, or consult it on a question/plan — as a cross-model check alongside Claude's own analysis. Read-only by design: never passes `--dangerously-skip-permissions`, so any write/delete/execute `agy` attempts is auto-denied. For a write-capable delegate, use `opencode-bridge` instead.
+
+**Triggers:**
+- "agy review"
+- "agy challenge"
+- "ask agy"
+- "antigravity review"
+- "second voice" / "second opinion"
+
+### `/bridge-dev:autoresearch-plan`
+
+Runs a Karpathy-autoresearch-style comparative experiment loop over candidate technical approaches (API designs, algorithms, data-flow strategies) after a plan has been reviewed but before it's handed to an implementer. Picks a winning approach against an explicit metric and records the baseline, logged to `docs/autoresearch/plan/`, so downstream implementation isn't built on an unvalidated guess.
+
+**Triggers:**
+- "autoresearch plan"
+- "compare candidate approaches"
+- "spike before implementing"
+- "test approaches experimentally"
+- "karpathy autoresearch plan"
+
+### `/bridge-dev:autoresearch-impl`
+
+Runs a Karpathy-autoresearch-style keep-or-discard iteration loop over an already-implemented branch — propose one variant, run it against tests/benchmarks, keep it if the metric improves or discard and revert, repeat within a fixed budget, logged to `docs/autoresearch/impl/` — before handing off to code-review/QA. Use after `subagent-driven-development` (or `opencode-subagent-driven-development`) finishes a task.
+
+**Triggers:**
+- "autoresearch implementation"
+- "iterate on implementation before review"
+- "benchmark implementation variants"
+- "try a few variants and keep the best"
+- "karpathy autoresearch impl"
+
+### `/bridge-dev:benchmark-opencode-models`
+
+Deep-benchmarks which OpenCode models are actually viable for `opencode-bridge` — pings each candidate model, then runs 5 canned superpowers-style task prompts per model (feature vs bugfix, short vs detailed, plus a dedicated TDD red-to-green prompt), independently verifies every result by executing the generated code (never trusts OpenCode's self-reported "done"), and scores each run on time/quality/completeness/autonomy/discipline/red-green-accuracy/test-call-discipline. Reports to `docs/opencode-model-tests/`. For a fast pass/fail availability check with no scoring, use `check-opencode-models` instead.
+
+**Triggers:**
+- "benchmark opencode models"
+- "deep test opencode models"
+- "which opencode models actually work"
+- "smoke test opencode-bridge models"
+- "tdd test opencode models"
+
+### `/bridge-dev:check-opencode-models`
+
+Fast two-stage check for a list of OpenCode models — ping (reachability/auth) followed by one real, minimal single-shot prompt test to catch models that ping fine but are actually slow or wrong under real dispatch. Reports which models are usable right now vs. reachable-but-slow vs. reachable-but-wrong vs. unreachable. Lighter than a full benchmark.
+
+**Triggers:**
+- "check opencode models"
+- "is this opencode model available"
+- "is this opencode model too slow"
+- "ping opencode models"
+- "which opencode models are up right now"
+
+### `/bridge-dev:full-pipeline`
+
+Orchestrates the user's full end-to-end workflow in order — gstack office-hours, autoplan, autoresearch-plan, superpowers writing-plans and subagent-driven-development, autoresearch-impl, code-review, and qa — invoking each skill in sequence and handing its output forward as the next step's input. At two fixed checkpoints (after the plan is locked, and after implementation lands) it judges whether the change touches database schema and if so invokes `supabase:supabase-postgres-best-practices` before continuing.
+
+**Triggers:**
+- "run the full pipeline"
+- "full workflow from office hours to qa"
+- "chain the whole pipeline"
+- "go from idea to shipped"
+- "orchestrate the entire flow"
+
+### `/bridge-dev:superpowers-pipeline`
+
+A lighter orchestrator than `full-pipeline` — chains only the core Superpowers loop (writing-plans, subagent-driven-development, finishing-a-development-branch) without gstack's office-hours/autoplan or the autoresearch experiment steps, for when a spec already exists or gstack-level planning isn't wanted. Still judges at two checkpoints whether the change touches database schema and invokes `supabase:supabase-postgres-best-practices` if so.
+
+**Triggers:**
+- "just the superpowers pipeline"
+- "superpowers only flow"
+- "skip gstack go straight to implementation"
+- "writing plans to finishing branch"
+
+### `/bridge-dev:opencode-subagent-driven-development`
+
+Wraps Superpowers' `subagent-driven-development` plan-execution loop, asking upfront whether the implementer step should be a Claude subagent (default) or OpenCode via `opencode-bridge` — spec-compliance and code-quality review stay identical either way.
+
+**Triggers:**
+- "subagent driven development with opencode"
+- "opencode subagent driven development"
+- "use opencode as implementer"
+
+### `/bridge-dev:review-pipeline-logs`
+
+Queries a project's local log files and reviews whether a just-developed application pipeline actually ran the way it was designed to. Reads the project's design/plan doc for the expected steps, parses the relevant log file(s), then checks the run against the plan step-by-step, flags errors/exceptions, judges whether logging is detailed and leveled clearly enough to debug from, and confirms output values matched expectations. Produces a detailed report to `docs/pipeline-reviews/` — not just a pass/fail line.
+
+**Triggers:**
+- "review pipeline logs" / "check pipeline logs" / "review the logs"
+- "is the pipeline correct"
+- "查詢 logs" / "log 有沒有跑對" / "review pipeline log對不對"
+- "pipeline log review"
+
+### `/bridge-dev:setup-env`
+
+Exports the user-scope Claude Code plugins, marketplaces, and gstack installation on this machine into a portable manifest at `docs/env-setup/claude-plugins-manifest.json`, or installs from an existing manifest onto a new machine to reproduce the same Claude Code environment.
+
+**Triggers:**
+- "export my plugins"
+- "back up my claude code setup"
+- "install my plugins on a new machine"
+- "replicate my claude code environment"
+- "bootstrap this machine's claude code setup"
+- "sync plugins to new machine"
+
 ## Skills (`bridge-fin` series)
 
 ### `/bridge-fin:setup-finance-sources`
@@ -149,31 +256,60 @@ Owns every direct call to [Finnhub](https://finnhub.io)'s REST API (quote, compa
 
 ## Skills (`bridge-mind` series)
 
-ESTP-tuned decision-support skills — fully autonomous, no slash command needed to trigger. Each one leans into or braces against a specific part of the Se → Ti → Fe → Ni function stack: fast empirical validation where Se/Ti strengths shine, structured checklists where Ni (long-horizon planning) is naturally weak.
+Designed around the ESTP cognitive-function stack: Se (extraverted sensing, live in the moment, grab concrete data) → Ti (introverted thinking, fast logical breakdown) → Fe (extraverted feeling) → Ni (introverted intuition, weakest, used last). This ordering means an ESTP thinker naturally acts first and thinks while doing, resists getting stuck in abstract planning, and prefers reasoning backward from empirical results over building a complete theory before executing. Combined with a DevOps/LLM/quant-trading background, the problem these skills solve is: in situations that call for careful planning, long-horizon thinking, or counter-intuitive decisions, structured skills force in the steps an ESTP naturally tends to skip — upfront risk assessment, delayed-gratification-style compound learning, trade-offs that don't pay off immediately.
+
+Fully autonomous, no slash command needed to trigger — Claude loads only each skill's `name` + `description` (~100 tokens) at startup, and only reads the full `SKILL.md` when a request matches that description ("progressive disclosure"). So each skill's `description` is written to be precise enough that it actually fires in the real situations it's meant for. Each one leans into or braces against a specific part of the Se → Ti → Fe → Ni stack: fast empirical validation where Se/Ti strengths shine, structured checklists where Ni (long-horizon planning) is naturally weak.
+
+Two cross-cutting properties apply to every skill in this series:
+
+- **Bilingual triggering.** Each `description` carries both English and Traditional Chinese phrasings, so a skill fires on 「要部署了」 as reliably as on "about to deploy". A risk check that only recognizes English is a risk check that misses the half of your sentences that aren't.
+- **Exempt from compression modes.** Every skill explicitly overrides any active terseness style (caveman mode or similar) for its own output. Compression is right for machine-facing text and wrong here: an ambiguous risk warning is worse than none, and a curt tone-check rewrite reproduces the exact defect it exists to catch. Structural compactness (fixed verdict blocks, tables) is kept; grammatical compression is not.
 
 ### `bridge-mind:rapid-prototype-thinking`
 
-For technical evaluations (new APIs, frameworks, K8s configs, architecture options). Replaces theoretical "in theory this should work" answers with the smallest runnable experiment that produces observable proof, converging by elimination instead of expanding every branch at once.
+For technical evaluations (new APIs, frameworks, K8s configs, cheap-to-reverse architecture options). Replaces theoretical "in theory this should work" answers with the smallest runnable experiment that produces observable proof, converging by elimination instead of expanding every branch at once. Splits from `system-design-devil-advocate` on **cost to reverse**, not topic — cheap to undo lands here, expensive to undo lands there.
 
-**Triggers:** "should I try this", "is this approach viable", "let's do a quick POC", "which option is better", "does this design look right"
+**Triggers:** "should I try this", "is this approach viable", "let's do a quick POC", "which option is better", "does this design look right" · 「這樣可行嗎」「快速試試看」「哪個比較好」「這設計對嗎」
 
 ### `bridge-mind:risk-brake-thinking`
 
-Mandatory checklist before irreversible actions — production deploys, DB migrations, or taking a trading strategy live. Forces reversibility check, worst-case quantification, and a rollback plan before an execution plan, plus a delayed-gratification check when the user is in a hurry.
+Checklist before irreversible actions — production deploys, DB migrations, force-pushes, or taking a trading strategy live. Forces reversibility check, worst-case quantification, and a rollback plan before an execution plan, then emits a fixed 5-field verdict block scannable in seconds.
 
-**Triggers:** "about to deploy", "about to place the order", "about to delete", "about to migrate", "taking this strategy live"
+Three mechanisms keep it from being either ignorable or annoying:
+
+- **A `PreToolUse` guard** (`hooks/risk-brake-guard.sh`) matches Bash commands against seven irreversible-action classes (`trade`, `destructive-sql`, `migration`, `deploy`, `force-push`, `publish`, `delete`) and injects context telling Claude to run the skill. Deterministic where description-matching is probabilistic — and **non-blocking**, so it never stalls an unattended `/loop` waiting on an answer nobody is there to give.
+- **A decision journal** at `.bridge/decisions.jsonl` (gitignored) records every warning, override, and eventual outcome. The skill reads it first: overridden three times in a class with no bad outcome and it backs off; a real past failure and it leads with that record. ESTPs update on experience, not argument — so the log becomes the only argument that reliably lands.
+- **A push-back rule**: state the worst case once, then comply. Never repeat a warning already given in the same session. One warning is a signal; two is noise, and a muted skill protects nothing.
+
+**Triggers:** "about to deploy", "about to place the order", "about to migrate", "taking this strategy live", "ship it" · 「要部署了」「要下單」「要跑 migration」「這個策略要進實盤」「直接推上去」
 
 ### `bridge-mind:compound-learning-tracker`
 
-For long-horizon skill learning (music theory, Rust, quant trading, an instrument) that hits a plateau. Diagnoses real vs. perceived stagnation against concrete output, redesigns the feedback loop to surface a visible result within days, and allows lateral pivots instead of full abandonment.
+For long-horizon skill learning (music theory, Rust, quant trading, an instrument) that hits a plateau. Measures **first** — commit counts, diff sizes, backtest outputs over a 2-week window — before asking how it's been going, since the gut feeling is the thing under investigation and can't also be the evidence. Separates real stagnation from perceived stagnation (the common case), redesigns the feedback loop to surface a visible result within 3 days, and allows lateral pivots instead of full abandonment.
 
-**Triggers:** "I can't keep going with this", "feels like no progress", "should I switch methods", "is this exercise even useful"
+**Triggers:** "I can't keep going with this", "feels like no progress", "should I switch methods", "is this exercise even useful" · 「卡住了」「沒進步」「練不下去」「要不要換方法」
 
 ### `bridge-mind:system-design-devil-advocate`
 
-Plays skeptic on new system/architecture designs (K8s topology, microservice splits, agent architectures) instead of agreeing with the user's excitement — stress-tests the design from a "maintaining this in six months" vantage point, surfacing only the 1-2 most painful issues with a concrete minimal-change fix.
+Plays skeptic on designs that are expensive to reverse (data models, service boundaries, public API contracts, deployment topologies) instead of agreeing with the user's excitement — stress-tests from a "maintaining this in six months" vantage point, surfacing only the 1-2 most painful issues with a concrete minimal-change fix. Explicitly stands down for cheap-to-reverse decisions, for settled decisions the user is now implementing, and for anything already mid-execution (that's `risk-brake-thinking`).
 
-**Triggers:** "I'm planning to design it this way", "here's the architecture diagram", "should I split this into multiple services"
+**Triggers:** "I'm planning to design it this way", "here's the architecture diagram", "should I split this into multiple services" · 「我打算這樣設計」「要不要拆服務」「這個 schema 這樣設計」
+
+### `bridge-mind:unfinished-work-audit`
+
+Counters Se novelty-chase — the pull toward whatever is newest and most stimulating, which makes the design phase compelling and the finishing phase not. Gathers hard evidence (unmerged and stale branches, untracked files, uncommitted work, stale TODO markers) and cross-references committed design specs against the codebase to find **specs with no implementation** — the most deceptive item in the audit, because the commit log reads as if something shipped.
+
+Each item gets a **ship / kill / park** recommendation, where killing counts explicitly as a success outcome, and a WIP ceiling of 3 open threads is enforced. Doesn't moralize about discipline and doesn't block starting something new — it shows the pile, asks one question, and respects the answer.
+
+**Triggers:** "what should I work on", "what's still open", "did I finish that", "I have too many things going", "let's start something new" · 「還有什麼沒做完」「東西太多了」「那個做完了嗎」「來做個新的」
+
+### `bridge-mind:tone-check-before-send`
+
+Covers the tertiary-Fe blind spot: under time pressure or deep technical focus, delivery drops out and what remains is Ti's raw correctness, landing far harder than intended. The author can't detect this from the inside — the text reads as merely efficient to whoever wrote it, because they have the friendly intent and the recipient has only the words.
+
+A translation layer, not a politeness lecture: **every technical claim survives at full strength**, only delivery changes — softening a correct objection into vagueness would be a worse failure than bluntness. Scores how the draft lands (collaborative / neutral / blunt / harsh), stays silent when it's already fine, and returns finished sendable text rather than a list of suggestions. Runs on outward-facing text only; skips private notes entirely.
+
+**Triggers:** "review this PR", "leave a comment", "reply to this", "how does this sound", "push back on this" · 「幫我回這個」「這樣回可以嗎」「寄給他」「這樣講會不會太兇」
 
 ## Requirements
 

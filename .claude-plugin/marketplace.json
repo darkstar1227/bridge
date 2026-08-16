@@ -7,17 +7,50 @@
     {
       "name": "bridge-dev",
       "source": "./plugins/bridge-dev",
-      "description": "Development-workflow skill series: gstack-plan to Superpowers writing-plans bridging, pipeline orchestration (full-pipeline, superpowers-pipeline, subagent-driven development via OpenCode), autoresearch comparison/iteration loops, OpenCode model benchmarking, Resend-based repo update-email digests, and pipeline log review against a design doc."
+      "description": "Development-workflow skill series: gstack-plan to Superpowers writing-plans bridging, pipeline orchestration (full-pipeline, superpowers-pipeline, subagent-driven development via OpenCode), autoresearch comparison/iteration loops, OpenCode model benchmarking, Resend-based repo update-email digests, and pipeline log review against a design doc.",
+      "skills": [
+        "./skills/agy-second-voice",
+        "./skills/autoresearch-impl",
+        "./skills/autoresearch-plan",
+        "./skills/benchmark-opencode-models",
+        "./skills/check-opencode-models",
+        "./skills/full-pipeline",
+        "./skills/gstack-to-plan",
+        "./skills/init-project",
+        "./skills/opencode-bridge",
+        "./skills/opencode-subagent-driven-development",
+        "./skills/review-pipeline-logs",
+        "./skills/send-update-email",
+        "./skills/setup-email-updates",
+        "./skills/setup-env",
+        "./skills/setup-relay-provider-template",
+        "./skills/superpowers-pipeline"
+      ]
     },
     {
       "name": "bridge-fin",
       "source": "./plugins/bridge-fin",
-      "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, and a shared Finnhub REST query skill."
+      "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, and a shared Finnhub REST query skill.",
+      "skills": [
+        "./skills/finnhub-query",
+        "./skills/market-account-report",
+        "./skills/setup-finance-sources",
+        "./skills/strategy-backtest",
+        "./skills/valuation-model"
+      ]
     },
     {
       "name": "bridge-mind",
       "source": "./plugins/bridge-mind",
-      "description": "ESTP-tuned decision-support skill series: rapid-prototype validation for technical evaluations, a mandatory risk/rollback checklist for irreversible or trading decisions, a compound-learning plateau tracker, and a system-design devil's-advocate pass — auto-triggering to reinforce long-horizon planning and risk assessment where Se/Ti-dominant thinking tends to under-weight them."
+      "description": "ESTP-tuned decision-support skill series: rapid-prototype validation for technical evaluations, a risk/rollback checklist for irreversible or trading decisions (backed by a non-blocking PreToolUse guard and a decision journal), a compound-learning plateau tracker, a system-design devil's-advocate pass, an unfinished-work audit countering Se novelty-chase, and an outward-facing tone check covering the tertiary-Fe blind spot. Triggers on English and Traditional Chinese phrasing, and its output is exempt from terseness/compression modes.",
+      "skills": [
+        "./skills/compound-learning-tracker",
+        "./skills/rapid-prototype-thinking",
+        "./skills/risk-brake-thinking",
+        "./skills/system-design-devil-advocate",
+        "./skills/tone-check-before-send",
+        "./skills/unfinished-work-audit"
+      ]
     }
   ]
 }
