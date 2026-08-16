@@ -53,6 +53,24 @@ hooks = true
 plugin_hooks = true
 ```
 
+#### Hook trust — required, one time
+
+Codex will not run a plugin hook until it has been **reviewed and trusted**, recording a `trusted_hash` under `[hooks.state]` in `~/.codex/config.toml`. Until then the hook is silently skipped — no error, no warning, it simply does not fire.
+
+Trust is granted interactively. Run `codex` (the TUI) once in a project after installing and approve the two `bridge-mind` hooks when prompted. `codex exec` cannot grant trust: a non-interactive run has no one to ask, so it skips untrusted hooks and continues.
+
+To verify the hooks work before granting trust, bypass it for a single invocation:
+
+```bash
+codex exec --dangerously-bypass-hook-trust "Reply: OK"
+ls .bridge/focus-state.json   # focus-timer.sh ran if this exists
+```
+
+Two things worth knowing when testing:
+
+- **Codex runs the installed cache copy**, not the working tree — `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/`. Editing a hook script in the repo has no effect until the plugin is reinstalled, even when the marketplace is a local path.
+- Hooks run with the project directory as cwd, so `.bridge/` lands in the right place.
+
 ## State files
 
 All under `.bridge/`, all gitignored, all personal rather than shared repo state.
