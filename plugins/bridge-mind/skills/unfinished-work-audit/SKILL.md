@@ -68,6 +68,12 @@ ls -la docs/superpowers/plans/ docs/superpowers/specs/ docs/plans/ 2>/dev/null
 
 echo "=== stale TODO/FIXME markers ==="
 grep -rIn --exclude-dir={.git,node_modules,.venv,dist,build} -E '(TODO|FIXME|XXX|HACK)' . 2>/dev/null | head -40
+
+echo "=== parked ideas awaiting review ==="
+test -f .bridge/inbox.md && cat .bridge/inbox.md || echo "NO_INBOX"
+
+echo "=== decisions with no recorded outcome ==="
+test -f .bridge/decisions.jsonl && grep '"outcome":null' .bridge/decisions.jsonl || echo "NO_OPEN_DECISIONS"
 ```
 
 Use context-mode (`ctx_batch_execute` / `ctx_execute_file`) for this gathering pass when the repo is large —
@@ -88,6 +94,28 @@ git log --oneline --all | grep -iE 'design spec|spec for|plan for|PRD'
 Cross-reference every spec found against the code. A committed spec with no corresponding implementation is
 abandoned work that looks like progress in the git history — the single most deceptive item in this audit,
 because the commit log reads as if something shipped.
+
+## Step 2b — Service the Two Companion Logs
+
+This audit is the scheduled review that keeps two other skills honest. Neither works without it.
+
+**`.bridge/inbox.md`** — ideas parked by `distraction-capture`. Every open item joins the Step 3 table on
+equal footing with branches and specs. Parking only keeps working as an alternative to chasing a tangent
+while the inbox demonstrably gets reviewed; the moment it becomes a graveyard, the user correctly learns
+that parking means discarding, and stops parking. Most entries will be killed in seconds — that is the
+intended outcome, not a shortfall.
+
+**`.bridge/decisions.jsonl`** — entries still holding `"outcome":null`, written by `risk-brake-thinking`.
+For each, ask once, in a single batch:
+
+> "Three risk decisions have no recorded outcome. The prod migration on the 9th, the force-push on the
+> 11th, the strategy going live on the 14th — any of those bite?"
+
+Update the entries with what the user says. This matters because `risk-brake-thinking` calibrates itself
+from recorded outcomes: it backs off after repeated clean overrides and leads with real failures when they
+exist. With `outcome` left null forever, the journal degrades into a list of times the user ignored a
+warning, which is both useless and faintly accusatory. Nothing else in the series asks these questions, so
+if this step is skipped they are never asked at all.
 
 ## Step 3 — Classify Each Item
 
@@ -128,6 +156,15 @@ them and do not lecture. Show the table, then ask one question:
 
 Then respect the answer, including "none of them, I want the new thing." Autonomy preserved is what keeps
 the skill trusted enough to be run at all next time.
+
+## Boundary vs Other Skills
+
+| Situation | Skill |
+|---|---|
+| Many threads, cold, across projects — decide what lives and dies | **this skill** |
+| One thread, interrupted recently, warm — restore it | `resume-interrupted-work` |
+| A single new idea surfacing right now — park it | `distraction-capture` |
+| The chosen item is clear but the user still cannot start | `task-activation` |
 
 ## Example
 

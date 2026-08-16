@@ -1,5 +1,6 @@
 .DS_Store
 
-# bridge-mind: personal decision history written by risk-brake-thinking.
-# Per-user cognitive state, not shared repo state.
-.bridge/decisions.jsonl
+# Per-user state, never shared repo state. Covers bridge-mind's cognitive logs
+# (decisions.jsonl, focus-state.json, focus-log.jsonl, inbox.md) and any
+# bridge-dev/bridge-fin config that may hold a plaintext token.
+.bridge/
