@@ -1,0 +1,44 @@
+{
+  "name": "bridge",
+  "interface": {
+    "displayName": "Bridge"
+  },
+  "plugins": [
+    {
+      "name": "bridge-dev",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bridge-dev"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "bridge-fin",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bridge-fin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "bridge-mind",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bridge-mind"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

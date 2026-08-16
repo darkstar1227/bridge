@@ -14,6 +14,17 @@ A Claude Code marketplace hosting three independently installable plugins. Futur
 
 Add this repo as a marketplace in Claude Code settings, then install `bridge-dev`, `bridge-fin`, and/or `bridge-mind` independently — each is a separately installable plugin.
 
+### Via Codex CLI
+
+All three plugins install into [Codex CLI](https://github.com/openai/codex) from the same repo — it ships a Codex marketplace descriptor (`.agents/plugins/marketplace.json`) alongside the Claude Code one:
+
+```
+codex plugin marketplace add darkstar1227/bridge
+codex plugin add bridge-mind@bridge
+```
+
+`codex plugin list` shows all three under marketplace `bridge`. `bridge-mind`'s two hooks run under Codex as well as Claude Code — that needs codex-cli ≥ 0.141.0 and `hooks = true` / `plugin_hooks = true` under `[features]` in `~/.codex/config.toml`. See the [bridge-mind README](plugins/bridge-mind/README.md#codex-cli-support) for details.
+
 ### Via `npx skills` (single skill, no plugin install)
 
 Any skill in this repo can be pulled individually with [`skills`](https://github.com/vercel-labs/skills), without installing a plugin:

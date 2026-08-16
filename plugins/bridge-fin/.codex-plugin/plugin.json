@@ -1,0 +1,41 @@
+{
+  "name": "bridge-fin",
+  "version": "1.0.0",
+  "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, and a shared Finnhub REST query skill.",
+  "author": {
+    "name": "ds-anxing"
+  },
+  "homepage": "https://github.com/darkstar1227/bridge",
+  "repository": "https://github.com/darkstar1227/bridge",
+  "license": "MIT",
+  "keywords": [
+    "finance",
+    "portfolio",
+    "valuation",
+    "dcf",
+    "backtest",
+    "trading",
+    "finnhub",
+    "bridge"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Bridge Fin",
+    "shortDescription": "Portfolio reporting, valuation, and backtesting",
+    "longDescription": "Five skills for financial workflows over your own configured data sources. Set up market and account sources once — an MCP connection, a direct HTTP API, or a local Python package — then pull balances, positions, and activity into a portfolio report, build a DCF valuation (refusing to fabricate cash flows for assets that are not DCF-shaped), or backtest a rule-based strategy for CAGR, Sharpe, max drawdown, and win rate. Reporting and valuation bridge into the anthropics/financial-services marketplace where it is installed, and render standalone where it is not. All Finnhub REST access is owned by a single shared skill so endpoint and auth handling lives in one place. Backtesting is simulation-only and never places live orders.",
+    "developerName": "ds-anxing",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/darkstar1227/bridge",
+    "defaultPrompt": [
+      "Generate a portfolio report.",
+      "Build a DCF valuation for this ticker.",
+      "Backtest this strategy.",
+      "Set up my finance data sources."
+    ],
+    "brandColor": "#059669"
+  }
+}

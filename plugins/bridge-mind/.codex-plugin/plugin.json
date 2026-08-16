@@ -1,0 +1,42 @@
+{
+  "name": "bridge-mind",
+  "version": "0.0.5",
+  "description": "Cognitive-support skills for an ESTP thinker with ADHD: rapid-prototype validation, a risk/rollback checklist for irreversible or trading decisions, a system-design devil's-advocate pass, an outward-facing tone check, plus executive-function support — interrupted-work reconstruction, task activation, time-blindness guards, distraction capture, and an unfinished-work audit.",
+  "author": {
+    "name": "ds-anxing"
+  },
+  "homepage": "https://github.com/darkstar1227/bridge",
+  "repository": "https://github.com/darkstar1227/bridge",
+  "license": "MIT",
+  "keywords": [
+    "thinking",
+    "decision-making",
+    "risk",
+    "estp",
+    "adhd",
+    "executive-function",
+    "focus",
+    "productivity",
+    "bridge"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Bridge Mind",
+    "shortDescription": "Decision support and ADHD executive function",
+    "longDescription": "Ten auto-triggering skills split across two layers. Decision support tuned to the ESTP Se-Ti-Fe-Ni function stack: validate cheap-to-reverse choices by running the smallest experiment, brake before irreversible or trading actions with a rollback-first checklist backed by a decision journal, stress-test expensive-to-reverse designs from six months out, and check outward-facing text before it lands harsher than intended. Executive-function support for ADHD: reconstruct what you were doing from git state rather than memory, break task paralysis down to one physical action under two minutes, replace absent time sense with a measured personal estimate multiplier, park distractions in a reviewed inbox instead of chasing them, and audit abandoned work into ship/kill/park decisions. Triggers on English and Traditional Chinese phrasing. Ships two non-blocking hooks: an irreversible-command guard and a session focus timer.",
+    "developerName": "ds-anxing",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/darkstar1227/bridge",
+    "defaultPrompt": [
+      "What was I doing?",
+      "I can't start this — what's the first step?",
+      "I'm about to deploy this to production.",
+      "What's still unfinished in this repo?"
+    ],
+    "brandColor": "#7C3AED"
+  }
+}

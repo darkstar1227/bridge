@@ -1,0 +1,41 @@
+{
+  "name": "bridge-dev",
+  "version": "2.0.2",
+  "description": "Development-workflow skill series: gstack-plan to Superpowers writing-plans bridging, pipeline orchestration (full-pipeline, superpowers-pipeline, subagent-driven development via OpenCode), autoresearch comparison/iteration loops, OpenCode model benchmarking, repo update-email digests, and pipeline log review against a design doc.",
+  "author": {
+    "name": "ds-anxing"
+  },
+  "homepage": "https://github.com/darkstar1227/bridge",
+  "repository": "https://github.com/darkstar1227/bridge",
+  "license": "MIT",
+  "keywords": [
+    "development",
+    "workflow",
+    "planning",
+    "pipeline",
+    "opencode",
+    "autoresearch",
+    "code-review",
+    "bridge"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Bridge Dev",
+    "shortDescription": "Plan-to-ship development workflow orchestration",
+    "longDescription": "Sixteen skills covering the path from idea to shipped code. Bridges gstack-reviewed strategic plans into Superpowers writing-plans execution specs, then orchestrates the full pipeline (office-hours, autoplan, implementation, review, QA) or the lighter Superpowers-only loop. Adds Karpathy-style autoresearch loops that compare candidate approaches against an explicit metric before committing, and keep-or-discard iteration over an implemented branch. Delegates implementation to OpenCode with structured handoff reports, benchmarks which OpenCode models are actually viable, gets an independent second opinion from Antigravity CLI, reviews pipeline logs against their design doc, initializes projects against stack conventions, and sends version-grouped repo update emails.",
+    "developerName": "ds-anxing",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/darkstar1227/bridge",
+    "defaultPrompt": [
+      "Run the full pipeline on this.",
+      "Bridge this gstack plan into a Superpowers plan.",
+      "Review the logs and check the pipeline ran correctly.",
+      "Delegate this task to OpenCode."
+    ],
+    "brandColor": "#2563EB"
+  }
+}
