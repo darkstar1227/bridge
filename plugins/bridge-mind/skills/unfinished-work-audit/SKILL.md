@@ -74,6 +74,9 @@ test -f .bridge/inbox.md && cat .bridge/inbox.md || echo "NO_INBOX"
 
 echo "=== decisions with no recorded outcome ==="
 test -f .bridge/decisions.jsonl && grep '"outcome":null' .bridge/decisions.jsonl || echo "NO_OPEN_DECISIONS"
+
+echo "=== time estimates with no recorded actual ==="
+test -f .bridge/focus-log.jsonl && grep '"actual_min":null' .bridge/focus-log.jsonl || echo "NO_OPEN_ESTIMATES"
 ```
 
 Use context-mode (`ctx_batch_execute` / `ctx_execute_file`) for this gathering pass when the repo is large —
@@ -95,9 +98,13 @@ Cross-reference every spec found against the code. A committed spec with no corr
 abandoned work that looks like progress in the git history — the single most deceptive item in this audit,
 because the commit log reads as if something shipped.
 
-## Step 2b — Service the Two Companion Logs
+## Step 2b — Service the Three Companion Logs
 
-This audit is the scheduled review that keeps two other skills honest. Neither works without it.
+This audit is the scheduled review that keeps three other skills honest. None of them work without it.
+
+Each of the three writes an open record that only becomes useful once it is closed out, and **this is the
+only step anywhere in the series that closes them.** Skip it and all three degrade the same way: they keep
+accumulating, none of them ever calibrate, and two of them turn into records of unmet obligations.
 
 **`.bridge/inbox.md`** — ideas parked by `distraction-capture`. Every open item joins the Step 3 table on
 equal footing with branches and specs. Parking only keeps working as an alternative to chasing a tangent
@@ -114,8 +121,25 @@ For each, ask once, in a single batch:
 Update the entries with what the user says. This matters because `risk-brake-thinking` calibrates itself
 from recorded outcomes: it backs off after repeated clean overrides and leads with real failures when they
 exist. With `outcome` left null forever, the journal degrades into a list of times the user ignored a
-warning, which is both useless and faintly accusatory. Nothing else in the series asks these questions, so
-if this step is skipped they are never asked at all.
+warning, which is both useless and faintly accusatory.
+
+**`.bridge/focus-log.jsonl`** — estimates written by `time-blindness-guard` that still have
+`"actual_min":null`. Ask about these in one batch too, and keep it light — this is bookkeeping, not an
+accounting of overruns:
+
+> "Four estimates are still open. The retry wrapper you called 45 minutes, the migration you called an
+> hour — roughly what did those actually take? A rough number is fine."
+
+A rough number genuinely is fine. The multiplier is a median across many entries, so individual precision
+barely moves it, whereas a missing entry removes a data point entirely. Recording "about 2 hours" beats
+recording nothing by a wide margin.
+
+This is the load-bearing step for that skill: `time-blindness-guard` stays silent below 5 completed
+entries rather than inventing a ratio, so if actuals are never filled in it simply never starts working.
+An estimate log with no actuals is a list of guesses.
+
+Do not compute or comment on individual overrun ratios while collecting these. The point is the median
+across many tasks, and remarking on any single one reads as scorekeeping.
 
 ## Step 3 — Classify Each Item
 

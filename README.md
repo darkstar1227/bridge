@@ -378,7 +378,7 @@ Two properties keep it working, and losing either breaks it: capture must be ins
 
 Sits across both layers. Counters Se novelty-chase — the pull toward whatever is newest, which makes the design phase compelling and the finishing phase not. Gathers hard evidence (unmerged and stale branches, untracked files, uncommitted work, stale TODO markers) and cross-references committed design specs against the codebase to find **specs with no implementation** — the most deceptive item in the audit, because the commit log reads as if something shipped.
 
-Also the scheduled review that keeps two other skills honest: it drains `inbox.md`, and it asks about `decisions.jsonl` entries still holding `outcome: null`. Nothing else in the series asks, and without those answers the risk journal degrades into a list of times a warning was ignored — useless and faintly accusatory.
+Also the scheduled review that keeps the three companion logs honest, and **the only step anywhere in the series that closes them**: it drains `inbox.md`, asks about `decisions.jsonl` entries still holding `outcome: null`, and collects actuals for `focus-log.jsonl` estimates still holding `actual_min: null`. Skip it and all three degrade the same way — they accumulate, never calibrate, and two of them become records of unmet obligations. `time-blindness-guard` in particular stays silent below 5 completed entries rather than inventing a ratio, so without this step it simply never starts working.
 
 Each item gets a **ship / kill / park** recommendation, where killing counts explicitly as a success outcome, and a WIP ceiling of 3 open threads is enforced. Doesn't moralize about discipline and doesn't block starting something new — it shows the pile, asks one question, and respects the answer.
 

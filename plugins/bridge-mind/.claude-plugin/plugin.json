@@ -1,6 +1,6 @@
 {
   "name": "bridge-mind",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Cognitive-support skill series for an ESTP thinker with ADHD. Decision-support side: rapid-prototype validation, a risk/rollback checklist for irreversible or trading decisions (backed by a non-blocking PreToolUse guard and a decision journal), a compound-learning plateau tracker, a system-design devil's-advocate pass, and an outward-facing tone check for the tertiary-Fe blind spot. Executive-function side: interrupted-work reconstruction, task activation down to one physical first action, time-blindness and hyperfocus guards (with a session focus timer hook), distraction capture into a reviewed inbox, and an unfinished-work audit countering Se novelty-chase. Triggers on English and Traditional Chinese phrasing; output is exempt from terseness/compression modes and compatible with i-have-adhd output shaping.",
   "author": {
     "name": "ds-anxing"
