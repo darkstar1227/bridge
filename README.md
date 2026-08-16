@@ -1,6 +1,10 @@
 # bridge
 
-A Claude Code marketplace hosting three independently installable plugins. Future skill series live here as additional plugins.
+A skill marketplace for **both [Claude Code](https://claude.com/claude-code) and [Codex CLI](https://github.com/openai/codex)** — 31 skills across three independently installable plugins, each usable on its own.
+
+The three cover different ground. [`bridge-dev`](plugins/bridge-dev/README.md) orchestrates the path from idea to shipped code: bridging strategic plans into execution specs, running the pipeline end to end, testing candidate approaches experimentally before committing to one, and delegating implementation to external agents. [`bridge-fin`](plugins/bridge-fin/README.md) works over your own configured market and account data for portfolio reporting, DCF valuation, and strategy backtesting. [`bridge-mind`](plugins/bridge-mind/README.md) is cognitive support — decision-making skills tuned to the ESTP function stack alongside ADHD executive-function skills, triggering autonomously in English and Traditional Chinese.
+
+Future skill series live here as additional plugins.
 
 ## Install
 
