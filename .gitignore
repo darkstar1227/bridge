@@ -9,3 +9,14 @@
 # under plugins/*/skills/ where both Claude Code and Codex scan for skills, and
 # Codex's `skills: "./skills/"` would otherwise package them on install.
 plugins/*/skills/*-workspace/
+
+# Python build/test artifacts from skills that shell out to `uv run`. A stray
+# `skills/` tree at the repo root (9.9M of .venv and caches) came from running
+# one of those scripts with the wrong cwd.
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Claude Code local overrides — machine-specific, not shared repo state.
+.claude/settings.local.json
