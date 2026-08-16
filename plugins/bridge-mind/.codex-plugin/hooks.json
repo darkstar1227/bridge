@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "local_shell|shell|shell_command|exec_command|Bash|Shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${PLUGIN_ROOT}/hooks/risk-brake-guard.sh\"",
+            "timeout": 5,
+            "statusMessage": "Checking for irreversible actions..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${PLUGIN_ROOT}/hooks/focus-timer.sh\"",
+            "timeout": 5,
+            "statusMessage": "Checking session elapsed time..."
+          }
+        ]
+      }
+    ]
+  }
+}

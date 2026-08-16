@@ -21,7 +21,13 @@ payload=$(cat 2>/dev/null) || exit 0
 # No jq means no reliable parse. Stay silent rather than guess.
 command -v jq >/dev/null 2>&1 || exit 0
 
-cmd=$(printf '%s' "$payload" | jq -r '.tool_input.command // empty' 2>/dev/null) || exit 0
+# Field name varies by runtime and tool. Claude Code's Bash uses .command;
+# Codex's local_shell / shell / exec_command may use .command, .cmd, or
+# .CommandLine, and may pass an argv array rather than a string.
+cmd=$(printf '%s' "$payload" | jq -r '
+  (.tool_input.command // .tool_input.cmd // .tool_input.CommandLine // empty)
+  | if type == "array" then join(" ") else . end
+' 2>/dev/null) || exit 0
 [ -n "$cmd" ] || exit 0
 
 klass=""

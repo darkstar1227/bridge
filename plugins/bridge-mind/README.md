@@ -22,8 +22,36 @@ Both ship with the plugin and are **non-blocking** — they inject context, neve
 
 | Hook | Event | What it does |
 |---|---|---|
-| `risk-brake-guard.sh` | `PreToolUse` (Bash) | Matches commands against seven irreversible-action classes and asks for `risk-brake-thinking` before proceeding. Deterministic where description-matching is probabilistic. |
+| `risk-brake-guard.sh` | `PreToolUse` (shell tools) | Matches commands against seven irreversible-action classes and asks for `risk-brake-thinking` before proceeding. Deterministic where description-matching is probabilistic. |
 | `focus-timer.sh` | `UserPromptSubmit` | Tracks elapsed session time in `.bridge/focus-state.json` (>45 min prompt gap starts a fresh session), nudging **once** at 2h and once at 4h. Never repeats a fired threshold. |
+
+### Codex CLI support
+
+Both hooks run under [Codex CLI](https://github.com/openai/codex) as well as Claude Code. The two runtimes get separate registrations pointing at the **same two scripts** — no duplicated logic:
+
+| File | Runtime | Notes |
+|---|---|---|
+| `hooks/hooks.json` | Claude Code | `${CLAUDE_PLUGIN_ROOT}`, matcher `Bash` |
+| `.codex-plugin/hooks.json` | Codex CLI | `${PLUGIN_ROOT}`, matcher `local_shell\|shell\|shell_command\|exec_command\|Bash\|Shell` |
+
+The scripts read the command from `.tool_input.command`, `.cmd`, or `.CommandLine`, and join it if it arrives as an argv array — Codex's shell tools vary across all of those shapes where Claude Code's `Bash` only ever uses the first.
+
+**Requires codex-cli ≥ 0.141.0.** Earlier builds honor `permissionDecision:"deny"` on `PreToolUse` but ignore `additionalContext`, and these hooks are deliberately non-blocking — so on an older build the risk guard would silently do nothing rather than degrade into blocking.
+
+Installing into Codex is a separate step from installing into Claude Code:
+
+```bash
+codex plugin marketplace add https://github.com/darkstar1227/bridge
+codex plugin add bridge-mind
+```
+
+Also confirm `~/.codex/config.toml` has both flags under `[features]`:
+
+```toml
+[features]
+hooks = true
+plugin_hooks = true
+```
 
 ## State files
 
