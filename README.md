@@ -40,9 +40,9 @@ npx skills add ds-anxing/bridge --all   # every skill across all three series
 
 ## Plugins
 
-### [`bridge-dev`](plugins/bridge-dev/README.md) — 16 skills
+### [`bridge-dev`](plugins/bridge-dev/README.md) — 17 skills
 
-Development-workflow skills, anchored by bridging [gstack](https://github.com/garrytan/gstack) reviewed plans into [Superpowers](https://github.com/obra/superpowers) `writing-plans` format, plus pipeline orchestration, autoresearch experiment loops, OpenCode model benchmarking, update-email digests, and pipeline log review.
+Development-workflow skills, anchored by bridging [gstack](https://github.com/garrytan/gstack) reviewed plans into [Superpowers](https://github.com/obra/superpowers) `writing-plans` format, plus pipeline orchestration, autoresearch experiment loops, OpenCode model benchmarking, update-email digests, pipeline log review, and an on-demand SRE assessment.
 
 **Requires:** [gstack](https://github.com/garrytan/gstack), [superpowers](https://github.com/obra/superpowers); [Resend](https://resend.com)/[`resend-mcp`](https://github.com/resend/resend-mcp), [`opencode`](https://opencode.ai) CLI, or [`relay`](https://github.com/darkstar1227/relay) CLI depending on which skill you use. Full list in the plugin README.
 

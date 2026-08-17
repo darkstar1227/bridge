@@ -1,7 +1,7 @@
 {
   "name": "bridge-dev",
-  "version": "2.0.2",
-  "description": "Development-workflow skill series: gstack-plan to Superpowers writing-plans bridging, pipeline orchestration (full-pipeline, superpowers-pipeline, subagent-driven development via OpenCode), autoresearch comparison/iteration loops, OpenCode model benchmarking, Resend-based repo update-email digests, and pipeline log review against a design doc.",
+  "version": "2.1.0",
+  "description": "Development-workflow skill series: gstack-plan to Superpowers writing-plans bridging, pipeline orchestration (full-pipeline, superpowers-pipeline, subagent-driven development via OpenCode), autoresearch comparison/iteration loops, OpenCode model benchmarking, Resend-based repo update-email digests, pipeline log review against a design doc, and an on-demand SRE assessment.",
   "author": {
     "name": "ds-anxing"
   },

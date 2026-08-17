@@ -175,6 +175,15 @@ Queries a project's local log files and reviews whether a just-developed applica
 - "查詢 logs" / "log 有沒有跑對" / "review pipeline log對不對"
 - "pipeline log review"
 
+### `/bridge-dev:sre-assessment`
+
+Runs an on-demand Site Reliability Engineering assessment of a project — SLO/SLI coverage, observability, incident readiness (runbooks/on-call/postmortems), deploy safety (rollback/canary/feature flags), capacity/scaling, and dependency/failure-mode risk. Scores each dimension 0-5 with evidence, surfaces top failure scenarios, and writes a prioritized report to `docs/sre-assessments/`. **User-driven only — no auto-trigger phrases**, so it never fires ambiently and never spends context unless invoked by name.
+
+**Triggers:** none (by design). Invoke explicitly:
+- `/bridge-dev:sre-assessment`
+- "run an SRE assessment" / "reliability audit"
+- "SRE 評估"
+
 ### `/bridge-dev:setup-env`
 
 Exports the user-scope Claude Code plugins, marketplaces, and gstack installation on this machine into a portable manifest at `docs/env-setup/claude-plugins-manifest.json`, or installs from an existing manifest onto a new machine to reproduce the same Claude Code environment.
