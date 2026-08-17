@@ -18,5 +18,8 @@ __pycache__/
 .pytest_cache/
 .venv/
 
-# Claude Code local overrides — machine-specific, not shared repo state.
-.claude/settings.local.json
+# Claude Code project settings. Deliberately ignored in full: this is a
+# marketplace repo, so committing an `enabledPlugins` block would auto-enable
+# plugins for everyone who clones it — including ones they have not installed.
+# Which plugins to enable is the installer's decision, not this repo's.
+.claude/
