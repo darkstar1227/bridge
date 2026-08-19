@@ -1,6 +1,6 @@
 # bridge-fin
 
-Financial-workflow skills: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into [`anthropics/financial-services`](https://github.com/anthropics/financial-services), standalone strategy backtesting, and a shared Finnhub REST query skill.
+Financial-workflow skills: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into [`anthropics/financial-services`](https://github.com/anthropics/financial-services), standalone strategy backtesting, a market-wide TWSE institutional-buying screen, and a shared Finnhub REST query skill.
 
 ## Skills
 
@@ -56,6 +56,16 @@ Owns every direct call to [Finnhub](https://finnhub.io)'s REST API (quote, compa
 - "finnhub quote"
 - "finnhub api"
 - "finnhub candles"
+
+### `/bridge-fin:institutional-buy-screen`
+
+Screens TWSE-listed (上市) stocks for sustained 三大法人 (institutional) net buying over a recent trading-day window that hasn't already run up in price, pulling directly from TWSE's public `T86`/`MI_INDEX` open-data endpoints (`plugins/bridge-fin/skills/institutional-buy-screen/scripts/screen.py`) — no `.bridge/finance-config.json` source or auth needed. FinMind's institutional-investor dataset is per-stock only, so this fills the "screen the whole market" gap. TPEX (上櫃) isn't covered — its open API has no historical-date query.
+
+**Triggers:**
+- `/bridge-fin:institutional-buy-screen`
+- "三大法人買超"
+- "institutional buy screen"
+- "screen institutional buying"
 
 ## Requirements
 

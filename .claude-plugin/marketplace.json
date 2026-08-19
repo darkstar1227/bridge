@@ -30,9 +30,10 @@
     {
       "name": "bridge-fin",
       "source": "./plugins/bridge-fin",
-      "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, and a shared Finnhub REST query skill.",
+      "description": "Financial-workflow skill series: configurable market/account data sources (MCP, direct HTTP, or local Python), portfolio/account reporting and DCF valuation bridged into anthropics/financial-services, standalone strategy backtesting, a market-wide TWSE institutional-buying screen, and a shared Finnhub REST query skill.",
       "skills": [
         "./skills/finnhub-query",
+        "./skills/institutional-buy-screen",
         "./skills/market-account-report",
         "./skills/setup-finance-sources",
         "./skills/strategy-backtest",
